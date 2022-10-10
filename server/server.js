@@ -1,8 +1,8 @@
-express = require('express')
-cors = require('cors')
-cookieParser = require('cookie-parser')
-app = express()
-PORT = 3000
+let express = require('express')
+let cors = require('cors')
+let cookieParser = require('cookie-parser')
+let app = express()
+let PORT = 3000
 
 // Middleware
 app.use(express.urlencoded({extended: true}))
@@ -11,7 +11,10 @@ app.use(cookieParser())
 app.use(cors({ origin:true, credentials:true }));
  
 // Routers
-const router = require('./routes/router')
+let router = require('./routes/router')
+app.use("/", router)
+
+// Test Case
 app.get("/", (req, res) => {
     res.send("hello");
 });
