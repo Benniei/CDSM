@@ -36,3 +36,41 @@
     transform: rotate(360deg);
   }
 }
+
+#editor-container {
+  height: 400px;
+}
+
+#splash-screen {
+  color: black;
+  font-size: 100px;
+  padding-top: 18%;
+  padding-bottom: 3%;
+  height:100%;
+  text-align: center;
+  vertical-align: center;
+}
+
+.splash-button-outer {
+  align-items: center;
+  height:5%;
+  font-size: 16px;
+  width:20%;
+  margin: auto;
+  margin-bottom: 5px;
+  border: 3px solid black;
+  padding: 10px;
+  border-radius: 25px;
+}
+
+.splash-button-outer:hover,
+.splash-button-inner:hover {
+  cursor: pointer;
+}
+
+.splash-link{
+  text-decoration: none;
+  color: black;
+  margin-left: 10px;
+  margin-top: -20px;
+}
