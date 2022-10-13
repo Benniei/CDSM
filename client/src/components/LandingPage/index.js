@@ -9,17 +9,22 @@ function LandingPage() {
 
     return (
         <div id="splash-screen">
-            <b>Kloud</b>
+            <Box
+                        inline
+                        component="img"
+                        sx={{width: 100, height: 100}}
+                        ml={1}
+                        src="https://i.imgur.com/MWrRhEY.png" /><b>loud Drive Manager</b>
             <br></br>
             {/* Login Button for Google Drive - Redirects to Dashboard Screen */}
-            <Box button className="splash-button-outer" onClick={event => window.location.href='http://localhost:4000/auth/google'} mt={3}>
+            <Box button className="splash-button-outer" onClick={event => window.location.href='http://localhost:4000/auth/google'} mt={4}>
                 <GoogleDrive />
-                <Typography inline variant='bold' ml={.5}> <strong> Login with Google Drive </strong> </Typography>
+                <Typography display="inline" ml={.5}> <strong> Login with Google Drive </strong> </Typography>
             </Box>
             {/* Login Button for Google Drive - Redirects to Dashboard Screen */}
             <Box button className="splash-button-outer" onClick={event => window.location.href=''}>
                 <MicrosoftOneDriveIcon />
-                <Typography inline variant='bold' ml={.5}> <strong> Login with Microsoft One Drive </strong> </Typography>
+                <Typography display="inline" ml={.5}> <strong> Login with Microsoft One Drive </strong> </Typography>
             </Box>
         </div>
     );
