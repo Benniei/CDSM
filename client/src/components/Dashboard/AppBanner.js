@@ -23,7 +23,8 @@ export default function AppBanner() {
                     <strong> LOUD </strong>
                 </Typography>
 
-                <Grid container spacing={2} ml={18} alignItems="center" justifyContent="center">
+                {/** Search Bar */}
+                <Grid container spacing={2} ml={7} alignItems="center" justifyContent="center">
                     <Grid item xs={9}>
                         <TextField   
                             id="search"
@@ -46,7 +47,7 @@ export default function AppBanner() {
                     button 
                     className="black-button" 
                     onClick={event => window.location.href='http://localhost:3000'}
-                    mr={-30}>
+                    mr={-28}>
                     {/** Add Logo? */}
                     <center>
                         <Typography display="inline"> <strong> Logout </strong> </Typography>

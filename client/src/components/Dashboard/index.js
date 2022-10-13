@@ -1,15 +1,13 @@
 // Local imports
-
+import AppBanner from './AppBanner';
+import DrawerContent from './DrawerContent';
 
 // Imports from Material-UI
 import Box from '@mui/material/Box';
-import AppBanner from './AppBanner';
 import Drawer from '@mui/material/Drawer';
-import Divider from '@mui/material/Divider';
 import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography'
 
-const drawerWidth = 250;
+const drawerWidth = 220;
 
 function Dashboard() {
     return (
@@ -25,21 +23,7 @@ function Dashboard() {
                 }}
             >
                 <Toolbar sx={{height: 80, borderBottom:1, borderColor: 'grey.500'}}/>
-                <center>
-                    <Box 
-                        button 
-                        className="black-button" 
-                        onClick={event => console.log("click")}
-                        sx={{width: 200}}
-                        mt={2}
-                        mb={2}
-                        >
-                        {/** Add Logo? */}
-                        <center>
-                            <Typography display="inline"> <strong> Sync </strong> </Typography>
-                        </center>
-                    </Box>
-                </center>
+                <DrawerContent />
             </Drawer>
         </Box>
     );
