@@ -41,7 +41,7 @@ function DrawerContent(){
                 <Divider> Drive </Divider>
                 <Divider sx={{mb: -3}}> Functionality </Divider>
                 <List mt={-15}>
-                    <ListItem key='analyze' disablePadding>
+                    <ListItem key='accesscontrol' disablePadding>
                             <ListItemButton>
                                 <ListItemIcon sx={{ml: 1}}>
                                     <PolicyIcon />

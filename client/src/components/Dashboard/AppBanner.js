@@ -19,7 +19,8 @@ export default function AppBanner() {
                     sx={{width: 55, height: 55}}
                     ml={.5}
                     src="https://i.imgur.com/MWrRhEY.png" />
-                <Typography variant="h4">
+                    
+                <Typography sx={{display: 'inline'}} variant="h4">
                     <strong> LOUD </strong>
                 </Typography>
 
