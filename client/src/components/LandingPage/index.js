@@ -22,7 +22,7 @@ function LandingPage() {
                 <Typography display="inline" ml={.5}> <strong> Login with Google Drive </strong> </Typography>
             </Box>
             {/* Login Button for Google Drive - Redirects to Dashboard Screen */}
-            <Box button className="splash-button-outer" onClick={event => window.location.href=''}>
+            <Box button className="splash-button-outer" onClick={event => window.location.href='http://localhost:4000/auth/onedrive'}>
                 <MicrosoftOneDriveIcon />
                 <Typography display="inline" ml={.5}> <strong> Login with Microsoft OneDrive </strong> </Typography>
             </Box>

@@ -17,4 +17,11 @@ router.get('/auth/google/callback', passport.authenticate('google', { failureRed
     console.log("Successfully authenticated with google.");
 });
 
+router.get('/auth/onedrive', passport.authenticate('onedrive'));
+router.get('/auth/onedrive/callback', passport.authenticate('onedrive', { failureRedirect: process.env.CLIENT_BASE_URL }), function(req, res) {
+    // Successful authentication, redirect to dashboard.
+    res.redirect(process.env.CLIENT_BASE_URL + '/dashboard');
+    console.log("Successfully authenticated with onedrive.");
+});
+
 module.exports = router;
