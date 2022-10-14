@@ -1,7 +1,7 @@
 // Import modules
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const OneDriveStrategy = require('passport-onedrive').Strategy;
+var MicrosoftStrategy = require('passport-microsoft').Strategy;
 const User = require('../models/user-model');
 
 // Serialize and deserialize user information to support sessions
@@ -47,10 +47,11 @@ async function(accessToken, refreshToken, profile, done) {
 }));
 
 // Passport for Microsoft OneDrive
-passport.use(new OneDriveStrategy({
+passport.use(new MicrosoftStrategy({
     clientID: process.env.ONEDRIVE_CLIENT_ID,
     clientSecret: process.env.ONEDRIVE_CLIENT_SECRET,
-    callbackURL: process.env.ONEDRIVE_AUTH_REDIRECT_URL
+    callbackURL: process.env.ONEDRIVE_AUTH_REDIRECT_URL,
+    scope: ['user.read']
 },
 async function(accessToken, refreshToken, profile, done) {
     try{
