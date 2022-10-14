@@ -10,6 +10,10 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import PolicyIcon from '@mui/icons-material/Policy';
+import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
+import CloudIcon from '@mui/icons-material/Cloud';
+import ShareIcon from '@mui/icons-material/Share';
+import FilterDramaIcon from '@mui/icons-material/FilterDrama';
 
 const Root = styled('div')(({ theme }) => ({
     width: '100%',
@@ -28,17 +32,42 @@ function DrawerContent(){
                         button 
                         className="black-button" 
                         onClick={event => console.log("click")}
-                        sx={{width: 150}}
+                        sx={{width: 180}}
                         mt={2}
                         mb={2}
+                        textAlign="center"
                         >
-                        {/** Add Logo? */}
-                        <center>
-                            <Typography display="inline"> <strong> Sync </strong> </Typography>
-                        </center>
+                        <AddAPhotoIcon />
+                        <Typography display="inline"> <strong> Take Snapshot </strong> </Typography>
                     </Box>
                 </center>
                 <Divider> Drive </Divider>
+                <List mt={-15}>
+                    <ListItem key='myDrive' disablePadding>
+                            <ListItemButton>
+                                <ListItemIcon sx={{ml: 1}}>
+                                    <CloudIcon />
+                                </ListItemIcon>
+                                <ListItemText primary='My Drive' sx={{ml: -1.5}} />
+                            </ListItemButton>
+                    </ListItem>
+                    <ListItem key='sharedwithme' disablePadding>
+                        <ListItemButton>
+                            <ListItemIcon sx={{ml: 1}}>
+                                <ShareIcon />
+                            </ListItemIcon>
+                            <ListItemText primary='Shared With Me' sx={{ml: -1.5}} />
+                        </ListItemButton>
+                    </ListItem>
+                    <ListItem key='otherdrive' disablePadding>
+                        <ListItemButton>
+                            <ListItemIcon sx={{ml: 1}}>
+                                <FilterDramaIcon />
+                            </ListItemIcon>
+                            <ListItemText primary='Other Drives' sx={{ml: -1.5}} />
+                        </ListItemButton>
+                    </ListItem>
+                </List>
                 <Divider sx={{mb: -3}}> Functionality </Divider>
                 <List mt={-15}>
                     <ListItem key='accesscontrol' disablePadding>
