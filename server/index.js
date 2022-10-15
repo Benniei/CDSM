@@ -32,6 +32,11 @@ connectDB();
 // Routers
 app.use('/', require('./routes/authRouter'));       // Route for cloud service authorization
 app.use("/", require('./routes/router'));
+// Hosts Static Websites
+app.use((req, res, next) => {
+    console.log('Request Type:', req.method, req.path);
+    res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
+});
 
 // Set server to listening mode
 app.listen(PORT,"localhost", () => console.log(`Server running on port ${PORT}`));
