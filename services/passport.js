@@ -19,7 +19,7 @@ passport.deserializeUser(function(id, done) {
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: `${process.env.CLIENT_BASE_URL}/auth/google/callback`,
+    callbackURL: `${process.env.CLIENT_BASE_URL}auth/google/callback`,
     proxy: true
 },
 async function(accessToken, refreshToken, profile, done) {
@@ -51,7 +51,7 @@ async function(accessToken, refreshToken, profile, done) {
 passport.use(new MicrosoftStrategy({
     clientID: process.env.ONEDRIVE_CLIENT_ID,
     clientSecret: process.env.ONEDRIVE_CLIENT_SECRET,
-    callbackURL: `${process.env.CLIENT_BASE_URL}/auth/microsoft/callback`,
+    callbackURL: `${process.env.CLIENT_BASE_URL}auth/microsoft/callback`,
     scope: ['user.read']
 },
 async function(accessToken, refreshToken, profile, done) {
