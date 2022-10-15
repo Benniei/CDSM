@@ -34,10 +34,10 @@ connectDB();
 app.use('/', require('./routes/authRouter'));       // Route for cloud service authorization
 app.use('/', require('./routes/router'));
 // Hosts Static Websites
-app.use(express.static(path.join(__dirname, "..", "client", "build")));
+app.use(express.static(path.join(__dirname, "..", "server", "build")));
 app.use((req, res, next) => {
     console.log('Request Type:', req.method, req.path);
-    res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
+    res.sendFile(path.resolve(__dirname, '../server/build', 'index.html'));
 });
 
 // Set server to listening mode
