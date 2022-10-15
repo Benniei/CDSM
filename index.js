@@ -40,4 +40,4 @@ app.get("*", function (request, response) {
   });
 
 // Set server to listening mode
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {console.log(`Server running on port ${PORT}`});
