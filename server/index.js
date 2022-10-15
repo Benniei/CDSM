@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 const express = require('express');
 const passport = require('passport');
 const session = require('express-session');
+const path = require("path");
 
 // Load config
 dotenv.config({ path: './config/config.env' });
@@ -31,8 +32,9 @@ connectDB();
 
 // Routers
 app.use('/', require('./routes/authRouter'));       // Route for cloud service authorization
-app.use("/", require('./routes/router'));
+app.use('/', require('./routes/router'));
 // Hosts Static Websites
+app.use(express.static(path.join(__dirname, "..", "client", "build")));
 app.use((req, res, next) => {
     console.log('Request Type:', req.method, req.path);
     res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
