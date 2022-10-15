@@ -7,6 +7,7 @@ import {Box, Typography} from '@mui/material'
 
 function LandingPage() {
 
+    let url = window.location.origin.toString();
     return (
         <div id="splash-screen">
             <Box
@@ -17,12 +18,12 @@ function LandingPage() {
                         src="https://i.imgur.com/MWrRhEY.png" /><b>loud Drive Manager</b>
             <br></br>
             {/* Login Button for Google Drive - Redirects to Dashboard Screen */}
-            <Box button className="splash-button-outer" onClick={event => window.location.href='http://localhost:4000/auth/google'} mt={4}>
+            <Box button className="splash-button-outer" onClick={event => window.location.href=`${url}/auth/google`} mt={4}>
                 <GoogleDrive />
                 <Typography display="inline" ml={.5}> <strong> Login with Google Drive </strong> </Typography>
             </Box>
             {/* Login Button for Google Drive - Redirects to Dashboard Screen */}
-            <Box button className="splash-button-outer" onClick={event => window.location.href='http://localhost:4000/auth/microsoft'}>
+            <Box button className="splash-button-outer" onClick={event => window.location.href=`${url}/auth/microsoft`}>
                 <MicrosoftOneDriveIcon />
                 <Typography display="inline" ml={.5}> <strong> Login with Microsoft OneDrive </strong> </Typography>
             </Box>

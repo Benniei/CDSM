@@ -11,7 +11,8 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 
 export default function AppBanner() {
-
+    let url = window.location.origin.toString();
+    console.log(url)
     return (
         <AppBar 
             position="fixed"
@@ -62,7 +63,7 @@ export default function AppBanner() {
                 <Box 
                     button 
                     className="black-button" 
-                    onClick={event => window.location.href='http://localhost:3000'}
+                    onClick={event => window.location.href=url}
                     sx={{zIndex: (theme) => theme.zIndex.drawer + 1, width: '70px', mt:1}}>
                     {/** Add Logo? */}
                     <center>

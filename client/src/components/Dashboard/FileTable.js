@@ -74,7 +74,7 @@ function FileTableHead(props) {
     const createSortHandler = (property) => (event) => {
         onRequestSort(event, property);
     };
-        console.log(rowCount, numSelected)
+    
     return (
         <TableHead>
             <TableRow>

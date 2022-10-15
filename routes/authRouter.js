@@ -13,14 +13,14 @@ router.get('/auth/google', passport.authenticate('google', { prompt: 'select_acc
 // Redirect based on Google authentication response
 router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: process.env.CLIENT_BASE_URL }), function(req, res) {
     // Upon successful authentication, redirect to dashboard
-    res.redirect(process.env.CLIENT_BASE_URL + '/dashboard');
+    res.redirect(req.get('origin') + '/dashboard');
     console.log("Successfully authenticated with google.");
 });
 
 router.get('/auth/microsoft', passport.authenticate('microsoft', { prompt: 'select_account'} ));
 router.get('/auth/microsoft/callback', passport.authenticate('microsoft', { failureRedirect: process.env.CLIENT_BASE_URL }), function(req, res) {
     // Successful authentication, redirect to dashboard.
-    res.redirect(process.env.CLIENT_BASE_URL + '/dashboard');
+    res.redirect(req.get('origin') + '/dashboard');
     console.log("Successfully authenticated with microsoft.");
 });
 
