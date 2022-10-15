@@ -15,7 +15,7 @@ const UserSchema = new Schema(
         threshold: { type: Number, required: true },            // Threshold value for deviant check
         filesnapshot: { type: Schema.Types.ObjectId, ref:'FileSnapshot', required: false },
         groupsnapshot: { type: Schema.Types.ObjectId, ref:'GroupSnapshot', required: false },
-        access_control_req: { type: String, required: true}     // access control requirements
+        access_control_req: { type: String, required: false}     // access control requirements
     },
     { timeStamps: true }                                        // Timestamps for when document was created and last updated
 );

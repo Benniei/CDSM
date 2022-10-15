@@ -9,7 +9,7 @@ const path = require("path");
 
 // Load config
 dotenv.config({ path: './config/config.env' });
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 
 // Initialize Express
 const app = express();
@@ -34,11 +34,10 @@ connectDB();
 app.use('/', require('./routes/authRouter'));       // Route for cloud service authorization
 app.use('/', require('./routes/router'));
 // Hosts Static Websites
-app.use(express.static(path.join(__dirname, "..", "server", "build")));
-app.use((req, res, next) => {
-    console.log('Request Type:', req.method, req.path);
-    res.sendFile(path.resolve(__dirname, '../server/build', 'index.html'));
-});
+app.use(express.static(path.resolve(__dirname, "./client/build")));
+app.get("*", function (request, response) {
+    response.sendFile(path.resolve(__dirname, "./client/build", "index.html"));
+  });
 
 // Set server to listening mode
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
