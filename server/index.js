@@ -9,7 +9,7 @@ const path = require("path");
 
 // Load config
 dotenv.config({ path: './config/config.env' });
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;
 
 // Initialize Express
 const app = express();
@@ -41,4 +41,4 @@ app.use((req, res, next) => {
 });
 
 // Set server to listening mode
-app.listen(PORT,"localhost", () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
