@@ -59,7 +59,7 @@ function SnapshotBar(){
                 <TextField
                     id="select-snapshot"
                     select
-                    label="Snapshot"
+                    label="File Snapshot"
                     value={snapshot}
                     onChange={handleSnapshotChange}
                     fullWidth

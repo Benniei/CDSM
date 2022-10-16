@@ -77,7 +77,6 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.openQueryBuilder = async function () {
-        console.log("queryBuilder")
         storeReducer({
             type: GlobalStoreActionType.OPEN_QUERY_BUILDER
         });

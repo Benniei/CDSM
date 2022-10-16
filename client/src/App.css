@@ -85,3 +85,9 @@
 .black-button:hover {
   transform: scale(1.05)
 }
+
+.grey-button {
+  border: .5px solid rgb(174, 173, 173);
+  padding: 5px;
+  border-radius: 25px;
+}
