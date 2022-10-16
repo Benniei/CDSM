@@ -3,6 +3,7 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const express = require('express');
+const MongoStore = require('connect-mongo');
 const passport = require('passport');
 const session = require('express-session');
 const path = require("path");
@@ -16,10 +17,15 @@ const app = express();
 
 // Middleware
 app.use(cookieParser());
-app.use(cors({ origin:true, credentials:true }));                                                   // Enable Cross Origin Resource Sharing
+app.use(cors({ origin:true, credentials:true }));                       // Enable Cross Origin Resource Sharing
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
-app.use(session({ secret: 'keyboard cat', resave: false, saveUninitialized: true,  }));     // Don't save session if unmodified, don't create session until something is stored
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,                                                        // Don't save session if unmodified
+  saveUninitialized: false,                                             // Don't create session until something is stored
+  store: MongoStore.create( { mongoUrl: process.env.MONGO_URI })
+}));
 
 // Initialize Passport
 require('./services/passport');
@@ -31,7 +37,7 @@ const connectDB = require('./db/mongoose');
 connectDB();
 
 // Routers
-app.use('/', require('./routes/authRouter'));       // Route for cloud service authorization
+app.use('/', require('./routes/authRouter'));
 app.use('/', require('./routes/router'));
 // Hosts Static Websites
 app.use(express.static(path.resolve(__dirname, "./client/build")));
