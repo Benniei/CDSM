@@ -17,6 +17,23 @@ export const test = () => api.get('/test')
  /* Authentication */
  
 
+ /* Snapshot */
+ export const getSnapshot = (id) => api.get('/snapshot/' + id)
+ .then(response => {
+    return response
+ })
+ .catch(error => {
+    return error.response;
+ });
+
+ export const takeSnapshot = (payload) => api.post('/snapshot/create', payload)
+ .then(response => {
+    return response
+ })
+ .catch(error => {
+    return error.response;
+ });
+ 
 const apis = {
 test
 };
