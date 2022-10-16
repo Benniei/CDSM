@@ -1,4 +1,6 @@
-import {Link} from 'react-router-dom';
+// Local Imports
+import {useContext} from 'react';
+import {GlobalStoreContext} from '../../store';
 
 // Imports from Material-UI
 import AppBar from '@mui/material/AppBar';
@@ -7,12 +9,17 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
-import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
+// import IconButton from '@mui/material/IconButton';
 
 export default function AppBanner() {
-    let url = window.location.origin.toString();
-    console.log(url)
+
+    const {store} = useContext(GlobalStoreContext);
+
+    function handleOpenBuilder(){
+        store.openQueryBuilder();
+    }
+
     return (
         <AppBar 
             position="fixed"
@@ -53,7 +60,7 @@ export default function AppBanner() {
                                         p:1,
                                         borderRadius: '50%'
                                     }}
-                                    onClick={event =>  window.location.href='/'}/>
+                                    onClick={event =>  handleOpenBuilder()}/>
                             </InputAdornment>
                         )
                       }}
@@ -63,7 +70,7 @@ export default function AppBanner() {
                 <Box 
                     button 
                     className="black-button" 
-                    onClick={event => window.location.href=url}
+                    onClick={event => window.location.href="/"}
                     sx={{zIndex: (theme) => theme.zIndex.drawer + 1, width: '70px', mt:1}}>
                     {/** Add Logo? */}
                     <center>

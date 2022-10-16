@@ -5,13 +5,16 @@ import api from '../api'
 export const GlobalStoreContext = createContext({})
 
 export const GlobalStoreActionType = {
-    GET_SNAPSHOT: "GET_SNAPSHOT"
+    GET_SNAPSHOT: "GET_SNAPSHOT",
+    OPEN_QUERY_BUILDER: "OPEN_QUERY_BUILDER",
+    CLOSE_QUERY_BUILDER: "CLOSE_QUERY_BUILDER"
 }
 
 function GlobalStoreContextProvider(props) {
     const [store, setStore] = useState({
         allItems: [],
         selectedDocuments: [],
+        queryBuilder: false,
         currentSnapshot: null
     });
 
@@ -24,7 +27,24 @@ function GlobalStoreContextProvider(props) {
                 return setStore({
                     allItems: store.allItems,
                     selectedDocuments: [],
+                    queryBuilder: false,
                     currentSnapshot: payload
+                })
+            }
+            case GlobalStoreActionType.OPEN_QUERY_BUILDER: {
+                return setStore({
+                    allItems: store.allItems,
+                    selectedDocuments: store.selectedDocuments,
+                    queryBuilder: true,
+                    currentSnapshot: store.currentSnapshot
+                })
+            }
+            case GlobalStoreActionType.CLOSE_QUERY_BUILDER: {
+                return setStore({
+                    allItems: store.allItems,
+                    selectedDocuments: store.selectedDOcuments,
+                    queryBuilder: false,
+                    currentSnapshot: store.currentSnapshot
                 })
             }
             default:
@@ -54,6 +74,19 @@ function GlobalStoreContextProvider(props) {
                 payload: snapshot
             })
         }
+    }
+
+    store.openQueryBuilder = async function () {
+        console.log("queryBuilder")
+        storeReducer({
+            type: GlobalStoreActionType.OPEN_QUERY_BUILDER
+        });
+    }
+
+    store.closeQueryBuilder = async function () {
+        storeReducer({
+            type: GlobalStoreActionType.CLOSE_QUERY_BUILDER
+        });
     }
 
     return (

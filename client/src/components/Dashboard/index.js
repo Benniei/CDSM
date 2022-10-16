@@ -1,7 +1,8 @@
 // Local imports
 import AppBanner from './AppBanner';
 import DrawerContent from './DrawerContent';
-import SnapshotView from './SnapshotView'
+import SnapshotView from './SnapshotView';
+import QueryBuilderModal from './QueryBuilderModal';
 
 // Imports from Material-UI
 import Box from '@mui/material/Box';
@@ -34,6 +35,9 @@ function Dashboard() {
                 <Toolbar sx={{height: 80}}/>
                 <SnapshotView />
             </Box>
+
+            {/* QueryBuilderModal */}
+            <QueryBuilderModal />
         </Box>
     );
 }
