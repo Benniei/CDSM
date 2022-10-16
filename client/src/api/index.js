@@ -1,9 +1,10 @@
 import axios from 'axios'
 
 axios.defaults.withCredentials=true;
-let ip = 'localhost:4000'
+let ip = 'http://localhost:4000'
+let devIP = 'https://kloud-drive.herokuapp.com'
 const api = axios.create({
-    baseURL: 'http://' + ip
+    baseURL: ip
 })
 
 export const test = () => api.get('/test')
