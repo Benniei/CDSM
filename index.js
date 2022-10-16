@@ -38,7 +38,9 @@ connectDB();
 
 // Routers
 app.use('/', require('./routes/authRouter'));
-app.use('/', require('./routes/router'));
+app.use('/', require('./routes/driveRouter'));
+app.use('/', require('./routes/googleDriveRouter'));
+
 // Hosts Static Websites
 app.use(express.static(path.resolve(__dirname, "./client/build")));
 app.get("*", function (request, response) {

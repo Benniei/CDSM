@@ -36,12 +36,12 @@ router.get('/logout', function(req, res, next) {
     });
 });
 
-router.get('/test', function(req, res, next) {
-    if (req.user) {
-        console.log(req.user);
-    } else {
-        console.log('User not authenticated.');
-    }
-})
+// router.get('/test', function(req, res, next) {
+//     if (req.user) {
+//         console.log(req.user);
+//     } else {
+//         console.log('User not authenticated.');
+//     }
+// });
 
 module.exports = router;
