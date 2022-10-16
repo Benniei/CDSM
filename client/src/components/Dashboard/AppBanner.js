@@ -12,7 +12,7 @@ import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 import InputAdornment from '@mui/material/InputAdornment';
 // import IconButton from '@mui/material/IconButton';
 
-export default function AppBanner() {
+function AppBanner() {
 
     const {store} = useContext(GlobalStoreContext);
 
@@ -85,3 +85,5 @@ export default function AppBanner() {
         </AppBar>
     );
 }
+
+export default AppBanner;

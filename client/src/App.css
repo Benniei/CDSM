@@ -81,3 +81,7 @@
   padding: 10px;
   border-radius: 25px;
 }
+
+.black-button:hover {
+  transform: scale(1.05)
+}
