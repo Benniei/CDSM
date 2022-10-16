@@ -70,7 +70,7 @@ export default function AppBanner() {
                 <Box 
                     button 
                     className="black-button" 
-                    onClick={event => window.location.href="/"}
+                    onClick={event => window.location.href=`${process.env.REACT_APP_URL}/logout`}
                     sx={{zIndex: (theme) => theme.zIndex.drawer + 1, width: '70px', mt:1}}>
                     {/** Add Logo? */}
                     <center>
