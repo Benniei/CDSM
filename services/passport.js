@@ -10,7 +10,7 @@ passport.serializeUser(function(user, done) {
 });
 
 passport.deserializeUser(function(id, done) {
-    User.findById(id, function(err, user) {
+    User.findById(id, '-profileId -refreshToken -__v', function(err, user) {
         done(err, user);
     });
 });
@@ -25,10 +25,15 @@ passport.use(new GoogleStrategy({
 async function(accessToken, refreshToken, profile, done) {
     try{
         // Check if the User already exists
-        const existingUser = await User.findOne({ profileId: profile.id });
+        let user = await User.findOne({ cloudProvider: profile.provider, profileId: profile.id }, '-profileId -refreshToken -__v');
         // If they do, attempt to redirect them to the dashboard immediately
-        if (existingUser) {
-            done(null, existingUser);
+        if (user) {
+            console.log(`User (${profile.provider}, ${profile.id}) found.`);
+            // Update document with new refresh token if any
+            if (refreshToken) {
+                user = await User.findOneAndUpdate({ _id: user._id }, { $set:{ refreshToken:refreshToken } }, { fields: '-profileId -refreshToken -__v', returnDocument: 'after' });
+            }
+            done(null, user);
         } else {
             // If not, create a new User and add it to the profile database before attempting to redirect the user
             const newUser = new User({
@@ -36,11 +41,14 @@ async function(accessToken, refreshToken, profile, done) {
                 cloudProvider: profile.provider,
                 displayName: profile.displayName,
                 email: profile.emails[0].value,
-                threshold: 0.8
+                refreshToken: refreshToken,
+                threshold: 0.8,
+                access_control_req: " "
             });
-            const savedUser = await newUser.save();
-            console.log(`Added User ${savedUser.displayName} to database`);
-            done(null, newUser);
+            await User.create(newUser);
+            user = await User.findOne({ cloudProvider: profile.provider, profileId: profile.id }, '-profileId -refreshToken -__v');
+            console.log(`Added User (${profile.provider}, ${profile.id}) to database`);
+            done(null, user);
         }
     }  catch (error) {
         console.error(error);
@@ -51,16 +59,20 @@ async function(accessToken, refreshToken, profile, done) {
 passport.use(new MicrosoftStrategy({
     clientID: process.env.ONEDRIVE_CLIENT_ID,
     clientSecret: process.env.ONEDRIVE_CLIENT_SECRET,
-    callbackURL: `${process.env.CLIENT_BASE_URL}auth/microsoft/callback`,
-    scope: ['user.read']
+    callbackURL: `${process.env.CLIENT_BASE_URL}auth/microsoft/callback`
 },
 async function(accessToken, refreshToken, profile, done) {
     try{
         // Check if the User already exists
-        const existingUser = await User.findOne({ profileId: profile.id });
+        let user = await User.findOne({ cloudProvider: profile.provider, profileId: profile.id }, '-profileId -refreshToken -__v');
         // If they do, attempt to redirect them to the dashboard immediately
-        if (existingUser) {
-            done(null, existingUser);
+        if (user) {
+            console.log(`User (${profile.provider}, ${profile.id}) found.`);
+            // Update document with new refresh token if any
+            if (refreshToken) {
+                user = await User.findOneAndUpdate({ _id: user._id }, { $set:{ refreshToken:refreshToken } }, { fields: '-profileId -refreshToken -__v', returnDocument: 'after' });
+            }
+            done(null, user);
         } else {
             // If not, create a new User and add it to the profile database before attempting to redirect the user
             const newUser = new User({
@@ -68,11 +80,14 @@ async function(accessToken, refreshToken, profile, done) {
                 cloudProvider: profile.provider,
                 displayName: profile.displayName,
                 email: profile.emails[0].value,
-                threshold: 0.8
+                refreshToken: refreshToken,
+                threshold: 0.8,
+                access_control_req: " "
             });
-            const savedUser = await newUser.save();
-            console.log(`Added User ${savedUser.displayName} to database`);
-            done(null, newUser);
+            await User.create(newUser);
+            user = await User.findOne({ cloudProvider: profile.provider, profileId: profile.id }, '-profileId -refreshToken -__v');
+            console.log(`Added User (${profile.provider}, ${profile.id}) to database`);
+            done(null, user);
         }
     }  catch (error) {
         console.error(error);
