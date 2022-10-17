@@ -57,6 +57,7 @@ function QueryBuilderModal() {
     }
 
     function closeModal() { 
+        console.log("Close Search Query Modal")
         store.closeQueryBuilder();
         setOpCount(0);
         setqueryOp([]);
@@ -70,6 +71,7 @@ function QueryBuilderModal() {
     }
 
     function addOperator() {
+        console.log("Add new empty Operator")
         const newOperator = {
             operator: '',
             target: '',
@@ -85,27 +87,33 @@ function QueryBuilderModal() {
     }
 
     function addRead(){
+        console.log("Add " + readText + " in Reader query")
         setReadableUser([...readableUser, readText])
         console.log(queryOp)
     }
 
     function removeRead(name){
+        console.log("Remove " + name + " in Reader query")
         setReadableUser(readableUser.filter((obj) => obj !== name))
     }
 
     function addWrite(){
+        console.log("Add " + writeText + " in Writer query")
         setWritableUser([...writableUser, writeText])
     }
 
     function removeWrite(name){
+        console.log("Remove " + name + " in Writer query")
         setWritableUser(writableUser.filter((obj) => obj !== name))
     }
 
     function addShare(){
+        console.log("Add " + shareText + " in Shared query")
         setSharableUser([...sharableUser, shareText])
     }
 
     function removeShare(name){
+        console.log("Remove " + name + " in Shared query")
         setSharableUser(sharableUser.filter((obj) => obj !== name))
     }
 

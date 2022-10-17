@@ -60,6 +60,7 @@ const headCells = [
 ]
 
 function arraySort(arr, order, orderBy){
+    console.log("Sort file by " + orderBy + " in " + order + " order")
     let newArr = arr.sort((a, b) => a[orderBy] > b[orderBy] ? 1 : -1);
     if(order === 'asc')
         return newArr;
@@ -134,21 +135,26 @@ function FileTable(props){
         
         // Add in the item
         if (selectedIndex === -1) {
+            console.log("Select " + name + " from list")
             newSelected = newSelected.concat(selected, name);
         }
         // Unselect the already selected item
         else if (selectedIndex === 0) {
+            console.log("Unselect " + name + " from list")
             newSelected = newSelected.concat(selected.slice(1));
         } 
         else if (selectedIndex === selected.length - 1) {
+            console.log("Unselect " + name + " from list")
             newSelected = newSelected.concat(selected.slice(0, -1));
         } 
         else if (selectedIndex > 0) {
+            console.log("Unselect " + name + " from list")
             newSelected = newSelected.concat(
               selected.slice(0, selectedIndex),
               selected.slice(selectedIndex + 1),
             );
         }
+
         setSelected(newSelected);
     };
 
