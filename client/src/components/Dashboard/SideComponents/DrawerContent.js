@@ -1,3 +1,7 @@
+// Local imports
+import {useContext} from 'react';
+import {GlobalStoreContext} from '../../../store';
+
 // Imports from Material-UI
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -24,13 +28,14 @@ const Root = styled('div')(({ theme }) => ({
   }));
 
 function DrawerContent(){
+    const {store} = useContext(GlobalStoreContext);
 
     return(
         <Root>
                 <center>
                     <Box 
                         className="black-button" 
-                        onClick={event => console.log("click")}
+                        onClick={event => store.openTakeSnapshot()}
                         sx={{width: 180}}
                         mt={2}
                         mb={2}

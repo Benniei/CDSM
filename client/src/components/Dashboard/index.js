@@ -3,6 +3,7 @@ import AppBanner from './SideComponents/AppBanner';
 import DrawerContent from './SideComponents/DrawerContent';
 import SnapshotView from './FileView/SnapshotView';
 import QueryBuilderModal from './QueryBuilderModal';
+import TakeSnapshotModal from './SideComponents/TakeSnapshotModal';
 
 // Imports from Material-UI
 import Box from '@mui/material/Box';
@@ -36,8 +37,9 @@ function Dashboard() {
                 <SnapshotView />
             </Box>
 
-            {/* QueryBuilderModal */}
+            {/* Modals */}
             <QueryBuilderModal />
+            <TakeSnapshotModal />
         </Box>
     );
 }

@@ -49,7 +49,7 @@ function QueryBuilderModal() {
 
     function closeModal() { 
         console.log("Close Search Query Modal")
-        store.closeQueryBuilder();
+        store.closeModal();
         setOpCount(0);
         setqueryOp([]);
         setReadText("");

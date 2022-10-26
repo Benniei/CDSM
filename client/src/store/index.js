@@ -6,15 +6,19 @@ export const GlobalStoreContext = createContext({})
 export const GlobalStoreActionType = {
     GET_SNAPSHOT: "GET_SNAPSHOT",
     OPEN_QUERY_BUILDER: "OPEN_QUERY_BUILDER",
-    CLOSE_QUERY_BUILDER: "CLOSE_QUERY_BUILDER"
+    OPEN_TAKE_SNAPSHOT_MODAL: "OPEN_TAKE_SNAPSHOT_MODAL",
+    OPEN_UPDATE_SHARING: "OPEN_UPDATE_SHARING",
+    CLOSE_MODAL: "CLOSE_MODAL"
 }
 
 function GlobalStoreContextProvider(props) {
     const [store, setStore] = useState({
         allItems: [],
         selectedDocuments: [],
+        currentSnapshot: null,
         queryBuilder: false,
-        currentSnapshot: null
+        takeSnapshotModal: false,
+        updateSharingModal: false
     });
 
     const storeReducer = (action) => {
@@ -24,24 +28,50 @@ function GlobalStoreContextProvider(props) {
                 return setStore({
                     allItems: store.allItems,
                     selectedDocuments: [],
+                    currentSnapshot: payload,
                     queryBuilder: false,
-                    currentSnapshot: payload
+                    takeSnapshotModal: false,
+                    updateSharingModal: false
                 })
             }
             case GlobalStoreActionType.OPEN_QUERY_BUILDER: {
                 return setStore({
                     allItems: store.allItems,
                     selectedDocuments: store.selectedDocuments,
+                    currentSnapshot: store.currentSnapshot,
                     queryBuilder: true,
-                    currentSnapshot: store.currentSnapshot
+                    takeSnapshotModal: false,
+                    updateSharingModal: false
                 })
             }
-            case GlobalStoreActionType.CLOSE_QUERY_BUILDER: {
+            case GlobalStoreActionType.OPEN_TAKE_SNAPSHOT_MODAL: {
+                return setStore({
+                    allItems: store.allItems,
+                    selectedDocuments: store.selectedDocuments,
+                    currentSnapshot: store.currentSnapshot,
+                    queryBuilder: false,
+                    takeSnapshotModal: true,
+                    updateSharingModal: false
+                })
+            }
+            case GlobalStoreActionType.OPEN_UPDATE_SHARING: {
+                return setStore({
+                    allItems: store.allItems,
+                    selectedDocuments: store.selectedDocuments,
+                    currentSnapshot: store.currentSnapshot,
+                    queryBuilder: true,
+                    takeSnapshotModal: true,
+                    updateSharingModal: true
+                })
+            }
+            case GlobalStoreActionType.CLOSE_MODAL: {
                 return setStore({
                     allItems: store.allItems,
                     selectedDocuments: store.selectedDOcuments,
+                    currentSnapshot: store.currentSnapshot,
                     queryBuilder: false,
-                    currentSnapshot: store.currentSnapshot
+                    takeSnapshotModal: false,
+                    updateSharingModal: false
                 })
             }
             default:
@@ -79,11 +109,24 @@ function GlobalStoreContextProvider(props) {
         });
     }
 
-    store.closeQueryBuilder = async function () {
+    store.openTakeSnapshot = async function () {
         storeReducer({
-            type: GlobalStoreActionType.CLOSE_QUERY_BUILDER
+            type: GlobalStoreActionType.OPEN_TAKE_SNAPSHOT_MODAL
         });
     }
+
+    store.openUpdateSharing = async function () {
+        storeReducer({
+            type: GlobalStoreActionType.OPEN_UPDATE_SHARING
+        });
+    }
+
+    store.closeModal = async function () {
+        storeReducer({
+            type: GlobalStoreActionType.CLOSE_MODAL
+        });
+    }
+
 
     return (
         <GlobalStoreContext.Provider value={{

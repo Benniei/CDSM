@@ -7,6 +7,7 @@ import TextField from'@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import Toolbar from '@mui/material/Toolbar';
 
 const snapshotArray = [
     {
@@ -51,45 +52,44 @@ function SnapshotBar(){
     // }
 
     return(
-        <Grid container spacing={2} mb={2}>
+        <Toolbar >
             {/* TODO: Add Selected item + selected drive */}
             {/* <Grid item xs={1}>
             </Grid> */}
 
             {/* Select Snapshot Dropdown Menu */}
-            <Grid item xs={6}>
-                <TextField
-                    id="select-snapshot"
-                    select
-                    label="File Snapshot"
-                    value={snapshot}
-                    onChange={handleSnapshotChange}
-                    fullWidth
-                    overflow='auto'
-                >
-                    {snapshotArray.map((option) => (
-                        <MenuItem key={option.id} value={option.id}>
-                            {option.id}
-                        </MenuItem>
-                    ))}
-                </TextField>
-            </Grid>
-            <Grid item xs={4.4} />
+            <TextField
+                id="select-snapshot"
+                select
+                display="inline"
+                label="File Snapshot"
+                value={snapshot}
+                onChange={handleSnapshotChange}
+                sx={{width:"50%"}}
+                overflow='auto'
+            >
+                {snapshotArray.map((option) => (
+                    <MenuItem key={option.id} value={option.id}>
+                        {option.id}
+                    </MenuItem>
+                ))}
+            </TextField>
 
             {/* View Information or Update Sharing */}
-            <Grid item xs={1.3}>
-                <Box 
-                    className="black-button" 
-                    onClick={event => console.log("Update Sharing Modal")}>
-                    <center>
-                        <Typography 
-                            display="inline" 
-                            sx={{color:'black'}}> 
-                            <strong> Update Sharing </strong> 
-                        </Typography>
-                    </center>
-                </Box>
-            </Grid>
+            <Box sx={{flexGrow:.95}}/>
+            <Box 
+                className="black-button" 
+                sx={{width:'150px'}}
+                onClick={event => console.log("Update Sharing Modal")}>
+                <center>
+                    <Typography 
+                        display="inline" 
+                        sx={{color:'black'}}> 
+                        <strong> Update Sharing </strong> 
+                    </Typography>
+                </center>
+            </Box>
+
 
             {/* Select Group Snapshot Dropdown Menu */}
             {/* <Grid item xs={4.5}>
@@ -109,11 +109,7 @@ function SnapshotBar(){
                     ))}
                 </TextField>
             </Grid> */}
-
-            <Grid item xs={1.5}>
-                {/* Button for edit sharing */}
-            </Grid>
-        </Grid>
+        </Toolbar>
     );
 }
 
