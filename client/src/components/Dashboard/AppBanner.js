@@ -68,7 +68,6 @@ function AppBanner() {
                 {/**Logout Button */}
                 <Box sx={{flexGrow:1}} />
                 <Box 
-                    button 
                     className="black-button" 
                     onClick={event => window.location.href=`${process.env.REACT_APP_URL}/logout`}
                     sx={{zIndex: (theme) => theme.zIndex.drawer + 1, width: '70px', mt:1}}>

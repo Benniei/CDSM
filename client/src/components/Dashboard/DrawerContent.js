@@ -29,7 +29,6 @@ function DrawerContent(){
         <Root>
                 <center>
                     <Box 
-                        button 
                         className="black-button" 
                         onClick={event => console.log("click")}
                         sx={{width: 180}}

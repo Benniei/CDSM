@@ -1,6 +1,7 @@
 // Local Imports
 import {useContext, useState} from 'react';
 import {GlobalStoreContext} from '../../store';
+import NameBar from "./NameBar"
 
 // Imports from Material UI
 import { styled } from '@mui/material/styles';
@@ -38,7 +39,7 @@ const Root = styled('div')(({ theme }) => ({
     },
   }));
 
-  const operators = ["Drive", "Owner", "Creator", "From", "To", "Name", "inFolder", "Folder", "Path", "Sharing"]
+const operators = ["Drive", "Owner", "Creator", "From", "To", "Name", "inFolder", "Folder", "Path", "Sharing"]
 
 function QueryBuilderModal() {
     const {store} = useContext(GlobalStoreContext);
@@ -86,35 +87,41 @@ function QueryBuilderModal() {
         setqueryOp(queryOp.filter((obj) => obj.id !== id));
     }
 
-    function addRead(){
+    function addRead(name){
         console.log("Add " + readText + " in Reader query")
-        setReadableUser([...readableUser, readText])
+        setReadableUser([...readableUser, name])
+        setOpCount(opCount+1)
         console.log(queryOp)
     }
 
     function removeRead(name){
         console.log("Remove " + name + " in Reader query")
         setReadableUser(readableUser.filter((obj) => obj !== name))
+        setOpCount(opCount-1)
     }
 
-    function addWrite(){
+    function addWrite(name){
         console.log("Add " + writeText + " in Writer query")
-        setWritableUser([...writableUser, writeText])
+        setWritableUser([...writableUser, name])
+        setOpCount(opCount+1)
     }
 
     function removeWrite(name){
         console.log("Remove " + name + " in Writer query")
         setWritableUser(writableUser.filter((obj) => obj !== name))
+        setOpCount(opCount-1)
     }
 
-    function addShare(){
+    function addShare(name){
         console.log("Add " + shareText + " in Shared query")
-        setSharableUser([...sharableUser, shareText])
+        setSharableUser([...sharableUser, name])
+        setOpCount(opCount+1)
     }
 
     function removeShare(name){
         console.log("Remove " + name + " in Shared query")
         setSharableUser(sharableUser.filter((obj) => obj !== name))
+        setOpCount(opCount-1)
     }
 
     return(
@@ -155,7 +162,6 @@ function QueryBuilderModal() {
                     <Switch display="inline" />
                     <Box sx={{flexGrow: 1}}/>
                     <Box 
-                        button 
                         className="black-button"
                         onClick={event=>addOperator()}>
                     <center>
@@ -170,130 +176,25 @@ function QueryBuilderModal() {
                 {/* Operators which allow for multiple entry */}
                 <Grid container spacing={3} mt={1.5} mb={5}>
                     <Grid item xs={12}>
-                        <Stack spacing={1}>
-                            <TextField
-                                id="readable"
-                                label="Readable"
-                                fullWidth
-                                overflow='auto' 
-                                value={readText}
-                                onChange= {(event) => {setReadText(event.target.value)}}
-                                onKeyPress={(event) => {
-                                    if (event.key === 'Enter'){
-                                        addRead(event);
-                                        setReadText("");
-                                    }
-                                }}/>
-                            <Box sx={{
-                                display: 'flex',
-                                flexWrap: 'wrap',
-                                alignContent: 'flex-start'}}>
-                                {readableUser.map((user) => (
-                                    <Box 
-                                        button
-                                        className="grey-button"
-                                        display="flex"
-                                        ml={.25}
-                                        mr={.25}
-                                    >
-                                        <Typography display='inline' sx={{ml:1}}>{user}</Typography>
-                                        <CloseIcon sx={{width:'28%', ml:.2, mt:-.2,
-                                            ':hover': {
-                                                bgcolor: 'grey.300',
-                                                color: 'black'
-                                            },
-                                            color: 'black',
-                                            p:.1,
-                                            borderRadius: '50%'}}
-                                            onClick={event => removeRead(user)}/>
-                                    </Box>
-                                ))}
-                            </Box>
-                        </Stack>
+                        <NameBar 
+                            label = {"Readable"}
+                            values = {readableUser}
+                            submitData = {addRead}
+                            removeData = {removeRead}/> 
                     </Grid>
                     <Grid item xs={12}>
-                        <Stack spacing={1}>
-                            <TextField
-                                id="writable"
-                                label="Writable"
-                                fullWidth
-                                overflow='auto' 
-                                value={writeText}
-                                onChange= {(event) => {setWriteText(event.target.value)}}
-                                onKeyPress={(event) => {
-                                    if (event.key === 'Enter'){
-                                        addWrite(event);
-                                        setWriteText("");
-                                    }
-                                }}/>
-                            <Box sx={{
-                                display: 'flex',
-                                flexWrap: 'wrap',
-                                alignContent: 'flex-start'}}>
-                                {writableUser.map((user) => (
-                                    <Box 
-                                        button
-                                        className="grey-button"
-                                        display="flex"
-                                        ml={.25}
-                                        mr={.25}
-                                    >
-                                        <Typography display='inline' sx={{ml:1}}>{user}</Typography>
-                                        <CloseIcon sx={{width:'28%', ml:.2, mt:-.2,
-                                            ':hover': {
-                                                bgcolor: 'grey.300',
-                                                color: 'black'
-                                            },
-                                            color: 'black',
-                                            p:.1,
-                                            borderRadius: '50%'}}
-                                            onClick={event => removeWrite(user)}/>
-                                    </Box>
-                                ))}
-                            </Box>
-                        </Stack>
+                        <NameBar 
+                            label = {"Writable"}
+                            values = {writableUser}
+                            submitData = {addWrite}
+                            removeData = {removeWrite}/> 
                     </Grid>
                     <Grid item xs={12}>
-                        <Stack spacing={1}>
-                            <TextField
-                                id="sharable"
-                                label="Shareable"
-                                fullWidth
-                                overflow='auto' 
-                                value={shareText}
-                                onChange= {(event) => {setShareText(event.target.value)}}
-                                onKeyPress={(event) => {
-                                    if (event.key === 'Enter'){
-                                        addShare(event);
-                                        setShareText("");
-                                    }
-                                }}/>
-                            <Box sx={{
-                                display: 'flex',
-                                flexWrap: 'wrap',
-                                alignContent: 'flex-start'}}>
-                                {sharableUser.map((user) => (
-                                    <Box 
-                                        button
-                                        className="grey-button"
-                                        display="flex"
-                                        ml={.25}
-                                        mr={.25}
-                                    >
-                                        <Typography display='inline' sx={{ml:1}}>{user}</Typography>
-                                        <CloseIcon sx={{width:'28%', ml:.2, mt:-.2,
-                                            ':hover': {
-                                                bgcolor: 'grey.300',
-                                                color: 'black'
-                                            },
-                                            color: 'black',
-                                            p:.1,
-                                            borderRadius: '50%'}}
-                                            onClick={event => removeShare(user)}/>
-                                    </Box>
-                                ))}
-                            </Box>
-                        </Stack>
+                        <NameBar 
+                            label = {"Shareable"}
+                            values = {sharableUser}
+                            submitData = {addShare}
+                            removeData = {removeShare}/> 
                     </Grid>
                 </Grid>
 
@@ -362,7 +263,6 @@ function QueryBuilderModal() {
                         mt={5}>
                         <Box sx={{flexGrow:.94}} />
                         <Box 
-                                button 
                                 className="black-button"
                                 sx={{width: '8%'}}>
                             <center>
