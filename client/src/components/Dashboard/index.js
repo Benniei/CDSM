@@ -4,6 +4,7 @@ import DrawerContent from './SideComponents/DrawerContent';
 import SnapshotView from './FileView/SnapshotView';
 import QueryBuilderModal from './QueryBuilderModal';
 import TakeSnapshotModal from './SideComponents/TakeSnapshotModal';
+import FileSharingModal from './FileView/FileSharingModal';
 
 // Imports from Material-UI
 import Box from '@mui/material/Box';
@@ -40,6 +41,7 @@ function Dashboard() {
             {/* Modals */}
             <QueryBuilderModal />
             <TakeSnapshotModal />
+            <FileSharingModal />
         </Box>
     );
 }

@@ -59,8 +59,8 @@ function GlobalStoreContextProvider(props) {
                     allItems: store.allItems,
                     selectedDocuments: store.selectedDocuments,
                     currentSnapshot: store.currentSnapshot,
-                    queryBuilder: true,
-                    takeSnapshotModal: true,
+                    queryBuilder: false,
+                    takeSnapshotModal: false,
                     updateSharingModal: true
                 })
             }

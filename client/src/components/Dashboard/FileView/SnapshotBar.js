@@ -1,5 +1,6 @@
 // Imports from React
-import {useState} from 'react';
+import {useContext, useState} from 'react';
+import {GlobalStoreContext} from '../../../store';
 
 // Imports from Material-UI
 import Grid from '@mui/material/Grid';
@@ -40,6 +41,7 @@ const snapshotArray = [
 // ]
 
 function SnapshotBar(){
+    const {store} = useContext(GlobalStoreContext);
     const [snapshot, setSnapshot] = useState('Snapshot01');
     // const [groupsnapshot, setGroupsnapshot] = useState('GroupSnapshot01');
 
@@ -80,7 +82,7 @@ function SnapshotBar(){
             <Box 
                 className="black-button" 
                 sx={{width:'150px'}}
-                onClick={event => console.log("Update Sharing Modal")}>
+                onClick={event => store.openUpdateSharing()}>
                 <center>
                     <Typography 
                         display="inline" 
