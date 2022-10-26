@@ -4,7 +4,6 @@ import {GlobalStoreContext} from '../../store';
 import NameBar from "./NameBar"
 
 // Imports from Material UI
-import { styled } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -28,16 +27,7 @@ const style = {
     p: 4,
     overflow: 'auto',
     overflowY: 'scroll'
-  };
-
-
-const Root = styled('div')(({ theme }) => ({
-    width: '100%',
-    ...theme.typography.body2,
-    '& > :not(style) + :not(style)': {
-      marginTop: theme.spacing(2),
-    },
-  }));
+};
 
 const operators = ["Drive", "Owner", "Creator", "From", "To", "Name", "inFolder", "Folder", "Path", "Sharing"]
 

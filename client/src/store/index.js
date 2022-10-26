@@ -1,5 +1,4 @@
 import {createContext, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
 import api from '../api'
 
 export const GlobalStoreContext = createContext({})
@@ -17,8 +16,6 @@ function GlobalStoreContextProvider(props) {
         queryBuilder: false,
         currentSnapshot: null
     });
-
-    const navigate = useNavigate();
 
     const storeReducer = (action) => {
         const {type, payload} = action;

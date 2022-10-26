@@ -1,7 +1,7 @@
 // Local imports
-import AppBanner from './AppBanner';
-import DrawerContent from './DrawerContent';
-import SnapshotView from './SnapshotView';
+import AppBanner from './SideComponents/AppBanner';
+import DrawerContent from './SideComponents/DrawerContent';
+import SnapshotView from './FileView/SnapshotView';
 import QueryBuilderModal from './QueryBuilderModal';
 
 // Imports from Material-UI

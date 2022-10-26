@@ -5,6 +5,8 @@ import {useState} from 'react';
 import Grid from '@mui/material/Grid';
 import TextField from'@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 
 const snapshotArray = [
     {
@@ -21,32 +23,32 @@ const snapshotArray = [
     },
 ]
 
-const groupSnapshotArray =[
-    {
-        id: 'GroupSnapshot01'
-    },
-    {
-        id: 'GroupSnapshot02'
-    },
-    {
-        id: 'GroupSnapshot03'
-    },
-    {
-        id: 'GroupSnapshot04'
-    }
-]
+// const groupSnapshotArray =[
+//     {
+//         id: 'GroupSnapshot01'
+//     },
+//     {
+//         id: 'GroupSnapshot02'
+//     },
+//     {
+//         id: 'GroupSnapshot03'
+//     },
+//     {
+//         id: 'GroupSnapshot04'
+//     }
+// ]
 
 function SnapshotBar(){
     const [snapshot, setSnapshot] = useState('Snapshot01');
-    const [groupsnapshot, setGroupsnapshot] = useState('GroupSnapshot01');
+    // const [groupsnapshot, setGroupsnapshot] = useState('GroupSnapshot01');
 
     const handleSnapshotChange = (event) => {
         setSnapshot(event.target.value);
     }
 
-    const handleGroupChange = (event) => {
-        setGroupsnapshot(event.target.value);
-    }
+    // const handleGroupChange = (event) => {
+    //     setGroupsnapshot(event.target.value);
+    // }
 
     return(
         <Grid container spacing={2} mb={2}>
@@ -55,7 +57,7 @@ function SnapshotBar(){
             </Grid> */}
 
             {/* Select Snapshot Dropdown Menu */}
-            <Grid item xs={4.5}>
+            <Grid item xs={6}>
                 <TextField
                     id="select-snapshot"
                     select
@@ -72,9 +74,25 @@ function SnapshotBar(){
                     ))}
                 </TextField>
             </Grid>
+            <Grid item xs={4.4} />
+
+            {/* View Information or Update Sharing */}
+            <Grid item xs={1.3}>
+                <Box 
+                    className="black-button" 
+                    onClick={event => console.log("Update Sharing Modal")}>
+                    <center>
+                        <Typography 
+                            display="inline" 
+                            sx={{color:'black'}}> 
+                            <strong> Update Sharing </strong> 
+                        </Typography>
+                    </center>
+                </Box>
+            </Grid>
 
             {/* Select Group Snapshot Dropdown Menu */}
-            <Grid item xs={4.5}>
+            {/* <Grid item xs={4.5}>
                 <TextField
                     id="select-group-snapshot"
                     select
@@ -90,7 +108,7 @@ function SnapshotBar(){
                         </MenuItem>
                     ))}
                 </TextField>
-            </Grid>
+            </Grid> */}
 
             <Grid item xs={1.5}>
                 {/* Button for edit sharing */}

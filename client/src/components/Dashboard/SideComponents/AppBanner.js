@@ -1,6 +1,6 @@
 // Local Imports
 import {useContext} from 'react';
-import {GlobalStoreContext} from '../../store';
+import {GlobalStoreContext} from '../../../store';
 
 // Imports from Material-UI
 import AppBar from '@mui/material/AppBar';

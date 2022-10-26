@@ -1,5 +1,5 @@
 // Local Imports
-import {useContext, useState} from 'react';
+import {useState} from 'react';
 
 // Imports from Material UI
 import Stack from '@mui/material/Stack';
