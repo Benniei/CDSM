@@ -1,4 +1,5 @@
 // Local imports
+const Analyze = require('./analyze-controller');
 const File = require('../models/file-model');
 const FileSnapshot = require('../models/filesnapshot-model');
 const User = require('../models/user-model');
@@ -37,6 +38,7 @@ createFileSnapshot = async function(req, res) {
                     fileId: file,
                     name: myDrive[file].name,
                     driveId: 'My Drive',
+                    path: myDrive[file].path,
                     root: myDrive[file].root,
                     parents: myDrive[file].parents,
                     children: myDrive[file].children,
@@ -48,13 +50,16 @@ createFileSnapshot = async function(req, res) {
                 await File.create(newFile);
                 console.log(`Added File (${newFile.fileId}) to database`); 
             }
-            return res.status(200).json({ success: true, fileSnapshot: newSnapshot });
+            res.status(200).json({ success: true, fileSnapshot: newSnapshot });
+            
+            // Analyze.sharingAnalysis(snapshotId, req.user.threshold);
         } else {
             res.status(403).json({ success: false, error: 'Unauthorized.' });
             throw new Error('Unauthorized User.');
         }
     } catch(error) {
-        console.error('Failed to create File Snapshot: ' + error);   
+        console.error('Failed to create File Snapshot: ' + error);
+        res.status(400).json({ success: false, error: error });   
     }
 };
 
@@ -135,10 +140,37 @@ createFileMap = function(fileList) {
             fileIds.push(file.id);
         }
     });
+    // Update each entry in the map with the file's path
+    fileList.forEach((file) => {
+        getPath(file, map);
+    });
     // Return the drive Map as a standard object and the array of file Ids
     return [Object.fromEntries(map), fileIds];
 };
 
+// Recursively retrieve a path using parent folders and a map
+getPath = function(file, map) {
+    // Have root folder return its fileId
+    if (!file.parents) {
+      return `/${file.id}/`;
+    }
+    // Return path of file if it has one
+    if (file.path) {
+      return file.path;
+    }
+    // Otherwise, create a path using the file's parent folder
+    let path = getPath(map.get(file.parents[0]), map);
+    // Append fileId to path if file is a folder
+    if (file.mimeType == 'application/vnd.google-apps.folder') {
+        path += `${file.id}/`;
+    }
+    // Set path property in map entry
+    map.set(file.id, { ...map.get(file.id), path: path });
+    // Return path of file
+    return path;
+};
+
+// Delete all files stored in the database
 // deleteFiles = async function(req, res) {
 //     await File.deleteMany({});
 //     res.send('All files deleted');
@@ -146,5 +178,5 @@ createFileMap = function(fileList) {
 
 module.exports = {
     createFileSnapshot,
-    //deleteFiles
+    // deleteFiles
 };
