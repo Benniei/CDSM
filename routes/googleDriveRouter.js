@@ -7,7 +7,10 @@ const express = require('express');
 // Create router instance
 const router = express.Router();
 
-// Retrieves file data for all files in user's drive
-router.get('/getFiles', DriveController.getFiles);
+// Create a File Snapshot of the user's drive
+router.get('/createFileSnapshot', DriveController.createFileSnapshot);
+
+// Delete all files stored in the database
+// router.get('/deleteFiles', DriveController.deleteFiles);
 
 module.exports = router;
