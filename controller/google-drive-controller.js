@@ -146,5 +146,5 @@ createFileMap = function(fileList) {
 
 module.exports = {
     createFileSnapshot,
-    deleteFiles
+    //deleteFiles
 };

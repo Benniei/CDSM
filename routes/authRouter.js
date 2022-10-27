@@ -11,6 +11,7 @@ router.get('/auth/google', passport.authenticate('google', { accessType: 'offlin
 router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: process.env.CLIENT_BASE_URL }), function(req, res) {
     // Upon successful authentication, redirect to dashboard
     console.log("Successfully authenticated with google.");
+    res.cookie('cookieName', req.session.passport.user, { maxAge: null, httpOnly: false });
     res.redirect(process.env.CLIENT_BASE_URL + 'dashboard');
     // res.redirect('http://localhost:3000/dashboard');
 });
@@ -31,6 +32,7 @@ router.get('/logout', function(req, res, next) {
         }
         // Redirect user to landing page
         console.log('User logged out.');
+        res.clearCookie('cookieName');
         res.redirect(process.env.CLIENT_BASE_URL);
         // res.redirect('http://localhost:3000');    
     });
