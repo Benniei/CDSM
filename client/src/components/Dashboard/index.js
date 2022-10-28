@@ -11,9 +11,19 @@ import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import Toolbar from '@mui/material/Toolbar';
 
+import React, {useContext, useEffect} from 'react';
+import AuthContext from '../../auth/index.js'
+
+
 const drawerWidth = 250;
 
 function Dashboard() {
+    const {auth} = useContext(AuthContext);
+
+    useEffect(() => {
+        auth.getLoggedIn();
+    }, [auth]);
+
     return (
         <Box sx={{display:'flex'}}>
             {/** Top App Banner (Static)*/}

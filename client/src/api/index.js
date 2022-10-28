@@ -14,7 +14,13 @@ export const test = () => api.get('/test')
  });
 
  /* Authentication */
- 
+ export const getLoggedIn = () => api.get(`/loggedIn`)
+.then(response => {
+    return response
+ })
+ .catch(error => {
+    return error.response
+ });
 
  /* Snapshot */
  export const getSnapshot = (id) => api.get('/snapshot/' + id)
@@ -34,7 +40,8 @@ export const test = () => api.get('/test')
  });
  
 const apis = {
-test
+test,
+getLoggedIn
 };
 
 export default apis;
