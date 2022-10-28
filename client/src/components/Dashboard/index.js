@@ -1,6 +1,7 @@
 // Local imports
-import {useContext} from 'react';
+import {useContext, useEffect} from 'react';
 import {GlobalStoreContext} from '../../store';
+import AuthContext from '../../auth/index.js'
 import AppBanner from './SideComponents/AppBanner';
 import DrawerContent from './SideComponents/DrawerContent';
 import SnapshotView from './FileView/SnapshotView';
@@ -13,6 +14,7 @@ import FileSharingModal from './FileView/FileSharingModal';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import Toolbar from '@mui/material/Toolbar';
+
 
 const drawerWidth = 250;
 

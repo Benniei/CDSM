@@ -6,6 +6,7 @@ const AuthContext = createContext();
 console.log("create AuthContext: " + AuthContext);
 
 export const AuthActionType = {
+    USER_LOGGED_IN: "GET_LOGGED_IN",
     USER_LOGIN: "USER_LOGIN",
     USER_LOGOUT: "USER_LOGOUT"
 }
@@ -25,6 +26,12 @@ function AuthContextProvider(props) {
     const authReducer = (action) => {
         const {type, payload} = action;
         switch(type) {
+            case AuthActionType.GET_LOGGED_IN: {
+                return setAuth({
+                    user: payload.user,
+                    loggedIn: payload.loggedIn
+                });
+            }
             case AuthActionType.USER_LOGIN: {
                 return setAuth({
                     user: null,
@@ -43,6 +50,19 @@ function AuthContextProvider(props) {
     }
 
     auth.getLoggedIn = async function () {
+        const response = await api.getLoggedIn();
+        if(response.status  === 200){
+            if (response.data.status !== "ERROR") {
+                console.log("Logged in user: " + response.data)
+                authReducer({
+                    type: AuthActionType.USER_LOGGED_IN,
+                    payload: {
+                        loggedIn: response.data.loggedIn,
+                        user: response.data.user
+                    }
+                });
+            }
+        }
     }
 
     auth.login = async function () { 

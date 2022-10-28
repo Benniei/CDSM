@@ -13,4 +13,8 @@ router.get('/createFileSnapshot', DriveController.createFileSnapshot);
 // Delete all files stored in the database
 // router.get('/deleteFiles', DriveController.deleteFiles);
 
+const AnalysisController = require('../controller/analyze-controller');
+// Perform sharing analysis on a map of files, and update their documents accordingly
+router.get('/sharingAnalysis', AnalysisController.sharingAnalysis);
+
 module.exports = router;
