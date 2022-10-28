@@ -1,7 +1,10 @@
 // Local imports
+import {useContext} from 'react';
+import {GlobalStoreContext} from '../../store';
 import AppBanner from './SideComponents/AppBanner';
 import DrawerContent from './SideComponents/DrawerContent';
 import SnapshotView from './FileView/SnapshotView';
+import AccessControlView from './AccessControl/AccessControlView';
 import QueryBuilderModal from './QueryBuilderModal';
 import TakeSnapshotModal from './SideComponents/TakeSnapshotModal';
 import FileSharingModal from './FileView/FileSharingModal';
@@ -14,6 +17,10 @@ import Toolbar from '@mui/material/Toolbar';
 const drawerWidth = 250;
 
 function Dashboard() {
+    const {store} = useContext(GlobalStoreContext);
+
+    let driveFlag = store.openAccess || store.openAnalyze;
+    console.log(driveFlag)
     return (
         <Box sx={{display:'flex'}}>
             {/** Top App Banner (Static)*/}
@@ -35,7 +42,8 @@ function Dashboard() {
             {/** Middle Component (Dynamic)*/}
             <Box component="main" sx={{flexGrow:1, p:3}}>
                 <Toolbar sx={{height: 80}}/>
-                <SnapshotView />
+                {/* {!driveFlag ? <SnapshotView/>: (store.openAccess? <AccessControlView/> : null)} */}
+                <SnapshotView/>
             </Box>
 
             {/* Modals */}

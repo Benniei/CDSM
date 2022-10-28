@@ -1,8 +1,8 @@
-// Imports from React
+// Local Imports
 import {useContext, useState} from 'react';
 import {GlobalStoreContext} from '../../../store';
 
-// Imports from Material-UI
+// Imports from MUI
 import TextField from'@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
 import Box from '@mui/material/Box';
@@ -24,35 +24,15 @@ const snapshotArray = [
     },
 ]
 
-// const groupSnapshotArray =[
-//     {
-//         id: 'GroupSnapshot01'
-//     },
-//     {
-//         id: 'GroupSnapshot02'
-//     },
-//     {
-//         id: 'GroupSnapshot03'
-//     },
-//     {
-//         id: 'GroupSnapshot04'
-//     }
-// ]
-
-function SnapshotBar(){
+function ACBar() {
     const {store} = useContext(GlobalStoreContext);
     const [snapshot, setSnapshot] = useState('Snapshot01');
-    // const [groupsnapshot, setGroupsnapshot] = useState('GroupSnapshot01');
 
     const handleSnapshotChange = (event) => {
         setSnapshot(event.target.value);
     }
 
-    // const handleGroupChange = (event) => {
-    //     setGroupsnapshot(event.target.value);
-    // }
-
-    return(
+    return (
         <Toolbar >
 
             {/* Select Snapshot Dropdown Menu */}
@@ -78,37 +58,17 @@ function SnapshotBar(){
             <Box 
                 className="black-button" 
                 sx={{width:'150px'}}
-                onClick={event => store.openUpdateSharing()}>
+                onClick={event => console.log("Create Access Control")}>
                 <center>
                     <Typography 
                         display="inline" 
                         sx={{color:'black'}}> 
-                        <strong> Update Sharing </strong> 
+                        <strong> Create Access Control Policy </strong> 
                     </Typography>
                 </center>
             </Box>
-
-
-            {/* Select Group Snapshot Dropdown Menu */}
-            {/* <Grid item xs={4.5}>
-                <TextField
-                    id="select-group-snapshot"
-                    select
-                    label="Group Snapshot"
-                    value={groupsnapshot}
-                    onChange={handleGroupChange}
-                    fullWidth
-                    overflow='auto'
-                >
-                    {groupSnapshotArray.map((option) => (
-                        <MenuItem key={option.id} value={option.id}>
-                            {option.id}
-                        </MenuItem>
-                    ))}
-                </TextField>
-            </Grid> */}
         </Toolbar>
     );
 }
 
-export default SnapshotBar;
+export default ACBar;

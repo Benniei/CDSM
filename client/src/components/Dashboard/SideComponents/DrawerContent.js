@@ -45,9 +45,14 @@ function DrawerContent(){
                         <Typography display="inline"> <strong> Take Snapshot </strong> </Typography>
                     </Box>
                 </center>
+
                 <Divider> Drive </Divider>
                 <List mt={-15}>
-                    <ListItem key='myDrive' disablePadding>
+                    {/* My Drive */}
+                    <ListItem key='myDrive' disablePadding
+                        onClick={(event)=>{
+                            console.log("Open My Drive")
+                        }}>
                             <ListItemButton>
                                 <ListItemIcon sx={{ml: 1}}>
                                     <CloudIcon />
@@ -55,7 +60,11 @@ function DrawerContent(){
                                 <ListItemText primary='My Drive' sx={{ml: -1.5}} />
                             </ListItemButton>
                     </ListItem>
-                    <ListItem key='sharedwithme' disablePadding>
+                    {/* Shared with Me */}
+                    <ListItem key='sharedwithme' disablePadding
+                        onClick={(event)=>{
+                            console.log("Shared Drive")
+                        }}>
                         <ListItemButton>
                             <ListItemIcon sx={{ml: 1}}>
                                 <ShareIcon />
@@ -63,6 +72,7 @@ function DrawerContent(){
                             <ListItemText primary='Shared With Me' sx={{ml: -1.5}} />
                         </ListItemButton>
                     </ListItem>
+                    {/* Other Shared Drives (Have to populate) */}
                     <ListItem key='otherdrive' disablePadding>
                         <ListItemButton>
                             <ListItemIcon sx={{ml: 1}}>
@@ -72,9 +82,15 @@ function DrawerContent(){
                         </ListItemButton>
                     </ListItem>
                 </List>
+
                 <Divider sx={{mb: -3}}> Functionality </Divider>
                 <List mt={-15}>
-                    <ListItem key='accesscontrol' disablePadding>
+                    {/* Access Control Policy */}
+                    <ListItem key='accesscontrol' disablePadding
+                        onClick={(event)=>{
+                            console.log("Open Access Control Policy")
+                            store.openAccessView();
+                        }}>
                             <ListItemButton>
                                 <ListItemIcon sx={{ml: 1}}>
                                     <PolicyIcon />
@@ -82,7 +98,12 @@ function DrawerContent(){
                                 <ListItemText primary='Access Control' sx={{ml: -1.5}} />
                             </ListItemButton>
                     </ListItem>
-                    <ListItem key='analyze' disablePadding>
+                    {/* Analyze Snapshot */}
+                    <ListItem key='analyze' disablePadding
+                        onClick={(event)=>{
+                            console.log("Open Analyze Snapshot")
+                            store.openAnalyzeView();
+                        }}>
                         <ListItemButton>
                             <ListItemIcon sx={{ml: 1}}>
                                 <TimelineIcon />
