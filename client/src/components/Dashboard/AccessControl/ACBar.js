@@ -54,16 +54,16 @@ function ACBar() {
             </TextField>
 
             {/* View Information or Update Sharing */}
-            <Box sx={{flexGrow:.95}}/>
+            <Box sx={{flexGrow:.85}}/>
             <Box 
                 className="black-button" 
                 sx={{width:'150px'}}
-                onClick={event => console.log("Create Access Control")}>
+                onClick={event => store.openCreateAccessControl() }>
                 <center>
                     <Typography 
                         display="inline" 
                         sx={{color:'black'}}> 
-                        <strong> Create Access Control Policy </strong> 
+                        <strong> Create New Access Control Policy </strong> 
                     </Typography>
                 </center>
             </Box>

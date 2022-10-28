@@ -5,10 +5,16 @@ import ACModal from './ACModal'
 
 // Imports from MUI
 import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
 
 function AccessControlView(){
     return (
         <Box sx={{flexGrow: 1}}>
+            {/* Access Control Title */}
+            <Typography variant='h4' ml={1.5} mb={1}>
+                <strong>Access Control Policy</strong>
+            </Typography>
+
             {/* Snapshot Bar on top to choose Snapshot + Create New Access Control Policy */}
             <ACBar />
 
@@ -16,7 +22,7 @@ function AccessControlView(){
 
             
             {/* AC Modal */}
-            
+            <ACModal />
         </Box>
     )
 }

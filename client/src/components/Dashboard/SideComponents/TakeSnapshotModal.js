@@ -173,6 +173,7 @@ function GroupSnapshot() {
     )
 }
 
+// Adaptor for Taking either a File or Group Snapshot
 function TakeSnapshotModal() {
     const {store} = useContext(GlobalStoreContext);
     const [snapshotType, setSnapshotType] = useState("File Snapshot")

@@ -8,7 +8,9 @@ export const GlobalStoreActionType = {
     OPEN_QUERY_BUILDER: "OPEN_QUERY_BUILDER",
     OPEN_TAKE_SNAPSHOT_MODAL: "OPEN_TAKE_SNAPSHOT_MODAL",
     OPEN_UPDATE_SHARING: "OPEN_UPDATE_SHARING",
+    OPEN_AC_MODAL: "OPEN_AC_MODAL",
     CLOSE_MODAL: "CLOSE_MODAL",
+    OPEN_AC_SEARCH: "OPEN_AC_SEARCH",
     OPEN_DRIVE: "OPEN_DRIVE",
     OPEN_ACCESS: "OPEN_ACCESS",
     OPEN_ANALYZE: "OPEN_ANALYZE"
@@ -22,6 +24,7 @@ function GlobalStoreContextProvider(props) {
         queryBuilder: false,
         takeSnapshotModal: false,
         updateSharingModal: false,
+        accessModal: false,
         openDrive: "My Drive",
         openAccess: false,
         openAnalyze: false
@@ -37,7 +40,11 @@ function GlobalStoreContextProvider(props) {
                     currentSnapshot: payload,
                     queryBuilder: false,
                     takeSnapshotModal: false,
-                    updateSharingModal: false
+                    updateSharingModal: false,
+                    accessModal: false,
+                    openDrive: store.openDrive,
+                    openAccess: store.openAccess,
+                    openAnalyze: store.openAnalyze
                 })
             }
             case GlobalStoreActionType.OPEN_QUERY_BUILDER: {
@@ -48,6 +55,7 @@ function GlobalStoreContextProvider(props) {
                     queryBuilder: true,
                     takeSnapshotModal: false,
                     updateSharingModal: false,
+                    accessModal: false,
                     openDrive: store.openDrive,
                     openAccess: store.openAccess,
                     openAnalyze: store.openAnalyze
@@ -61,6 +69,7 @@ function GlobalStoreContextProvider(props) {
                     queryBuilder: false,
                     takeSnapshotModal: true,
                     updateSharingModal: false,
+                    accessModal: false,
                     openDrive: store.openDrive,
                     openAccess: store.openAccess,
                     openAnalyze: store.openAnalyze
@@ -74,6 +83,35 @@ function GlobalStoreContextProvider(props) {
                     queryBuilder: false,
                     takeSnapshotModal: false,
                     updateSharingModal: true,
+                    accessModal: false,
+                    openDrive: store.openDrive,
+                    openAccess: store.openAccess,
+                    openAnalyze: store.openAnalyze
+                })
+            }
+            case GlobalStoreActionType.OPEN_AC_MODAL: {
+                return setStore({
+                    allItems: store.allItems,
+                    selectedDocuments: store.selectedDocuments,
+                    currentSnapshot: store.currentSnapshot,
+                    queryBuilder: false,
+                    takeSnapshotModal: false,
+                    updateSharingModal: false,
+                    accessModal: true,
+                    openDrive: store.openDrive,
+                    openAccess: store.openAccess,
+                    openAnalyze: store.openAnalyze
+                })
+            }
+            case GlobalStoreActionType.OPEN_AC_SEARCH: {
+                return setStore({
+                    allItems: store.allItems,
+                    selectedDocuments: store.selectedDocuments,
+                    currentSnapshot: store.currentSnapshot,
+                    queryBuilder: true,
+                    takeSnapshotModal: false,
+                    updateSharingModal: false,
+                    accessModal: true,
                     openDrive: store.openDrive,
                     openAccess: store.openAccess,
                     openAnalyze: store.openAnalyze
@@ -87,11 +125,13 @@ function GlobalStoreContextProvider(props) {
                     queryBuilder: false,
                     takeSnapshotModal: false,
                     updateSharingModal: false,
+                    accessModal: false,
                     openDrive: store.openDrive,
                     openAccess: store.openAccess,
                     openAnalyze: store.openAnalyze
                 })
             }
+            
             case GlobalStoreActionType.OPEN_ACCESS: {
                 return setStore({
                     allItems: store.allItems,
@@ -100,6 +140,7 @@ function GlobalStoreContextProvider(props) {
                     queryBuilder: false,
                     takeSnapshotModal: false,
                     updateSharingModal: false,
+                    accessModal: false,
                     openDrive: null,
                     openAccess: true,
                     openAnalyze: false
@@ -113,6 +154,7 @@ function GlobalStoreContextProvider(props) {
                     queryBuilder: false,
                     takeSnapshotModal: false,
                     updateSharingModal: false,
+                    accessModal: false,
                     openDrive: null,
                     openAccess: false,
                     openAnalyze: true
@@ -126,6 +168,7 @@ function GlobalStoreContextProvider(props) {
                     queryBuilder: false,
                     takeSnapshotModal: false,
                     updateSharingModal: false,
+                    accessModal: false,
                     openDrive: payload,
                     openAccess: false,
                     openAnalyze: false
@@ -180,10 +223,29 @@ function GlobalStoreContextProvider(props) {
         });
     }
 
-    store.closeModal = async function () {
+    store.openCreateAccessControl = async function () { 
+        console.log("Open Access Control Modal")
         storeReducer({
-            type: GlobalStoreActionType.CLOSE_MODAL
-        });
+            type: GlobalStoreActionType.OPEN_AC_MODAL
+        })
+    }
+
+    store.openAccessControlSearch = async function () {
+        console.log("Open Query Builder with Access Control")
+        storeReducer({
+            type: GlobalStoreActionType.OPEN_AC_SEARCH
+        })
+    }
+
+    store.closeModal = async function () {
+        if(store.accessModal && store.queryBuilder)
+            storeReducer({
+                type: GlobalStoreActionType.OPEN_AC_MODAL
+            });
+        else
+            storeReducer({
+                type: GlobalStoreActionType.CLOSE_MODAL
+            });
     }
 
     store.openDriveView = async function (driveName) {

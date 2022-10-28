@@ -20,9 +20,13 @@ const drawerWidth = 250;
 
 function Dashboard() {
     const {store} = useContext(GlobalStoreContext);
+    const {auth} = useContext(AuthContext);
+
+    // useEffect(() => {
+    //     auth.getLoggedIn();
+    // }, [auth]);
 
     let driveFlag = store.openAccess || store.openAnalyze;
-    console.log(driveFlag)
     return (
         <Box sx={{display:'flex'}}>
             {/** Top App Banner (Static)*/}
@@ -44,8 +48,7 @@ function Dashboard() {
             {/** Middle Component (Dynamic)*/}
             <Box component="main" sx={{flexGrow:1, p:3}}>
                 <Toolbar sx={{height: 80}}/>
-                {/* {!driveFlag ? <SnapshotView/>: (store.openAccess? <AccessControlView/> : null)} */}
-                <SnapshotView/>
+                {!driveFlag ? <SnapshotView/>: (store.openAccess? <AccessControlView/> : null)}
             </Box>
 
             {/* Modals */}
