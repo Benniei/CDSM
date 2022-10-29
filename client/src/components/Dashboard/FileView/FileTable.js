@@ -1,5 +1,6 @@
 // Imports from React
-import {useState} from 'react';
+import {useState, useEffect, useContext} from 'react';
+import {GlobalStoreContext} from '../../../store';
 
 // Imports from Material-UI
 import Box from '@mui/material/Box';
@@ -23,13 +24,13 @@ function createData(name, type, owner, lastModified, size) {
     };
 }
 
-const rows = [
+/*const rows = [
     createData('Folder1', 'Folder', 'me', 'Today', '-'),
     createData('Folder2', 'Folder', 'me', 'Today', '35 mb'),
     createData('Folder3', 'Folder', 'me', 'Today', '35 mb'),
     createData('File1', 'File', 'me', 'Today', '7 mb'),
     createData('File2', 'File', 'me', 'Today', '66 mb'),
-]
+]*/
 
 const headCells = [
     {
@@ -107,9 +108,21 @@ function FileTableHead(props) {
 
 // Overview of the whole table {resource: https://mui.com/material-ui/react-table/}
 function FileTable(props){
+    const {store} = useContext(GlobalStoreContext);
     const [order, setOrder] = useState('asc')
     const [orderBy, setOrderBy] = useState('name')
     const [selected, setSelected] = useState([])
+
+    const [rows, setRows] = useState([])
+
+    useEffect(() => {
+        let list = [];
+        for (let file in store.allItems) {
+            list.append(createData(file.name, file.children ? "Folder" : "File",
+                file.owners[0].displayName, file.lastModifiedTime, "0 mb"));
+        };
+        setRows(list);
+    }, store.allItems);
     
     // Change the order direction or the field
     const handleRequestSort = (event, property) => {

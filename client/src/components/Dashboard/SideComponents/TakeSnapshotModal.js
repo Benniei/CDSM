@@ -74,7 +74,7 @@ function FileSnapshot() {
             <Box 
                 className="black-button" 
                 sx={{width:'100px', ml: '80%', mt:3}}
-                onClick={event => console.log("Confirm File Snapshot")}>
+                onClick={event => {store.takeSnapshot()}}>
                 <center>
                     <Typography 
                         sx={{color:'black'}}> 
