@@ -65,6 +65,7 @@ function DrawerContent(){
                     <ListItem key='sharedwithme' disablePadding
                         onClick={(event)=>{
                             console.log("Open Shared Drive")
+                            store.openDriveView('Shared With Me')
                         }}>
                         <ListItemButton>
                             <ListItemIcon sx={{ml: 1}}>

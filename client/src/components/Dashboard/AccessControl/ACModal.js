@@ -30,6 +30,7 @@ const style = {
 
 function ACModal() {
     const {store} = useContext(GlobalStoreContext);
+    const [name, setName] = useState("");
     const [allowWrite, setAllowWrite] = useState("");
     const [allowWriters, setAllowWriters] = useState([]);
     const [allowRead, setAllowRead] = useState("");
@@ -130,6 +131,17 @@ function ACModal() {
                         variant="h5"
                     >Create New Access Control Policy</Typography>
 
+                    {/* Access Control Policy Name */}
+                    <TextField   
+                        id="name"
+                        label="Access Control Name"
+                        name="name"
+                        autoComplete="Access Control Name"
+                        size="large"
+                        onChange={(event) => setName(event.value.target)}
+                        sx={{backgroundColor:"#FFFFFF", width:'85%', mt:3}}
+                    />
+
                     {/* Search Bar */}
                     <TextField   
                         id="search"
@@ -201,7 +213,7 @@ function ACModal() {
                     <Typography 
                         sx={{color:'black'}}
                         > 
-                        <strong> Submit </strong> 
+                        <strong> Save </strong> 
                     </Typography>
                 </center>
             </Box>
