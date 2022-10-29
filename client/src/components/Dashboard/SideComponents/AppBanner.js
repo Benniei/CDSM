@@ -1,6 +1,10 @@
 // Local Imports
-import {useContext} from 'react';
+import {useContext, useEffect} from 'react';
 import {GlobalStoreContext} from '../../../store';
+import AuthContext from '../../../auth/index.js';
+import { ReactComponent as GoogleDrive } from '../../../assets/GoogleDriveIcon.svg';
+import { ReactComponent as MicrosoftOneDriveIcon } from '../../../assets/MicrosoftOneDriveIcon.svg';
+
 
 // Imports from Material-UI
 import AppBar from '@mui/material/AppBar';
@@ -10,14 +14,22 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 import InputAdornment from '@mui/material/InputAdornment';
-// import IconButton from '@mui/material/IconButton';
+import Divider from '@mui/material/Divider';
 
 function AppBanner() {
-
     const {store} = useContext(GlobalStoreContext);
+    const {auth} = useContext(AuthContext);
 
+    console.log(auth.loggedIn)
     function handleOpenBuilder(){
         store.openQueryBuilder();
+    }
+
+    let driveIcon = null;
+    let email = "";
+    if (auth.loggedIn) {
+        driveIcon = auth.user.cloudProvider === "google"? <GoogleDrive className="driveIcon"/>:<MicrosoftOneDriveIcon className="driveIcon"/>;
+        email = auth.user.email;
     }
 
     return (
@@ -64,9 +76,17 @@ function AppBanner() {
                             </InputAdornment>
                         )
                       }}
-                />
-                {/**Logout Button */}
+                />                
                 <Box sx={{flexGrow:1}} />
+                {/* Logo + User Login Name */}
+                {driveIcon}
+                <Divider orientation="vertical" variant="middle" flexItem />
+                <Typography
+                    sx={{zIndex: (theme) => theme.zIndex.drawer + 1, color:'black', ml: 1, mr: 2, mt:1.5}}
+                    variant='h9'>
+                    <strong> {email} </strong>
+                </Typography>
+                {/* Logout Button */}
                 <Box 
                     className="black-button" 
                     onClick={event => window.location.href=`${process.env.REACT_APP_URL}/logout`}

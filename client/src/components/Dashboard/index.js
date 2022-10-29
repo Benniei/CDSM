@@ -1,7 +1,6 @@
 // Local imports
-import {useContext, useEffect} from 'react';
+import {useContext} from 'react';
 import {GlobalStoreContext} from '../../store';
-import AuthContext from '../../auth/index.js'
 import AppBanner from './SideComponents/AppBanner';
 import DrawerContent from './SideComponents/DrawerContent';
 import SnapshotView from './FileView/SnapshotView';
@@ -20,11 +19,7 @@ const drawerWidth = 250;
 
 function Dashboard() {
     const {store} = useContext(GlobalStoreContext);
-    const {auth} = useContext(AuthContext);
 
-    // useEffect(() => {
-    //     auth.getLoggedIn();
-    // }, [auth]);
 
     let driveFlag = store.openAccess || store.openAnalyze;
     return (

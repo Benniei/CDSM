@@ -102,3 +102,10 @@
 .upload-button:hover {
   transform: scale(1.05)
 }
+
+.driveIcon {
+  height: 35px;
+  width: 35px;
+  margin-top: 8px;
+  margin-right: 10px;
+}
