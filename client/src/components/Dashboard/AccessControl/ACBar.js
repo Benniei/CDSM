@@ -33,7 +33,7 @@ function ACBar() {
     }
 
     return (
-        <Toolbar >
+        <Toolbar sx={{mb:3}}>
 
             {/* Select Snapshot Dropdown Menu */}
             <TextField

@@ -19,8 +19,8 @@ function AccessControlView(){
             <ACBar />
 
             {/* An AC Card for every Access Control Policy */}
-
-            
+            <ACCard />
+            <ACCard />
             {/* AC Modal */}
             <ACModal />
         </Box>

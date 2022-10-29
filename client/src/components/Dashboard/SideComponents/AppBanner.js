@@ -1,5 +1,5 @@
 // Local Imports
-import {useContext, useEffect} from 'react';
+import {useContext} from 'react';
 import {GlobalStoreContext} from '../../../store';
 import AuthContext from '../../../auth/index.js';
 import { ReactComponent as GoogleDrive } from '../../../assets/GoogleDriveIcon.svg';
