@@ -223,19 +223,22 @@ function GlobalStoreContextProvider(props) {
         }
     }
 
-    store.getFolder = async function(snapshotid, folderid, folderName) {
-        console.log("Get Folder with ID " + folderid + " from Snapshot " + folderid)
+    store.getFolder = async function(snapshotid, folderid, folderName, prevFile) {
+        console.log("Get Folder " + folderName.name + " with ID " + folderid + " from Snapshot " + snapshotid)
         const response = await api.getFolder(auth.user, snapshotid, folderid);
         if(response.status === 200) {
-            console.log(response.data)
+            let path;
+            if(prevFile > -1){
+                path = store.path.filter((item, index) => index <= prevFile)
+            }
+            else{
+                path = [...store.path, folderName]
+            }
             let snapshot = {
                 folder: response.data.folder,
                 id: snapshotid,
-                path: store.path
+                path: path
             };
-            if(folderName)
-                snapshot["path"] = [...store.path, folderName]
-
             console.log(snapshot)
             storeReducer({
                 type:GlobalStoreActionType.GET_FOLDER,
@@ -248,15 +251,12 @@ function GlobalStoreContextProvider(props) {
         console.log("Get " + driveName + " with ID " + driveID + " from Snapshot " + driveID)
         const response = await api.getFolder(auth.user, snapshotid, driveID);
         if(response.status === 200) {
-            console.log(response.data)
             let snapshot = {
                 folder: response.data.folder,
                 id: snapshotid,
                 path: store.path,
                 driveName: driveName
             };
-
-            console.log(snapshot)
             storeReducer({
                 type:GlobalStoreActionType.GET_SNAPSHOT,
                 payload: snapshot
@@ -269,11 +269,10 @@ function GlobalStoreContextProvider(props) {
      * the current snapshot.
      */
     store.getSnapshot = async function(id, driveName) {
-        console.log("Get Snapshot " + id)
+        console.log("Get Snapshot " + id + " in " + driveName)
         const response = await api.getSnapshot({id: id});
         if(response.status === 200) {
             let snapshot = response.data;
-            console.log(store.openDrive, snapshot)
             // TODO: CHANGE snapshot.myDrive To support other drives
             if(driveName === "My Drive" && snapshot.myDrive){
                 store.getDrive(id, snapshot.myDrive, driveName);
@@ -340,7 +339,7 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.openAccessView = async function () { 
-        console.log("open Access View")
+        console.log("Open Access Control Policy View")
         storeReducer({
             type: GlobalStoreActionType.OPEN_ACCESS
         })

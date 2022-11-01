@@ -21,18 +21,20 @@ function RouteBar(){
             <HomeIcon sx={{width: 35, height: 35, mr: .5}}/>
                 <Box
                     className="folderLink"
-                    onClick={() => store.getSnapshot(store.currentSnapshot)}>
+                    onClick={() => store.getSnapshot(store.currentSnapshot, store.openDrive)}>
                     <Typography variant='h6' mt={.5} ml={.5} mr={.5}>
                         {store.openDrive}
                     </Typography>
                 </Box>
-            {
-                path.map((item) => {
+            {   
+                path.length > 0?
+                path.map((item, index) => {
                     return(
                             [<NavigateNextIcon key={item.id+"nav"}/>,
                             <Box 
                                 key={item.id+"box"}
                                 className="folderLink"
+                                onClick={() => store.getFolder(store.currentSnapshot, item.id, item.name, index)}
                                 >
                                 <Typography variant='h6' ml={.5} mr={.5} mt={.5}>
                                     {item.name}
@@ -40,6 +42,8 @@ function RouteBar(){
                             </Box>]
                     );
                 })
+                :
+                null
             }
             
         </Toolbar>

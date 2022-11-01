@@ -15,7 +15,7 @@ function SnapshotBar(){
     const {store} = useContext(GlobalStoreContext);
     const {auth} = useContext(AuthContext);
     const handleSnapshotChange = (event) => {
-        store.getSnapshot(event.target.value);
+        store.getSnapshot(event.target.value, store.openDrive);
     }
 
     const snapshotArray = auth.user?auth.user.filesnapshot:[];

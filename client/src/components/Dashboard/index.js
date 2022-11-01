@@ -25,7 +25,7 @@ function Dashboard() {
     useEffect(() => {
         if(auth.loggedIn){
             if (auth.user.filesnapshot)
-                store.getSnapshot(auth.user.filesnapshot[0])
+                store.getSnapshot(auth.user.filesnapshot[0], store.openDrive)
         }
     }, [auth]);
     

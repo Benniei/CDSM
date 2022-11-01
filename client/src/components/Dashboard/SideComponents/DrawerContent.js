@@ -90,7 +90,6 @@ function DrawerContent(){
                     {/* Access Control Policy */}
                     <ListItem key='accesscontrol' disablePadding
                         onClick={(event)=>{
-                            console.log("Open Access Control Policy")
                             store.openAccessView();
                         }}>
                             <ListItemButton>

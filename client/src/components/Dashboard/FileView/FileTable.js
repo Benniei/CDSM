@@ -140,7 +140,7 @@ function FileTable(props){
         if(type === "Folder") {
             const snapshotID = store.currentSnapshot
             console.log(snapshotID, fileID)
-            store.getFolder(snapshotID, fileID, {name: name, id: fileID});
+            store.getFolder(snapshotID, fileID, {name: name, id: fileID}, -1);
         }
     }
 
