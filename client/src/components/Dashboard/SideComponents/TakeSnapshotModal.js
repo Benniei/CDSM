@@ -1,5 +1,6 @@
 // Local Imports
 import {useContext, useState} from 'react';
+import AuthContext from '../../../auth/index.js';
 import {GlobalStoreContext} from '../../../store';
 
 // Imports from MUI
@@ -31,12 +32,27 @@ const style = {
 
 function FileSnapshot() {
     const {store} = useContext(GlobalStoreContext);
+    const {auth} = useContext(AuthContext);
+
     const [snapshotID, setSnapshotID] = useState("")
+
+    let email = ""
+    if(auth.loggedIn)
+        email = auth.user.email;
     return(
         <Box sx={{width: '100%'}}>
             <Stack
                 direction="row">
+                <Typography
+                    variant="h6"
+                    sx={{ml: 14.5, mt: 1.7, width: '70%'}}>
+                    <strong> Would you like to take a new snapshot? </strong>
+                </Typography>
+            </Stack>
 
+            <Stack
+                direction="row"
+                mt={1}>
                 <Typography 
                     display="flex"
                     variant="h6"
@@ -47,14 +63,10 @@ function FileSnapshot() {
                 <Typography
                     variant="h6"
                     sx={{ml: 2, mt: 1.7, width: '70%'}}>
-                    <strong> EMAIL </strong>
+                    <strong> {email} </strong>
                 </Typography>
-                
-            </Stack>
-            <Stack
-                direction="row"
-                mt={1}>
 
+                {/* Adding Snapshot ID
                 <Typography 
                     display="flex"
                     variant="h6"
@@ -69,7 +81,7 @@ function FileSnapshot() {
                     sx={{width: '70%',}}
                     overflow='auto'
                     onChange= {(event) => {setSnapshotID(event.target.value)}}
-                />
+                /> */}
             </Stack>
             <Box 
                 className="black-button" 

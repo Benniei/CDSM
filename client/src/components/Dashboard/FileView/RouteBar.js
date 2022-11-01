@@ -14,10 +14,17 @@ function RouteBar(){
     return (
         <Toolbar>
             <HomeIcon sx={{width: 35, height: 35}}/>
-            <Typography variant='h6' ml={1} mt={.5}>
-                {store.openDrive}
-            </Typography>
+                <Box>
+                    <Typography variant='h6' ml={1} mt={.5}>
+                        {store.openDrive}
+                    </Typography>
+                </Box>
             <NavigateNextIcon />
+                {/* <Box>
+                    <Typography variant='h6' ml={1} mt={.5}>
+                        {store.openDrive}
+                    </Typography>
+                </Box> */}
         </Toolbar>
     );
 }
