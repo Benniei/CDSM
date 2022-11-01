@@ -43,7 +43,8 @@ function FileSnapshot() {
                 direction="row">
                 <Typography
                     variant="h6"
-                    sx={{ml: 14.5, mt: 1.7, width: '70%'}}>
+                    sx={{ mt: 1.7, ml:'20%'}}
+                    >
                     <strong> Would you like to take a new snapshot? </strong>
                 </Typography>
             </Stack>

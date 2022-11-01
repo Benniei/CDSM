@@ -25,14 +25,6 @@ function createData(name, type, owner, lastModified, id) {
     };
 }
 
-/*const rows = [
-    createData('Folder1', 'Folder', 'me', 'Today', '-'),
-    createData('Folder2', 'Folder', 'me', 'Today', '35 mb'),
-    createData('Folder3', 'Folder', 'me', 'Today', '35 mb'),
-    createData('File1', 'File', 'me', 'Today', '7 mb'),
-    createData('File2', 'File', 'me', 'Today', '66 mb'),
-]*/
-
 const headCells = [
     {
         id: 'name',

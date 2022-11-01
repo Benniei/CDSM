@@ -21,6 +21,7 @@ function ACNameBar(props) {
 
                 {names.map((item) => (
                     <Box 
+                        key={item}
                         className="grey-button"
                         display="flex"
                         ml={.25}

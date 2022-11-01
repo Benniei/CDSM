@@ -7,6 +7,7 @@ export const GlobalStoreContext = createContext({})
 
 export const GlobalStoreActionType = {
     GET_FOLDER: "GET_FOLDER",
+    GET_DRIVE: "GET_DRIVE",
     OPEN_QUERY_BUILDER: "OPEN_QUERY_BUILDER",
     OPEN_TAKE_SNAPSHOT_MODAL: "OPEN_TAKE_SNAPSHOT_MODAL",
     OPEN_UPDATE_SHARING: "OPEN_UPDATE_SHARING",
@@ -57,14 +58,14 @@ function GlobalStoreContextProvider(props) {
                 return setStore({
                     allItems: payload.folder,
                     selectedDocuments: [],
-                    currentSnapshot: payload.id,
+                    currentSnapshot: payload.snapshotid,
                     queryBuilder: false,
                     takeSnapshotModal: false,
                     updateSharingModal: false,
                     accessModal: false,
                     openDrive: payload.driveName,
-                    openAccess: store.openAccess,
-                    openAnalyze: store.openAnalyze,
+                    openAccess: false,
+                    openAnalyze: false,
                     path: []
                 })
             }
@@ -239,7 +240,7 @@ function GlobalStoreContextProvider(props) {
                 id: snapshotid,
                 path: path
             };
-            console.log(snapshot)
+            // console.log(snapshot)
             storeReducer({
                 type:GlobalStoreActionType.GET_FOLDER,
                 payload: snapshot
@@ -253,12 +254,12 @@ function GlobalStoreContextProvider(props) {
         if(response.status === 200) {
             let snapshot = {
                 folder: response.data.folder,
-                id: snapshotid,
-                path: store.path,
+                snapshotid: snapshotid,
                 driveName: driveName
             };
+            // console.log(snapshot)
             storeReducer({
-                type:GlobalStoreActionType.GET_SNAPSHOT,
+                type:GlobalStoreActionType.GET_DRIVE,
                 payload: snapshot
             })
         }
@@ -274,6 +275,7 @@ function GlobalStoreContextProvider(props) {
         if(response.status === 200) {
             let snapshot = response.data;
             // TODO: CHANGE snapshot.myDrive To support other drives
+            console.log(snapshot)
             if(driveName === "My Drive" && snapshot.myDrive){
                 store.getDrive(id, snapshot.myDrive, driveName);
                 return;
