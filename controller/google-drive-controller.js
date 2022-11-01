@@ -52,7 +52,7 @@ createFileSnapshot = async function(req, res) {
                 console.log(`Added File (${newFile.fileId}) to database`); 
             }
             if(user.filesnapshot)
-                user.filesnapshot.push(snapshotId);
+                user.filesnapshot.unshift(snapshotId);
             else
                 user.filesnapshot = [snapshotId]
             user.save();

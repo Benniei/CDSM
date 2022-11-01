@@ -6,7 +6,7 @@ import {useContext} from 'react';
 export const GlobalStoreContext = createContext({})
 
 export const GlobalStoreActionType = {
-    GET_SNAPSHOT: "GET_SNAPSHOT",
+    GET_FOLDER: "GET_FOLDER",
     OPEN_QUERY_BUILDER: "OPEN_QUERY_BUILDER",
     OPEN_TAKE_SNAPSHOT_MODAL: "OPEN_TAKE_SNAPSHOT_MODAL",
     OPEN_UPDATE_SHARING: "OPEN_UPDATE_SHARING",
@@ -24,20 +24,21 @@ function GlobalStoreContextProvider(props) {
     const [store, setStore] = useState({
         allItems: [],
         selectedDocuments: [],
-        currentSnapshot: null,
+        currentSnapshot: "",
         queryBuilder: false,
         takeSnapshotModal: false,
         updateSharingModal: false,
         accessModal: false,
         openDrive: "My Drive",
         openAccess: false,
-        openAnalyze: false
+        openAnalyze: false,
+        path: []
     });
 
     const storeReducer = (action) => {
         const {type, payload} = action;
         switch(type){
-            case GlobalStoreActionType.GET_SNAPSHOT: {
+            case GlobalStoreActionType.GET_FOLDER: {
                 return setStore({
                     allItems: payload.folder,
                     selectedDocuments: [],
@@ -48,7 +49,23 @@ function GlobalStoreContextProvider(props) {
                     accessModal: false,
                     openDrive: store.openDrive,
                     openAccess: store.openAccess,
-                    openAnalyze: store.openAnalyze
+                    openAnalyze: store.openAnalyze,
+                    path: payload.path
+                })
+            }
+            case GlobalStoreActionType.GET_DRIVE: {
+                return setStore({
+                    allItems: payload.folder,
+                    selectedDocuments: [],
+                    currentSnapshot: payload.id,
+                    queryBuilder: false,
+                    takeSnapshotModal: false,
+                    updateSharingModal: false,
+                    accessModal: false,
+                    openDrive: payload.driveName,
+                    openAccess: store.openAccess,
+                    openAnalyze: store.openAnalyze,
+                    path: []
                 })
             }
             case GlobalStoreActionType.OPEN_QUERY_BUILDER: {
@@ -62,7 +79,8 @@ function GlobalStoreContextProvider(props) {
                     accessModal: false,
                     openDrive: store.openDrive,
                     openAccess: store.openAccess,
-                    openAnalyze: store.openAnalyze
+                    openAnalyze: store.openAnalyze,
+                    path: store.path
                 })
             }
             case GlobalStoreActionType.OPEN_TAKE_SNAPSHOT_MODAL: {
@@ -76,7 +94,8 @@ function GlobalStoreContextProvider(props) {
                     accessModal: false,
                     openDrive: store.openDrive,
                     openAccess: store.openAccess,
-                    openAnalyze: store.openAnalyze
+                    openAnalyze: store.openAnalyze,
+                    path: store.path
                 })
             }
             case GlobalStoreActionType.OPEN_UPDATE_SHARING: {
@@ -90,7 +109,8 @@ function GlobalStoreContextProvider(props) {
                     accessModal: false,
                     openDrive: store.openDrive,
                     openAccess: store.openAccess,
-                    openAnalyze: store.openAnalyze
+                    openAnalyze: store.openAnalyze,
+                    path: store.path
                 })
             }
             case GlobalStoreActionType.OPEN_AC_MODAL: {
@@ -104,7 +124,8 @@ function GlobalStoreContextProvider(props) {
                     accessModal: true,
                     openDrive: store.openDrive,
                     openAccess: store.openAccess,
-                    openAnalyze: store.openAnalyze
+                    openAnalyze: store.openAnalyze,
+                    path: store.path
                 })
             }
             case GlobalStoreActionType.OPEN_AC_SEARCH: {
@@ -118,7 +139,8 @@ function GlobalStoreContextProvider(props) {
                     accessModal: true,
                     openDrive: store.openDrive,
                     openAccess: store.openAccess,
-                    openAnalyze: store.openAnalyze
+                    openAnalyze: store.openAnalyze,
+                    path: store.path
                 })
             }
             case GlobalStoreActionType.CLOSE_MODAL: {
@@ -132,7 +154,8 @@ function GlobalStoreContextProvider(props) {
                     accessModal: false,
                     openDrive: store.openDrive,
                     openAccess: store.openAccess,
-                    openAnalyze: store.openAnalyze
+                    openAnalyze: store.openAnalyze,
+                    path: store.path
                 })
             }
             
@@ -147,7 +170,8 @@ function GlobalStoreContextProvider(props) {
                     accessModal: false,
                     openDrive: null,
                     openAccess: true,
-                    openAnalyze: false
+                    openAnalyze: false,
+                    path: []
                 })
             }
             case GlobalStoreActionType.OPEN_ANALYZE: {
@@ -161,12 +185,13 @@ function GlobalStoreContextProvider(props) {
                     accessModal: false,
                     openDrive: null,
                     openAccess: false,
-                    openAnalyze: true
+                    openAnalyze: true,
+                    path: []
                 })
             }
             case GlobalStoreActionType.OPEN_DRIVE: {
                 return setStore({
-                    allItems: store.allItems,
+                    allItems: [],
                     selectedDocuments: store.selectedDocuments,
                     currentSnapshot: store.currentSnapshot,
                     queryBuilder: false,
@@ -175,7 +200,8 @@ function GlobalStoreContextProvider(props) {
                     accessModal: false,
                     openDrive: payload,
                     openAccess: false,
-                    openAnalyze: false
+                    openAnalyze: false,
+                    path: []
                 })
             }
             default:
@@ -193,18 +219,44 @@ function GlobalStoreContextProvider(props) {
         if(response.status === 200) {
             let snapshot = response.data.fileSnapshot;
             let folderId = snapshot.myDrive;
-            store.getFolder(snapshot.snapshotId, folderId);
+            store.getFolder(snapshot.snapshotId, folderId, null);
         }
     }
 
-    store.getFolder = async function(id, folderid) {
-        const response = await api.getFolder(auth.user, id, folderid);
+    store.getFolder = async function(snapshotid, folderid, folderName) {
+        console.log("Get Folder with ID " + folderid + " from Snapshot " + folderid)
+        const response = await api.getFolder(auth.user, snapshotid, folderid);
         if(response.status === 200) {
             console.log(response.data)
             let snapshot = {
                 folder: response.data.folder,
-                id: id
+                id: snapshotid,
+                path: store.path
             };
+            if(folderName)
+                snapshot["path"] = [...store.path, folderName]
+
+            console.log(snapshot)
+            storeReducer({
+                type:GlobalStoreActionType.GET_FOLDER,
+                payload: snapshot
+            })
+        }
+    }
+
+    store.getDrive = async function(snapshotid, driveID, driveName) {
+        console.log("Get " + driveName + " with ID " + driveID + " from Snapshot " + driveID)
+        const response = await api.getFolder(auth.user, snapshotid, driveID);
+        if(response.status === 200) {
+            console.log(response.data)
+            let snapshot = {
+                folder: response.data.folder,
+                id: snapshotid,
+                path: store.path,
+                driveName: driveName
+            };
+
+            console.log(snapshot)
             storeReducer({
                 type:GlobalStoreActionType.GET_SNAPSHOT,
                 payload: snapshot
@@ -216,13 +268,19 @@ function GlobalStoreContextProvider(props) {
      * The user retrieves a snapshot and sets it to 
      * the current snapshot.
      */
-    store.getSnapshot = async function(id) {
+    store.getSnapshot = async function(id, driveName) {
         console.log("Get Snapshot " + id)
         const response = await api.getSnapshot({id: id});
         if(response.status === 200) {
             let snapshot = response.data;
-            
-            store.getFolder(snapshot.snapshotId, snapshot.myDrive);
+            console.log(store.openDrive, snapshot)
+            // TODO: CHANGE snapshot.myDrive To support other drives
+            if(driveName === "My Drive" && snapshot.myDrive){
+                store.getDrive(id, snapshot.myDrive, driveName);
+                return;
+            }
+            if(driveName === "Shared With Me" && snapshot.sharedDrive )
+                store.getDrive(id, snapshot.shareDrive, driveName);
         }
     }
 
@@ -289,7 +347,7 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.openAnalyzeView = async function () {
-        console.log("open analyze view")
+        console.log("Open Analyze View")
         storeReducer({
             type:GlobalStoreActionType.OPEN_ANALYZE
         })

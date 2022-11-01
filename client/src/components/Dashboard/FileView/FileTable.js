@@ -113,9 +113,8 @@ function FileTable(props){
 
     if (store.allItems) {
         for (let file of store.allItems) {
-
             rows.push(createData(file.name, file.children ? "Folder" : "File",
-                file.owners[0].emailAddress === auth.user.email ? "me": file.owners[0].emailAddress, file.lastModifiedTime, file.id));
+                file.owners[0].emailAddress === auth.user.email ? "me": file.owners[0].emailAddress, file.lastModifiedTime, file.fileId));
         };
     }
 
@@ -137,9 +136,12 @@ function FileTable(props){
         setSelected([]);
     };
 
-    const handleChangeFolder = (event, type, id) => {
-        if(type === "Folder")
-            store.getFolder(store.currentSnapshot, id);
+    const handleChangeFolder = (event, type, fileID, name) => {
+        if(type === "Folder") {
+            const snapshotID = store.currentSnapshot
+            console.log(snapshotID, fileID)
+            store.getFolder(snapshotID, fileID, {name: name, id: fileID});
+        }
     }
 
     // Handles clicking on the row
@@ -195,7 +197,7 @@ function FileTable(props){
                                 return(
                                     <TableRow
                                         hover
-                                        onDoubleClick={(event) => handleChangeFolder(event, row.type, row.id)}
+                                        onDoubleClick={(event) => handleChangeFolder(event, row.type, row.id, row.name)}
                                         role="checkbox"
                                         aria-checked={isItemSelected}
                                         tabIndex={-1}

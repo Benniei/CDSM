@@ -52,7 +52,7 @@ function DrawerContent(){
                     <ListItem key='myDrive' disablePadding
                         onClick={(event)=>{
                             console.log("Open My Drive")
-                            store.openDriveView("myDrive")
+                            store.getSnapshot(store.currentSnapshot, "My Drive")
                         }}>
                             <ListItemButton>
                                 <ListItemIcon sx={{ml: 1}}>
