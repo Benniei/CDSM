@@ -34,8 +34,6 @@ function FileSnapshot() {
     const {store} = useContext(GlobalStoreContext);
     const {auth} = useContext(AuthContext);
 
-    const [snapshotID, setSnapshotID] = useState("")
-
     let email = ""
     if(auth.loggedIn)
         email = auth.user.email;

@@ -14,7 +14,7 @@ createFileSnapshot = async function(req, res) {
         // Check if user is authenticated with Google
         if (req.user && req.user.cloudProvider == 'google') {
             // Retrieve User refreshToken from database
-            const user = await User.findById(req.user.id, { _id: 0, refreshToken: 1 });
+            let user = await User.findById(req.user.id, { _id: 1, refreshToken: 1, filesnapshot: 1});
             if (!user) {
                 throw new Error('Could not find User in database.');
             }
@@ -51,8 +51,11 @@ createFileSnapshot = async function(req, res) {
                 await File.create(newFile);
                 console.log(`Added File (${newFile.fileId}) to database`); 
             }
-            user.filesnapshot.push(newSnapshot.snapshotId);
-            user.save(done);
+            if(user.filesnapshot)
+                user.filesnapshot.push(snapshotId);
+            else
+                user.filesnapshot = [snapshotId]
+            user.save();
             // Send the newly created FileSnapshot's id and owner to the client
             res.status(200).json({ success: true, fileSnapshot: newSnapshot });
             // Perform sharing analysis on the newly created snapshot

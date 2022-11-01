@@ -200,6 +200,7 @@ function GlobalStoreContextProvider(props) {
     store.getFolder = async function(id, folderid) {
         const response = await api.getFolder(auth.user, id, folderid);
         if(response.status === 200) {
+            console.log(response.data)
             let snapshot = {
                 folder: response.data.folder,
                 id: id
@@ -216,17 +217,19 @@ function GlobalStoreContextProvider(props) {
      * the current snapshot.
      */
     store.getSnapshot = async function(id) {
+        console.log("Get Snapshot " + id)
         const response = await api.getSnapshot({id: id});
         if(response.status === 200) {
             let snapshot = response.data;
-            storeReducer({
-                type:GlobalStoreActionType.GET_SNAPSHOT,
-                payload: snapshot
-            })
+            
+            store.getFolder(snapshot.snapshotId, snapshot.myDrive);
         }
     }
 
+
+    /**!SECTION Functions for managing the view/state of the application */
     store.openQueryBuilder = async function () {
+        console.log("Open Query Builder");
         storeReducer({
             type: GlobalStoreActionType.OPEN_QUERY_BUILDER
         });
@@ -286,6 +289,7 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.openAnalyzeView = async function () {
+        console.log("open analyze view")
         storeReducer({
             type:GlobalStoreActionType.OPEN_ANALYZE
         })

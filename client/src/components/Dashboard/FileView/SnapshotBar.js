@@ -1,6 +1,7 @@
 // Imports from React
 import {useContext, useState} from 'react';
 import {GlobalStoreContext} from '../../../store';
+import AuthContext from '../../../auth/index.js';
 
 // Imports from Material-UI
 import TextField from'@mui/material/TextField';
@@ -9,48 +10,15 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Toolbar from '@mui/material/Toolbar';
 
-const snapshotArray = [
-    {
-        id: 'Snapshot01'
-    },
-    {
-        id: 'Snapshot02'
-    },
-    {
-        id: 'Snapshot03'
-    },
-    {
-        id: 'Snapshot04'
-    },
-]
-
-// const groupSnapshotArray =[
-//     {
-//         id: 'GroupSnapshot01'
-//     },
-//     {
-//         id: 'GroupSnapshot02'
-//     },
-//     {
-//         id: 'GroupSnapshot03'
-//     },
-//     {
-//         id: 'GroupSnapshot04'
-//     }
-// ]
 
 function SnapshotBar(){
     const {store} = useContext(GlobalStoreContext);
-    const [snapshot, setSnapshot] = useState('Snapshot01');
-    // const [groupsnapshot, setGroupsnapshot] = useState('GroupSnapshot01');
-
+    const {auth} = useContext(AuthContext);
     const handleSnapshotChange = (event) => {
-        setSnapshot(event.target.value);
+        store.getSnapshot(event.target.value);
     }
 
-    // const handleGroupChange = (event) => {
-    //     setGroupsnapshot(event.target.value);
-    // }
+    const snapshotArray = auth.user?auth.user.filesnapshot:[];
 
     return(
         <Toolbar >
@@ -61,14 +29,15 @@ function SnapshotBar(){
                 select
                 display="inline"
                 label="File Snapshot"
-                value={snapshot}
+                value={store.currentSnapshot}
+                InputLabelProps={{shrink: true}}
                 onChange={handleSnapshotChange}
                 sx={{width:"50%"}}
                 overflow='auto'
             >
                 {snapshotArray.map((option) => (
-                    <MenuItem key={option.id} value={option.id}>
-                        {option.id}
+                    <MenuItem key={option} value={option}>
+                        {option}
                     </MenuItem>
                 ))}
             </TextField>

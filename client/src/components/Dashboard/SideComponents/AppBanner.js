@@ -20,7 +20,6 @@ function AppBanner() {
     const {store} = useContext(GlobalStoreContext);
     const {auth} = useContext(AuthContext);
 
-    console.log(auth.loggedIn)
     function handleOpenBuilder(){
         store.openQueryBuilder();
     }

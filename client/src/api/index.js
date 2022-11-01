@@ -23,7 +23,7 @@ export const test = () => api.get('/test')
  });
 
  /* Snapshot */
- export const getSnapshot = (id) => api.get('/snapshot/' + id)
+ export const getSnapshot = (payload) => api.post('/snapshot', payload)
  .then(response => {
     return response
  })
@@ -51,8 +51,9 @@ export const getFolder = (payload, id, folderid) => api.post('/snapshot/' + id +
 const apis = {
 test,
 getLoggedIn,
+getSnapshot,
+getFolder,
 takeSnapshot,
-getFolder
 };
 
 export default apis;
