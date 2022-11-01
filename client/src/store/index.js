@@ -1,5 +1,7 @@
 import {createContext, useState} from 'react';
 import api from '../api'
+import AuthContext from '../auth/index.js';
+import {useContext} from 'react';
 
 export const GlobalStoreContext = createContext({})
 
@@ -17,6 +19,8 @@ export const GlobalStoreActionType = {
 }
 
 function GlobalStoreContextProvider(props) {
+    const {auth} = useContext(AuthContext);
+
     const [store, setStore] = useState({
         allItems: [],
         selectedDocuments: [],
@@ -35,9 +39,9 @@ function GlobalStoreContextProvider(props) {
         switch(type){
             case GlobalStoreActionType.GET_SNAPSHOT: {
                 return setStore({
-                    allItems: store.allItems,
+                    allItems: payload.folder,
                     selectedDocuments: [],
-                    currentSnapshot: payload,
+                    currentSnapshot: payload.id,
                     queryBuilder: false,
                     takeSnapshotModal: false,
                     updateSharingModal: false,
@@ -185,7 +189,26 @@ function GlobalStoreContextProvider(props) {
      * MongoDB.
      */
     store.takeSnapshot = async function() {
+        const response = await api.takeSnapshot(auth.user);
+        if(response.status === 200) {
+            let snapshot = response.data.fileSnapshot;
+            let folderId = snapshot.myDrive;
+            store.getFolder(snapshot.snapshotId, folderId);
+        }
+    }
 
+    store.getFolder = async function(id, folderid) {
+        const response = await api.getFolder(auth.user, id, folderid);
+        if(response.status === 200) {
+            let snapshot = {
+                folder: response.data.folder,
+                id: id
+            };
+            storeReducer({
+                type:GlobalStoreActionType.GET_SNAPSHOT,
+                payload: snapshot
+            })
+        }
     }
 
     /**

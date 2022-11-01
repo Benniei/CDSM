@@ -21,10 +21,12 @@ createFileSnapshot = async function(req, res) {
             // Map-like object of all files in the user's drive
             const myDrive = await getMyDrive(user.refreshToken);
             // Create a File Snapshot in our database to obtain a snapshotId
+            let myDriveId = Object.keys(myDrive).filter(file => myDrive[file].name === "My Drive" && myDrive[file].root === true)[0];
             const newSnapshot = new FileSnapshot({
                 owner: req.user.id,
                 snapshotId: req.user.id + '-' + moment().format('MMMM Do YYYY, H:mm:ss'),
-                myDrive: myDrive
+                // This will only send back root folders (drives) and their ids.
+                myDrive: myDriveId
             });
             await FileSnapshot.create(newSnapshot);
             console.log(`Added FileSnapshot (${newSnapshot.snapshotId}) to database`); 
@@ -52,7 +54,7 @@ createFileSnapshot = async function(req, res) {
             // Send the newly created FileSnapshot's id and owner to the client
             res.status(200).json({ success: true, fileSnapshot: newSnapshot });
             // Perform sharing analysis on the newly created snapshot
-            Analyze.sharingAnalysis(snapshotId, req.user.threshold);
+            //Analyze.sharingAnalysis(snapshotId, req.user.threshold);
         } else {
             res.status(403).json({ success: false, error: 'Unauthorized.' });
             throw new Error('Unauthorized User.');
@@ -184,6 +186,28 @@ createPermissionMap = function (permissionList) {
     return Object.fromEntries(map);
 };
 
+getFolder = async function(req, res) {
+    const {id, folderid} = req.params;
+    try {
+        // Check if user is authenticated with Google
+        if (req.user && req.user.cloudProvider == 'google') {
+            // Retrieve User refreshToken from database
+            const user = await User.findById(req.user.id, { _id: 0, refreshToken: 1 });
+            if (!user) {
+                throw new Error('Could not find User in database.');
+            }
+            const fileList = await File.find({ snapshotId: id, parents: folderid});
+            res.status(200).json({ success: true, folder: fileList });
+        } else {
+            res.status(403).json({ success: false, error: 'Unauthorized.' });
+            throw new Error('Unauthorized User.');
+        }
+    } catch(error) {
+        console.error('Failed to create File Snapshot: ' + error);
+        res.status(400).json({ success: false, error: error });   
+    }
+};
+
 // Delete all files stored in the database
 // deleteFiles = async function(req, res) {
 //     await File.deleteMany({});
@@ -192,5 +216,6 @@ createPermissionMap = function (permissionList) {
 
 module.exports = {
     createFileSnapshot,
-    // deleteFiles
+    getFolder
+    //deleteFiles
 };
