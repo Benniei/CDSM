@@ -51,6 +51,8 @@ createFileSnapshot = async function(req, res) {
                 await File.create(newFile);
                 console.log(`Added File (${newFile.fileId}) to database`); 
             }
+            user.filesnapshot.push(newSnapshot.snapshotId);
+            user.save(done);
             // Send the newly created FileSnapshot's id and owner to the client
             res.status(200).json({ success: true, fileSnapshot: newSnapshot });
             // Perform sharing analysis on the newly created snapshot

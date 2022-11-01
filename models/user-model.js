@@ -14,9 +14,9 @@ const UserSchema = new Schema(
         email: { type: String, required: true },                                                // Email taken from cloud provider
         threshold: { type: Number, required: true },                                            // Threshold value for deviant check
         refreshToken: { type: String, required: false },                                        // Refresh token provided by cloud provider
-        access_control_req: { type: String, required: false},                                   // Access control requirements assigned by the user
+        access_control_req: { type: [Object], required: false},                                 // Access control requirements assigned by the user
         searchHistory: { type: [String], required: true },                                      // History of search queries made by the user
-        filesnapshot: { type: Schema.Types.ObjectId, ref:'FileSnapshot', required: false },
+        filesnapshot: { type: [String], required: false },
         groupsnapshot: { type: Schema.Types.ObjectId, ref:'GroupSnapshot', required: false }
     },
     { timeStamps: true }                                                                        // Timestamps for when document was created and last updated
