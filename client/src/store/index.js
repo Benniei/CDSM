@@ -209,6 +209,7 @@ function GlobalStoreContextProvider(props) {
             let snapshot = response.data.fileSnapshot;
             // Retrieve fileId of root folder of 'My Drive' file collection
             let driveID = snapshot.myDrive;
+            auth.takeSnapshot(snapshot.snapshotId);
             store.getDrive(snapshot.snapshotId, driveID, "My Drive");
 
         }
