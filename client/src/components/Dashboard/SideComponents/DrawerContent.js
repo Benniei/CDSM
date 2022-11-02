@@ -52,7 +52,7 @@ function DrawerContent(){
                     <ListItem key='myDrive' disablePadding
                         onClick={(event)=>{
                             console.log("Open My Drive")
-                            store.getSnapshot(store.currentSnapshot, "My Drive")
+                            store.getSnapshot(store.currentSnapshot, 'MyDrive')
                         }}>
                             <ListItemButton>
                                 <ListItemIcon sx={{ml: 1}}>
@@ -65,7 +65,8 @@ function DrawerContent(){
                     <ListItem key='sharedwithme' disablePadding
                         onClick={(event)=>{
                             console.log("Open Shared Drive")
-                            store.openDriveView('Shared With Me')
+                            store.getSnapshot(store.currentSnapshot, 'SharedWithMe')
+                            // store.openDriveView('SharedWithMe')
                         }}>
                         <ListItemButton>
                             <ListItemIcon sx={{ml: 1}}>
