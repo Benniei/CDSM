@@ -47,6 +47,24 @@ function QueryBuilderModal() {
         flag = true;
     }
 
+    function buildQuery() {
+        let query = "";
+        for (let op in queryOp) {
+            query += op.operator + ':' + op.target + ' and '
+        }
+        for (let op in readableUser) {
+            query += 'readable:' + op + ' and '
+        }
+        for (let op in writableUser) {
+            query += 'writable:' + op + ' and '
+        }
+        for (let op in sharableUser) {
+            query += 'sharable:' + op + ' and '
+        }
+        query = query.substring(0, query.lastIndexOf(' and '));
+        store.buildQuery(query);
+    }
+
     function closeModal() { 
         console.log("Close Search Query Modal")
         store.closeModal();
@@ -254,7 +272,8 @@ function QueryBuilderModal() {
                         <Box sx={{flexGrow:.94}} />
                         <Box 
                                 className="black-button"
-                                sx={{width: '8%'}}>
+                                sx={{width: '8%'}}
+                                onClick={event => buildQuery()}>
                             <center>
                                 <Typography 
                                     display="inline"> 

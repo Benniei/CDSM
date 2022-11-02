@@ -274,6 +274,15 @@ function GlobalStoreContextProvider(props) {
         }
     }
 
+    store.buildQuery = async function(query) {
+        console.log("Building query: " + query);
+        const response = await api.buildQuery({query: query});
+        if(response.status === 200) {
+            console.log(response.data);
+            // TODO
+        }
+    }
+
     store.updateACR = async function(access_control_req) {
         const response = await api.updateACR(access_control_req);
         if(response.status === 200) {

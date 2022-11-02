@@ -31,9 +31,9 @@ getFolder = async function(req, res) {
 };
 
 buildQuery = async function(req, res) {
-    const query = req.body;
+    const query = req.body.query;
     try {
-        const user = await User.findById(req.userId, { _id: 0, searchHistory: 1 });
+        const user = await User.findById(req.userId, { searchHistory: 1 });
         if (!user) {
             throw new Error('Could not find User in database.');
         }
