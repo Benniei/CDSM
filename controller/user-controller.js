@@ -32,7 +32,7 @@ getFolder = async function(req, res) {
 // User Functions
 updateACR = async (req, res) => {
     try {
-        const acr = await User.findOneAndUpdate({ _id: req.userId }, { $set:{ access_control_req: req.access_control_req }, { fields: 'access_control_req -_id', returnDocument: 'after' } });
+        const acr = await User.findOneAndUpdate({ _id: req.userId }, { $set:{ access_control_req: req.access_control_req }}, { fields: 'access_control_req -_id', returnDocument: 'after' });
         if (!acr) {
             throw new Error('Could not find User in database.');
         }
@@ -40,6 +40,7 @@ updateACR = async (req, res) => {
     } catch(error) {
         console.error('Failed to update ACR: ' + error);
         res.status(400).json({ success: false, error: error });   
+    }
 }
 
 listSnapshots = async (req, res) => {
@@ -52,6 +53,7 @@ listSnapshots = async (req, res) => {
     } catch(error) {
         console.error('Failed to update ACR: ' + error);
         res.status(400).json({ success: false, error: error });   
+    }
 }
 
 module.exports = {

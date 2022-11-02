@@ -39,7 +39,7 @@ connectDB();
 // Routers
 app.use('/', require('./routes/authRouter'));
 app.use('/', require('./routes/driveRouter'));
-app.use('/', require('./routes/googleDriveRouter'));
+app.use('/', require('./routes/userRouter'));
 
 // Hosts Static Websites
 app.use(express.static(path.resolve(__dirname, "./client/build")));
