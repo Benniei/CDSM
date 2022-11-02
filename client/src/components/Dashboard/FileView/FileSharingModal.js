@@ -16,7 +16,7 @@ const style = {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: '60%',
+    width: '70%',
     maxHeight:'70%',
     bgcolor: 'background.paper',
     boxShadow: 24,
@@ -26,10 +26,10 @@ const style = {
 };
 
 function FileSharingUser(props) {
-    const {selectValues, setUniqueUsers, mixedUsers, setMixedUsers} = props
+    const {user, selectValues, setUniqueUsers, mixedUsers, setMixedUsers} = props
 
     return (
-        <Box />
+        <Box key={user.email}/>
     )
 }
 
@@ -50,10 +50,9 @@ function FileSharingModal(props) {
             let mixedResult = [];
             let uniqueResult = [];
             if(selected.length > 0) {
-                console.log(2);
                 let data = [];
                 for(let file of selected){
-                    let fileInfo = store.allItems[file.index].permissions[0];
+                    let fileInfo = store.allItems[file.index].permissions;
                     let setdata = [];
                     for(let key in fileInfo){
                         let obj = fileInfo[key]
@@ -68,7 +67,7 @@ function FileSharingModal(props) {
                     }
                     data.push(setdata);
                 }
-                console.log(data);
+                // console.log(data);
                 uniqueResult = data.reduce((a, b) => a.filter(c => b.some(item => item.id === c.id)));
                 // console.log("Unique Results ", uniqueResult);
                 // Get all the owners on top 
@@ -95,7 +94,7 @@ function FileSharingModal(props) {
                     }
                 }
                 // console.log("mixedResult ",  mixedResult);
-
+                // console.log(uniqueResult, mixedResult)
                 setUniqueUsers(uniqueResult)
                 setMixedUsers(mixedResult)
             }
@@ -187,6 +186,7 @@ function FileSharingModal(props) {
                                 uniqueUsers.map((item) => {
                                     return(
                                         <FileSharingUser 
+                                            user={item}
                                             selectValues={uniqueSelections} 
                                             setUniqueUsers={setUniqueUsers}
                                             mixedUsers={mixedUsers}

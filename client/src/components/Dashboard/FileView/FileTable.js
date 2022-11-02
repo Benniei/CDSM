@@ -109,7 +109,7 @@ function FileTable(props){
         let i = 0;
         for (let file of store.allItems) {
             rows.push(createData(file.name, file.children ? "Folder" : "File",
-                file.owners[0].emailAddress === auth.user.email ? "me": file.owners[0].emailAddress, file.lastModifiedTime, file.fileId, i++));
+                file.owner === auth.user.email ? "me": file.owner, file.lastModifiedTime, file.fileId, i++));
         };
     }
 
