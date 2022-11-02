@@ -8,7 +8,8 @@ console.log("create AuthContext: " + AuthContext);
 export const AuthActionType = {
     USER_LOGGED_IN: "USER_LOGGED_IN",
     USER_LOGIN: "USER_LOGIN",
-    USER_LOGOUT: "USER_LOGOUT"
+    USER_LOGOUT: "USER_LOGOUT",
+    USER_UPDATE_ACR: "USER_UPDATE_ACR"
 }
 
 function AuthContextProvider(props) {
@@ -41,6 +42,12 @@ function AuthContextProvider(props) {
             case AuthActionType.USER_LOGOUT: {
                 return setAuth({
                     user: null,
+                    loggedIn: payload.loggedIn
+                })
+            }
+            case AuthActionType.USER_UPDATE_ACR: {
+                return setAuth({
+                    user: payload.user,
                     loggedIn: payload.loggedIn
                 })
             }
@@ -86,6 +93,18 @@ function AuthContextProvider(props) {
             }
         })
         navigate('/', {replace: true})
+    }
+
+    auth.updateACR = async function(access_control_req) {
+        let user = auth.user;
+        user.access_control_req = access_control_req;
+        authReducer({
+            type: AuthActionType.USER_UPDATE_ACR,
+            payload: {
+                user: user,
+                loggedIn: true
+            }
+        })
     }
 
     return (

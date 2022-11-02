@@ -24,7 +24,7 @@ getFolder = async function(req, res) {
         const fileList = await File.find({ snapshotId: id, parent: folderid });
         res.status(200).json({ success: true, folder: fileList });
     } catch(error) {
-        console.error('Failed to create File Snapshot: ' + error);
+        console.error('Failed to find folder: ' + error);
         res.status(400).json({ success: false, error: error });   
     }
 };
@@ -32,7 +32,7 @@ getFolder = async function(req, res) {
 // User Functions
 updateACR = async (req, res) => {
     try {
-        const acr = await User.findOneAndUpdate({ _id: req.userId }, { $set:{ access_control_req: req.access_control_req }}, { fields: 'access_control_req -_id', returnDocument: 'after' });
+        const acr = await User.findOneAndUpdate({ _id: req.userId }, { $set:{ access_control_req: req.body }}, { fields: 'access_control_req', returnDocument: 'after' });
         if (!acr) {
             throw new Error('Could not find User in database.');
         }
@@ -51,7 +51,7 @@ listSnapshots = async (req, res) => {
         }
         res.status(200).json({ success: true, snapshots: snapshots });
     } catch(error) {
-        console.error('Failed to update ACR: ' + error);
+        console.error('Failed to list snapshots: ' + error);
         res.status(400).json({ success: false, error: error });   
     }
 }

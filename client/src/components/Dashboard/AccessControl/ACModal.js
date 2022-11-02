@@ -48,6 +48,17 @@ function ACModal() {
         store.openAccessControlSearch();
     }
 
+    function handleSave() {
+        let access_control_req = {
+            AW: allowWriters,
+            AR: allowReaders,
+            DW: denyWriters,
+            DR: denyReaders,
+            Grp: flag
+        };
+        store.updateACR(access_control_req);
+    }
+
     function closeModal() { 
         console.log("Close Access Control Modal");
         store.closeModal();
@@ -212,6 +223,7 @@ function ACModal() {
                 <center>
                     <Typography 
                         sx={{color:'black'}}
+                        onClick={(event) => handleSave()}
                         > 
                         <strong> Save </strong> 
                     </Typography>
