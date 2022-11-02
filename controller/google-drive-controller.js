@@ -11,82 +11,71 @@ const moment = require('moment');
 // Create a snapshot of the user's current drive
 createFileSnapshot = async function(req, res) {
     try {
-        // Check if user is authenticated with Google
-        if (req.user && req.user.cloudProvider == 'google') {
-            // Retrieve User refreshToken from database
-            let user = await User.findById(req.user.id, { _id: 1, refreshToken: 1, filesnapshot: 1});
-            if (!user) {
-                throw new Error('Could not find User in database.');
-            }
-            // Create OAuth 2.0 Client for use with Google Drive API
-            const oauth2Client = new google.auth.OAuth2(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET, `${process.env.CLIENT_BASE_URL}auth/google/callback`);
-            // Retrieve access token from Google using refresh token to authorize OAuth 2.0 Client
-            oauth2Client.setCredentials({ refresh_token: user.refreshToken });
-            const accessToken = await oauth2Client.getAccessToken();
-            oauth2Client.setCredentials({ access_token: accessToken, refresh_token: user.refreshToken });
-            // Initialize Google Drive API
-            const driveAPI = google.drive({ version: 'v3', auth: oauth2Client });
-            // Retrieve the name and Ids of all of the user's drives
-            const driveIds = await getDrives(driveAPI);
-            // Retrieve a map of all files in the user's drives
-            const driveMap = await getFiles(driveAPI, driveIds);
+        let user = req.user;
+        // Create OAuth 2.0 Client for use with Google Drive API
+        const oauth2Client = new google.auth.OAuth2(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET, `${process.env.CLIENT_BASE_URL}auth/google/callback`);
+        // Retrieve access token from Google using refresh token to authorize OAuth 2.0 Client
+        oauth2Client.setCredentials({ refresh_token: user.refreshToken });
+        const accessToken = await oauth2Client.getAccessToken();
+        oauth2Client.setCredentials({ access_token: accessToken, refresh_token: user.refreshToken });
+        // Initialize Google Drive API
+        const driveAPI = google.drive({ version: 'v3', auth: oauth2Client });
+        // Retrieve the name and Ids of all of the user's drives
+        const driveIds = await getDrives(driveAPI);
+        // Retrieve a map of all files in the user's drives
+        const driveMap = await getFiles(driveAPI, driveIds);
 
-            // Map-like object of all files in the user's drive
-            // const myDrive = await getMyDrive(user.refreshToken);
-            // Create a File Snapshot in our database to obtain a snapshotId
-            let myDriveId = Object.keys(driveIds).find(key => driveIds[key] === 'MyDrive');
+        // Map-like object of all files in the user's drive
+        // const myDrive = await getMyDrive(user.refreshToken);
+        // Create a File Snapshot in our database to obtain a snapshotId
+        let myDriveId = Object.keys(driveIds).find(key => driveIds[key] === 'MyDrive');
 
-            const newSnapshot = new FileSnapshot({
-                owner: req.user.id,
-                snapshotId: req.user.id + '-' + moment().format('MMMM Do YYYY, H:mm:ss'),
-                driveIds: driveIds,
-                // This will only send back root folders (drives) and their ids.
-                myDrive: myDriveId
+        const newSnapshot = new FileSnapshot({
+            owner: req.user.id,
+            snapshotId: req.user.id + '-' + moment().format('MMMM Do YYYY, H:mm:ss'),
+            driveIds: driveIds,
+            // This will only send back root folders (drives) and their ids.
+            myDrive: myDriveId
+        });
+
+        await FileSnapshot.create(newSnapshot);
+        console.log(`Added FileSnapshot (${newSnapshot.snapshotId}) to database`); 
+        // Retrieve the File Snapshot's snapshotId
+        snapshotId = newSnapshot.snapshotId;
+        // Create a File Document for each file in the user's drive
+        await Promise.all(Object.values(driveMap).map(async (file) => {
+            const newFile = new File({
+                snapshotId: newSnapshot.snapshotId,
+                fileId: file.id,
+                name: file.name,
+                driveId: file.driveId,
+                path: file.path,
+                owner: file.owners,
+                creator: file.owners,
+                sharingUser: file.sharingUser,
+                root: file.root,
+                parent: file.parents,
+                children: file.children,
+                permissions: file.permissions,
+                permissionIds: file.permissionIds,
+                lastModifiedTime: file.modifiedTime,
             });
+            await File.create(newFile);
+            console.log(`Added File (${newFile.fileId}) to database`);
+        }));
 
-            await FileSnapshot.create(newSnapshot);
-            console.log(`Added FileSnapshot (${newSnapshot.snapshotId}) to database`); 
-            // Retrieve the File Snapshot's snapshotId
-            snapshotId = newSnapshot.snapshotId;
-            // Create a File Document for each file in the user's drive
-            await Promise.all(Object.values(driveMap).map(async (file) => {
-                const newFile = new File({
-                    snapshotId: newSnapshot.snapshotId,
-                    fileId: file.id,
-                    name: file.name,
-                    driveId: file.driveId,
-                    path: file.path,
-                    owner: file.owners,
-                    creator: file.owners,
-                    sharingUser: file.sharingUser,
-                    root: file.root,
-                    parent: file.parents,
-                    children: file.children,
-                    permissions: file.permissions,
-                    permissionIds: file.permissionIds,
-                    lastModifiedTime: file.modifiedTime,
-                });
-                await File.create(newFile);
-                console.log(`Added File (${newFile.fileId}) to database`);
-            }));
+        // Perform sharing analysis on the newly created snapshot
+        // Analyze.sharingAnalysis(snapshotId, driveMap, req.user.threshold);
 
-            // Perform sharing analysis on the newly created snapshot
-            // Analyze.sharingAnalysis(snapshotId, driveMap, req.user.threshold);
-
-            if (user.filesnapshot) {
-                user.filesnapshot.unshift(snapshotId);
-            } else {
-                user.filesnapshot = [snapshotId];
-            }     
-            user.save();
-
-            // Send the newly created FileSnapshot's id and owner to the client
-            res.status(200).json({ success: true, fileSnapshot: newSnapshot });
-            
+        if (user.filesnapshot) {
+            user.filesnapshot.unshift(snapshotId);
         } else {
-            res.status(403).json({ success: false, error: 'Unauthorized.' });
-            throw new Error('Unauthorized User.');
-        }
+            user.filesnapshot = [snapshotId];
+        }     
+        user.save();
+
+        // Send the newly created FileSnapshot's id and owner to the client
+        res.status(200).json({ success: true, fileSnapshot: newSnapshot }); 
     } catch(error) {
         console.error('Failed to create File Snapshot: ' + error);
         res.status(400).json({ success: false, error: error });   

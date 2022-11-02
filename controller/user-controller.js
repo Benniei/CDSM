@@ -32,11 +32,10 @@ getFolder = async function(req, res) {
 // User Functions
 updateACR = async (req, res) => {
     try {
-        const user = await User.findById(req.userId, { _id: 0, refreshToken: 1 });
-        if (!user) {
+        const acr = await User.findOneAndUpdate({ _id: req.userId }, { $set:{ access_control_req: req.access_control_req }, { fields: 'access_control_req -_id', returnDocument: 'after' } });
+        if (!acr) {
             throw new Error('Could not find User in database.');
         }
-        const acr = await User.findOneAndUpdate({ _id: user._id }, { $set:{ access_control_req: req.access_control_req }, { fields: 'access_control_req -_id', returnDocument: 'after' } });
         res.status(200).json({ success: true, acr: acr.access_control_req });
     } catch(error) {
         console.error('Failed to update ACR: ' + error);
