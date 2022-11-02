@@ -30,7 +30,7 @@ function GlobalStoreContextProvider(props) {
         takeSnapshotModal: false,
         updateSharingModal: false,
         accessModal: false,
-        openDrive: "My Drive",
+        openDrive: "MyDrive",
         openAccess: false,
         openAnalyze: false,
         path: []
@@ -219,7 +219,10 @@ function GlobalStoreContextProvider(props) {
         const response = await api.takeSnapshot(auth.user);
         if(response.status === 200) {
             let snapshot = response.data.fileSnapshot;
-            let folderId = snapshot.myDrive;
+            // Retrieve fileId of root folder of 'My Drive' file collection
+            let driveIds = snapshot.driveIds;
+            let folderId = Object.keys(driveIds).find((key) => driveIds[key] === 'MyDrive');
+            console.log(folderId);
             store.getFolder(snapshot.snapshotId, folderId, null);
         }
     }
@@ -269,19 +272,17 @@ function GlobalStoreContextProvider(props) {
      * The user retrieves a snapshot and sets it to 
      * the current snapshot.
      */
-    store.getSnapshot = async function(id, driveName) {
-        console.log("Get Snapshot " + id + " in " + driveName)
-        const response = await api.getSnapshot({id: id});
+    store.getSnapshot = async function(snapshotId, driveName) {
+        console.log("Get Snapshot " + snapshotId + " in " + driveName)
+        const response = await api.getSnapshot({ id: snapshotId });
         if(response.status === 200) {
             let snapshot = response.data;
-            // TODO: CHANGE snapshot.myDrive To support other drives
             console.log(snapshot)
-            if(driveName === "My Drive" && snapshot.myDrive){
-                store.getDrive(id, snapshot.myDrive, driveName);
-                return;
+            let driveIds = snapshot.driveIds;
+            let driveId = Object.keys(driveIds).find((key) => driveIds[key] === driveName);
+            if (driveId) {
+                store.getDrive(snapshotId, driveId, driveName);
             }
-            if(driveName === "Shared With Me" && snapshot.sharedDrive )
-                store.getDrive(id, snapshot.shareDrive, driveName);
         }
     }
 
