@@ -291,27 +291,6 @@ createFileMap = function(driveIds, fileList) {
     return path;
 };
 
-getFolder = async function(req, res) {
-    const {id, folderid} = req.params;
-    try {
-        // Check if user is authenticated with Google
-        if (req.user && req.user.cloudProvider == 'google') {
-            // Retrieve User refreshToken from database
-            const user = await User.findById(req.user.id, { _id: 0, refreshToken: 1 });
-            if (!user) {
-                throw new Error('Could not find User in database.');
-            }
-            const fileList = await File.find({ snapshotId: id, parent: folderid });
-            res.status(200).json({ success: true, folder: fileList });
-        } else {
-            res.status(403).json({ success: false, error: 'Unauthorized.' });
-            throw new Error('Unauthorized User.');
-        }
-    } catch(error) {
-        console.error('Failed to create File Snapshot: ' + error);
-        res.status(400).json({ success: false, error: error });   
-    }
-};
 
 // Delete all files stored in the database
 // deleteFiles = async function(req, res) {
@@ -321,7 +300,6 @@ getFolder = async function(req, res) {
 // };
 
 module.exports = {
-    createFileSnapshot,
-    getFolder,
+    createFileSnapshot
     // deleteFiles
 };

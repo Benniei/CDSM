@@ -10,8 +10,6 @@ const router = express.Router();
 // Create a File Snapshot of the user's drive
 router.post('/snapshot/create', DriveController.createFileSnapshot);
 
-router.post('/snapshot/:id/:folderid', DriveController.getFolder);
-
 // Delete all files stored in the database
 // router.get('/deleteFiles', DriveController.deleteFiles);
 

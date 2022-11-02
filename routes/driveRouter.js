@@ -7,6 +7,4 @@ const express = require('express');
 
 const router = express.Router();
 
-router.post('/snapshot', auth.verify, DriveController.getSnapshot);
-
 module.exports = router;
