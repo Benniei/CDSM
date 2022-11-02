@@ -50,7 +50,7 @@ function QueryBuilderModal() {
     function buildQuery() {
         let query = "";
         for (let op in queryOp) {
-            query += op.operator + ':' + op.target + ' and '
+            query += queryOp[op].operator + ':' + queryOp[op].target + ' and '
         }
         for (let op in readableUser) {
             query += 'readable:' + op + ' and '
