@@ -32,7 +32,7 @@ function FileSharingUser(props) {
     const [select, setSelect] = useState(user.role.charAt(0).toUpperCase() + user.role.slice(1))
     return (
         <Box 
-            className="fileShareUser"
+            className="fileFolderModal"
             display="flex"
             key={user.email}
             mt={1.5}
