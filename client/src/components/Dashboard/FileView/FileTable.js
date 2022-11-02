@@ -106,7 +106,7 @@ function FileTable(props){
     if (store.allItems) {
         for (let file of store.allItems) {
             rows.push(createData(file.name, file.children ? "Folder" : "File",
-                file.owners[0].emailAddress === auth.user.email ? "me": file.owners[0].emailAddress, file.lastModifiedTime, file.fileId));
+                file.owner === auth.user.email ? "me": file.owner, file.lastModifiedTime, file.fileId));
         };
     }
 
