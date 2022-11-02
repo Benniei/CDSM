@@ -10,6 +10,7 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
+import MenuItem from '@mui/material/MenuItem';
 
 const style = {
     position: 'absolute',
@@ -28,8 +29,87 @@ const style = {
 function FileSharingUser(props) {
     const {user, selectValues, setUniqueUsers, mixedUsers, setMixedUsers} = props
 
+    const [select, setSelect] = useState(user.role.charAt(0).toUpperCase() + user.role.slice(1))
     return (
-        <Box key={user.email}/>
+        <Box 
+            className="fileShareUser"
+            display="flex"
+            key={user.email}
+            mt={1.5}
+            >
+            <Box
+                sx={{width:'70%'}}
+                ml={1}>
+                <Stack
+                    direction='row'>
+                    {user.type === "user"?
+                        <Box>
+                            <Typography variant="h6">
+                                <strong>{user.name}</strong>
+                            </Typography>
+                            <Typography variant="h7">
+                                <strong>{user.email}</strong>
+                            </Typography>
+                        </Box>
+                        :
+                        <Typography >
+                            <strong>{user.email}</strong>
+                        </Typography>
+                    }
+                </Stack>
+                <Stack
+                    direction='row'>
+                </Stack>
+            </Box>
+            {user.role === "owner" ?
+                <TextField
+                    display="flex"
+                    id={"roles"}
+                    label="Role"
+                    value={"Owner"}
+                    fullWidth
+                    overflow='auto'
+                    sx={{width:'30%', "& .MuiInputBase-input.Mui-disabled": {
+                        WebkitTextFillColor: "black",
+                    }}}
+                    justifyContent="flex-end"
+                    disabled={true}
+                >
+                    {selectValues.map((item, index) => (
+                        <MenuItem key={index} value={item}>
+                            {item}
+                        </MenuItem>
+                    ))}
+                </TextField>
+                :
+                <TextField
+                    display="flex"
+                    id={"roles"}
+                    select
+                    label="Role"
+                    value={select}
+                    fullWidth
+                    overflow='auto'
+                    sx={{width:'30%'}}
+                    justifyContent="flex-end"
+                    onChange={(event) => {
+                        setSelect(event.target.value)
+                        // setqueryOp(queryOp.map((user) => {
+                        //     if (user.id === option.id) {
+                        //         return {...user, operator: event.target.value}
+                        //     }
+                        //     return user
+                        // }))
+                    }}
+                >
+                    {selectValues.map((item, index) => (
+                        <MenuItem key={index} value={item}>
+                            {item}
+                        </MenuItem>
+                    ))}
+                </TextField>
+                }
+        </Box>
     )
 }
 
@@ -40,8 +120,8 @@ function FileSharingModal(props) {
     const [uniqueUsers, setUniqueUsers] = useState([]); // Follow a schema of {Email, role, type, name}
     const [mixedUsers, setMixedUsers] = useState([]); // Follow a schema of {Email, role, type}
 
-    const uniqueSelections = ["Viewer", "Commenter", "Editor"]
-    const mixedSelections = ["Mixed Values", "Viewer", "Commenter", "Editor"]
+    const uniqueSelections = ["Reader", "Commenter", "Writer"]
+    const mixedSelections = ["Mixed Values", "Reader", "Commenter", "Writer"]
     let flag = store.updateSharingModal;
 
     useEffect(() => {
@@ -88,7 +168,8 @@ function FileSharingModal(props) {
                             mixedResult.push({
                                 name: perm.name,
                                 email: perm.email,
-                                type: perm.type
+                                type: perm.type,
+                                role: "Mixed Values"
                             });
                         }
                     }
@@ -149,7 +230,7 @@ function FileSharingModal(props) {
                     display="flex">
                         {/* Left Column -- Shows all Selected Files */}
                         <Stack
-                            sx={{width: '40%'}}>
+                            sx={{width: '30%'}}>
                                 <Typography variant="h5" mb={1.2}>
                                     <strong>Selected Items</strong>
                                 </Typography>
@@ -166,14 +247,14 @@ function FileSharingModal(props) {
                         <Divider orientation="vertical" flexItem/>
                         {/* Right Column -- Show all Shared Users */}
                         <Stack
-                            sx={{width: '60%'}}>
+                            sx={{width: '70%'}}>
                                 <TextField
                                     id={"user"}
                                     label={"Add User or Group"}
                                     fullWidth
                                     overflow='auto' 
                                     value={data}
-                                    sx={{width: '90%', ml:3}}
+                                    sx={{width: '90%', ml:3, mb:1}}
                                     onChange= {(event) => {setData(event.target.value)}}
                                     onKeyPress={(event) => {
                                         if (event.key === 'Enter'){
