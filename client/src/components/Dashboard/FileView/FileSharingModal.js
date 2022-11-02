@@ -27,9 +27,8 @@ const style = {
 };
 
 function FileSharingUser(props) {
-    const {user, selectValues, setUniqueUsers, mixedUsers, setMixedUsers} = props
+    const {user, selectValues, users, setUsers} = props
 
-    const [select, setSelect] = useState(user.role.charAt(0).toUpperCase() + user.role.slice(1))
     return (
         <Box 
             className="fileFolderModal"
@@ -45,14 +44,14 @@ function FileSharingUser(props) {
                     {user.type === "user"?
                         <Box>
                             <Typography variant="h6">
-                                <strong>{user.name}</strong>
+                                <strong>{user.email}</strong>
                             </Typography>
                             <Typography variant="h7">
-                                <strong>{user.email}</strong>
+                                <strong>{user.type}</strong>
                             </Typography>
                         </Box>
                         :
-                        <Typography >
+                        <Typography variant="h6">
                             <strong>{user.email}</strong>
                         </Typography>
                     }
@@ -63,43 +62,42 @@ function FileSharingUser(props) {
             </Box>
             {user.role === "owner" ?
                 <TextField
-                    display="flex"
-                    id={"roles"}
-                    label="Role"
-                    value={"Owner"}
-                    fullWidth
-                    overflow='auto'
-                    sx={{width:'30%', "& .MuiInputBase-input.Mui-disabled": {
-                        WebkitTextFillColor: "black",
-                    }}}
-                    justifyContent="flex-end"
-                    disabled={true}
-                >
-                    {selectValues.map((item, index) => (
-                        <MenuItem key={index} value={item}>
-                            {item}
-                        </MenuItem>
-                    ))}
-                </TextField>
+                        display="flex"
+                        id={"roles"}
+                        label="Role"
+                        value={"Owner"}
+                        fullWidth
+                        overflow='auto'
+                        sx={{width:'30%', "& .MuiInputBase-input.Mui-disabled": {
+                            WebkitTextFillColor: "black",
+                        }}}
+                        justifycontent="flex-end"
+                        disabled={true}
+                    >
+                        {selectValues.map((item, index) => (
+                            <MenuItem key={index} value={item}>
+                                {item}
+                            </MenuItem>
+                        ))}
+                    </TextField>
                 :
                 <TextField
                     display="flex"
                     id={"roles"}
                     select
                     label="Role"
-                    value={select}
+                    value={user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                     fullWidth
                     overflow='auto'
                     sx={{width:'30%'}}
                     justifyContent="flex-end"
                     onChange={(event) => {
-                        setSelect(event.target.value)
-                        // setqueryOp(queryOp.map((user) => {
-                        //     if (user.id === option.id) {
-                        //         return {...user, operator: event.target.value}
-                        //     }
-                        //     return user
-                        // }))
+                        setUsers(users.map((item) => {
+                            if (item.email === user.email) {
+                                return {...item, role: event.target.value}
+                            }
+                            return item
+                        }))
                     }}
                 >
                     {selectValues.map((item, index) => (
@@ -120,8 +118,8 @@ function FileSharingModal(props) {
     const [uniqueUsers, setUniqueUsers] = useState([]); // Follow a schema of {Email, role, type, name}
     const [mixedUsers, setMixedUsers] = useState([]); // Follow a schema of {Email, role, type}
 
-    const uniqueSelections = ["Reader", "Commenter", "Writer"]
-    const mixedSelections = ["Mixed Values", "Reader", "Commenter", "Writer"]
+    const uniqueSelections = ["Reader", "Commenter", "Writer", "Remove Access"]
+    const mixedSelections = ["Mixed Values", "Reader", "Commenter", "Writer", "Remove Access"]
     let flag = store.updateSharingModal;
 
     useEffect(() => {
@@ -190,10 +188,11 @@ function FileSharingModal(props) {
         store.closeModal();
     }
 
-    function submitData(data) {
-
+    console.log(uniqueUsers);
+    function newUser(data) {
+        setUniqueUsers([...uniqueUsers, {email: data, role: "writer", type: "new"}])
     }
-
+    
     return (
         <Modal
             open={flag}
@@ -258,7 +257,7 @@ function FileSharingModal(props) {
                                     onChange= {(event) => {setData(event.target.value)}}
                                     onKeyPress={(event) => {
                                         if (event.key === 'Enter'){
-                                            submitData(data);
+                                            newUser(data);
                                             setData("");
                                         }
                                     }}/>
@@ -269,9 +268,8 @@ function FileSharingModal(props) {
                                         <FileSharingUser 
                                             user={item}
                                             selectValues={uniqueSelections} 
-                                            setUniqueUsers={setUniqueUsers}
-                                            mixedUsers={mixedUsers}
-                                            setMixedUsers={setMixedUsers} />
+                                            users={uniqueUsers}
+                                            setUsers={setUniqueUsers} />
                                     )
                                 })
                             }
@@ -279,10 +277,10 @@ function FileSharingModal(props) {
                                 mixedUsers.map((item) => {
                                     return(
                                         <FileSharingUser 
+                                            user={item}
                                             selectValues={mixedSelections} 
-                                            setUniqueUsers={setUniqueUsers}
-                                            mixedUsers={mixedUsers}
-                                            setMixedUsers={setMixedUsers} />
+                                            users={mixedUsers}
+                                            setUsers={setMixedUsers} />
                                     )
                                 })
                             }
