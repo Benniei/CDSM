@@ -1,5 +1,6 @@
 // Local imports
 const FileSnapshot = require('../models/filesnapshot-model');
+const File = require('../models/file-model');
 const User = require('../models/user-model');
 
 // Non-Specific Drive Functions
