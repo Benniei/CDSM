@@ -15,13 +15,14 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import Checkbox from '@mui/material/Checkbox';
 
 /* For Testing */
-function createData(name, type, owner, lastModified, id) {
+function createData(name, type, owner, lastModified, id, index) {
     return {
         name: name,
         type: type,
         owner: owner,
         lastModified: lastModified,
-        id: id
+        id: id,
+        index: index
     };
 }
 
@@ -99,14 +100,16 @@ function FileTable(props){
     const {auth} = useContext(AuthContext);
     const [order, setOrder] = useState('asc')
     const [orderBy, setOrderBy] = useState('name')
-    const [selected, setSelected] = useState([])
+    const {selected, setSelected} = props;
+
     
     let rows = [];
 
     if (store.allItems) {
+        let i = 0;
         for (let file of store.allItems) {
             rows.push(createData(file.name, file.children ? "Folder" : "File",
-                file.owners[0].emailAddress === auth.user.email ? "me": file.owners[0].emailAddress, file.lastModifiedTime, file.fileId));
+                file.owners[0].emailAddress === auth.user.email ? "me": file.owners[0].emailAddress, file.lastModifiedTime, file.fileId, i++));
         };
     }
 
@@ -121,7 +124,7 @@ function FileTable(props){
     // Selects all the items in the list
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelected = rows.map((n) => n.name);
+            const newSelected = rows;
             setSelected(newSelected);
             return;
         }
@@ -137,14 +140,15 @@ function FileTable(props){
     }
 
     // Handles clicking on the row
-    const handleClick = (event, name) => {
-        const selectedIndex = selected.indexOf(name);
+    const handleClick = (event, row) => {
+        let name = row.name
+        const selectedIndex = selected.map((e) => e.name).indexOf(name);
         let newSelected = [];
         
         // Add in the item
         if (selectedIndex === -1) {
             console.log("Select " + name + " from list")
-            newSelected = newSelected.concat(selected, name);
+            newSelected = newSelected.concat(selected, row);
         }
         // Unselect the already selected item
         else if (selectedIndex === 0) {
@@ -162,11 +166,10 @@ function FileTable(props){
               selected.slice(selectedIndex + 1),
             );
         }
-
         setSelected(newSelected);
     };
 
-    const isSelected = (name) => selected.indexOf(name) !== -1;
+    const isSelected = (e) => selected.map((item) => item.name).indexOf(e) !== -1;
 
     return (
         <Box sx={{width: '100%'}}>
@@ -200,7 +203,7 @@ function FileTable(props){
                                                 color='primary'
                                                 checked={isItemSelected}
                                                 inputProps={{'aria-labelledby': labelID}} 
-                                                onClick={(event) => handleClick(event, row.name)}/>
+                                                onClick={(event) => handleClick(event, row)}/>
                                         </TableCell>
                                         <TableCell
                                             componet='th'

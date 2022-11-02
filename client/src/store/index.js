@@ -24,7 +24,6 @@ function GlobalStoreContextProvider(props) {
 
     const [store, setStore] = useState({
         allItems: [],
-        selectedDocuments: [],
         currentSnapshot: "",
         queryBuilder: false,
         takeSnapshotModal: false,
@@ -42,7 +41,6 @@ function GlobalStoreContextProvider(props) {
             case GlobalStoreActionType.GET_FOLDER: {
                 return setStore({
                     allItems: payload.folder,
-                    selectedDocuments: [],
                     currentSnapshot: payload.id,
                     queryBuilder: false,
                     takeSnapshotModal: false,
@@ -57,7 +55,6 @@ function GlobalStoreContextProvider(props) {
             case GlobalStoreActionType.GET_DRIVE: {
                 return setStore({
                     allItems: payload.folder,
-                    selectedDocuments: [],
                     currentSnapshot: payload.snapshotid,
                     queryBuilder: false,
                     takeSnapshotModal: false,
@@ -72,7 +69,6 @@ function GlobalStoreContextProvider(props) {
             case GlobalStoreActionType.OPEN_QUERY_BUILDER: {
                 return setStore({
                     allItems: store.allItems,
-                    selectedDocuments: store.selectedDocuments,
                     currentSnapshot: store.currentSnapshot,
                     queryBuilder: true,
                     takeSnapshotModal: false,
@@ -87,7 +83,6 @@ function GlobalStoreContextProvider(props) {
             case GlobalStoreActionType.OPEN_TAKE_SNAPSHOT_MODAL: {
                 return setStore({
                     allItems: store.allItems,
-                    selectedDocuments: store.selectedDocuments,
                     currentSnapshot: store.currentSnapshot,
                     queryBuilder: false,
                     takeSnapshotModal: true,
@@ -102,7 +97,6 @@ function GlobalStoreContextProvider(props) {
             case GlobalStoreActionType.OPEN_UPDATE_SHARING: {
                 return setStore({
                     allItems: store.allItems,
-                    selectedDocuments: store.selectedDocuments,
                     currentSnapshot: store.currentSnapshot,
                     queryBuilder: false,
                     takeSnapshotModal: false,
@@ -117,7 +111,6 @@ function GlobalStoreContextProvider(props) {
             case GlobalStoreActionType.OPEN_AC_MODAL: {
                 return setStore({
                     allItems: store.allItems,
-                    selectedDocuments: store.selectedDocuments,
                     currentSnapshot: store.currentSnapshot,
                     queryBuilder: false,
                     takeSnapshotModal: false,
@@ -132,7 +125,6 @@ function GlobalStoreContextProvider(props) {
             case GlobalStoreActionType.OPEN_AC_SEARCH: {
                 return setStore({
                     allItems: store.allItems,
-                    selectedDocuments: store.selectedDocuments,
                     currentSnapshot: store.currentSnapshot,
                     queryBuilder: true,
                     takeSnapshotModal: false,
@@ -147,7 +139,6 @@ function GlobalStoreContextProvider(props) {
             case GlobalStoreActionType.CLOSE_MODAL: {
                 return setStore({
                     allItems: store.allItems,
-                    selectedDocuments: store.selectedDocuments,
                     currentSnapshot: store.currentSnapshot,
                     queryBuilder: false,
                     takeSnapshotModal: false,
@@ -163,7 +154,6 @@ function GlobalStoreContextProvider(props) {
             case GlobalStoreActionType.OPEN_ACCESS: {
                 return setStore({
                     allItems: store.allItems,
-                    selectedDocuments: store.selectedDocuments,
                     currentSnapshot: store.currentSnapshot,
                     queryBuilder: false,
                     takeSnapshotModal: false,
@@ -178,7 +168,6 @@ function GlobalStoreContextProvider(props) {
             case GlobalStoreActionType.OPEN_ANALYZE: {
                 return setStore({
                     allItems: store.allItems,
-                    selectedDocuments: store.selectedDocuments,
                     currentSnapshot: store.currentSnapshot,
                     queryBuilder: false,
                     takeSnapshotModal: false,
@@ -193,7 +182,6 @@ function GlobalStoreContextProvider(props) {
             case GlobalStoreActionType.OPEN_DRIVE: {
                 return setStore({
                     allItems: [],
-                    selectedDocuments: store.selectedDocuments,
                     currentSnapshot: store.currentSnapshot,
                     queryBuilder: false,
                     takeSnapshotModal: false,
@@ -219,8 +207,8 @@ function GlobalStoreContextProvider(props) {
         const response = await api.takeSnapshot(auth.user);
         if(response.status === 200) {
             let snapshot = response.data.fileSnapshot;
-            let folderId = snapshot.myDrive;
-            store.getFolder(snapshot.snapshotId, folderId, null);
+            let driveID = snapshot.myDrive;
+            store.getDrive(snapshot.snapshotId, driveID, "My Drive");
         }
     }
 

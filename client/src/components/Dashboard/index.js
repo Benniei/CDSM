@@ -8,7 +8,6 @@ import SnapshotView from './FileView/SnapshotView';
 import AccessControlView from './AccessControl/AccessControlView';
 import QueryBuilderModal from './QueryBuilderModal';
 import TakeSnapshotModal from './SideComponents/TakeSnapshotModal';
-import FileSharingModal from './FileView/FileSharingModal';
 
 // Imports from Material-UI
 import Box from '@mui/material/Box';
@@ -58,7 +57,6 @@ function Dashboard() {
             {/* Modals */}
             <QueryBuilderModal />
             <TakeSnapshotModal />
-            <FileSharingModal />
         </Box>
     );
 }
