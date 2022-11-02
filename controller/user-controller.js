@@ -30,6 +30,28 @@ getFolder = async function(req, res) {
     }
 };
 
+buildQuery = async function(req, res) {
+    const query = req.body;
+    try {
+        const user = await User.findById(req.userId, { _id: 0, searchHistory: 1 });
+        if (!user) {
+            throw new Error('Could not find User in database.');
+        }
+        if (user.searchHistory) {
+            user.searchHistory.unshift(query);
+            if(user.searchHistory.length > 5) 
+                user.searchHistory = user.searchHistory.slice(0, 5);
+        } else {
+            user.searchHistory = [query];
+        } 
+        user.save();
+        res.status(200).json({ success: true, query: query });
+    } catch(error) {
+        console.error('Failed to build search query: ' + error);
+        res.status(400).json({ success: false, error: error });   
+    }
+};
+
 // User Functions
 updateACR = async (req, res) => {
     try {
@@ -61,5 +83,6 @@ module.exports = {
     updateACR,
     listSnapshots,
     getSnapshot,
-    getFolder
+    getFolder,
+    buildQuery
 };

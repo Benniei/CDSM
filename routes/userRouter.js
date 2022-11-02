@@ -15,6 +15,7 @@ router.get('/sharingAnalysis', AnalysisController.sharingAnalysis);
 
 // User Routes
 router.post('/acr', auth.verify, UserController.updateACR);
+router.post('/buildQuery', auth.verify, UserController.buildQuery);
 router.get('/snapshot/list', auth.verify, UserController.listSnapshots);
 
 module.exports = router;
