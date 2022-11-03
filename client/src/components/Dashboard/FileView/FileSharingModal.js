@@ -187,8 +187,7 @@ function FileSharingModal(props) {
         setMixedUsers([]);
         store.closeModal();
     }
-
-    console.log(uniqueUsers);
+    
     function newUser(data) {
         setUniqueUsers([...uniqueUsers, {email: data, role: "writer", type: "new"}])
     }

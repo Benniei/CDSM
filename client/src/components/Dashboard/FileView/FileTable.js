@@ -13,6 +13,11 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import Checkbox from '@mui/material/Checkbox';
+import ArticleIcon from '@mui/icons-material/Article';
+import FolderIcon from '@mui/icons-material/Folder';
+import Stack from '@mui/material/Stack';
+
+
 
 /* For Testing */
 function createData(name, type, owner, lastModified, id, index) {
@@ -30,22 +35,32 @@ const headCells = [
     {
         id: 'name',
         disablePadding: true,
-        label: 'Name'
-    },
-    {
-        id: 'type',
-        disablePadding: false,
-        label: 'File Type'
+        label: 'Name',
+        sort: true
     },
     {
         id: 'owner',
         disablePadding: false,
-        label: 'Owner'
+        label: 'Owner',
+        sort: true
+    },
+    {
+        id: 'inheritedperms',
+        disablePadding:false,
+        label: "Inherited Permissions",
+        sort: false
+    },
+    {
+        id: 'directedperms',
+        disablePadding:false,
+        label: "Directed Permissions",
+        sort:false
     },
     {
         id: 'lastModified',
         disablePadding: false,
-        label: 'Last Modified'
+        label: 'Last Modified',
+        sort:true
     }
 ]
 
@@ -76,6 +91,7 @@ function FileTableHead(props) {
                         inputProps={{'aria-label': 'select all files'}} />
                 </TableCell>
                 {headCells.map((headCell) => (
+                    headCell.sort?
                     <TableCell
                         key={headCell.id}
                         align='left'
@@ -87,6 +103,13 @@ function FileTableHead(props) {
                                 onClick={createSortHandler(headCell.id)}>
                                     {headCell.label}
                             </TableSortLabel>
+                    </TableCell>
+                    :
+                    <TableCell
+                        key={headCell.id}
+                        align='left'
+                        padding={headCell.disablePadding? 'none': 'normal'}>
+                            {headCell.label}
                     </TableCell>
                 ))} 
             </TableRow>
@@ -104,7 +127,7 @@ function FileTable(props){
 
     
     let rows = [];
-
+    console.log(store.allItems)
     if (store.allItems) {
         let i = 0;
         for (let file of store.allItems) {
@@ -173,9 +196,10 @@ function FileTable(props){
 
     return (
         <Box sx={{width: '100%'}}>
-            <TableContainer>
+            <TableContainer
+                sx={{width:'100%', overflowX: 'auto'}}>
                 <Table
-                    sx={{minwidth:750}}
+                    sx={{minWidth: 1000}}
                     aria-labelledby="tableTitle">
                         <FileTableHead
                             numSelected={selected.length}
@@ -209,10 +233,17 @@ function FileTable(props){
                                             componet='th'
                                             id={labelID}
                                             scope='row'
-                                            padding='none'>
-                                            {row.name}
+                                            padding='none'
+                                            >
+                                            <Stack direction="row" alignItems="center" gap={1}>
+                                                {
+                                                    row.type === "Folder"? <FolderIcon /> : <ArticleIcon sx={{mr:.5}}/>
+                                                }
+                                                <Box display='inline'>{row.name}</Box>
+                                            </Stack>
                                         </TableCell>
-                                        <TableCell align="left">{row.type}</TableCell>
+                                        <TableCell align="left">{row.owner}</TableCell>
+                                        <TableCell align="left">{row.owner}</TableCell>
                                         <TableCell align="left">{row.owner}</TableCell>
                                         <TableCell align="left">{row.lastModified}</TableCell>
                                     </TableRow>

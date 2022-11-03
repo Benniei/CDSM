@@ -265,7 +265,6 @@ function GlobalStoreContextProvider(props) {
         const response = await api.getSnapshot({ id: snapshotId });
         if(response.status === 200) {
             let snapshot = response.data;
-            console.log(snapshot)
             let driveIds = snapshot.driveIds;
             let driveId = Object.keys(driveIds).find((key) => driveIds[key] === driveName);
             if (driveId) {
