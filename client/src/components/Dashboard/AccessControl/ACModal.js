@@ -50,6 +50,7 @@ function ACModal() {
 
     function handleSave() {
         let access_control_req = {
+            name: name,
             AW: allowWriters,
             AR: allowReaders,
             DW: denyWriters,

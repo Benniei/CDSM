@@ -1,6 +1,7 @@
 // Local Imports
 import {useContext} from 'react';
 import {GlobalStoreContext} from '../../../store';
+import AuthContext from '../../../auth/index.js';
 
 // Imports from MUI
 import Box from '@mui/material/Box';
@@ -8,7 +9,8 @@ import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 
 function ACNameBar(props) {
-    const {content, names} = props
+    const {content, names} = props;
+    console.log(content, names);
     return (
         <Box sx={{
             display: 'flex',
@@ -37,13 +39,14 @@ function ACNameBar(props) {
 
 function ACCard() {
     const {store} = useContext(GlobalStoreContext);
+    const {auth} = useContext(AuthContext);
     let data = {
-        name: "Access Control 01",
+        name: auth.user.access_control_req.name,
         query: "Search Query",
-        allowWrite: ["adam", "Bob", "Carlos"],
-        allowRead: [],
-        denyRead: ["Zombis", "yell"],
-        denyWrite: []
+        allowWrite: auth.user.access_control_req.AW,
+        allowRead: auth.user.access_control_req.AR,
+        denyRead: auth.user.access_control_req.DR,
+        denyWrite: auth.user.access_control_req.DW
     }
     
     return (
@@ -62,7 +65,7 @@ function ACCard() {
             {(data.allowRead.length > 0) ? 
                 <ACNameBar
                     content={"Allowed Readers: "}
-                    names={data.allowReaders} />:null}
+                    names={data.allowRead} />:null}
             {(data.denyRead.length > 0) ? 
                 <ACNameBar
                     content={"Deny Readers: "}
