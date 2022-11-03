@@ -48,6 +48,7 @@ createFileSnapshot = async function(req, res) {
                 parent: file.parents,
                 children: file.children,
                 permissions: file.permissions,
+                permissionsRaw: file.permissionsRaw,
                 permissionIds: file.permissionIds,
                 lastModifiedTime: file.modifiedTime,
             });
@@ -181,7 +182,9 @@ createFileMap = function(driveIds, fileList) {
         }
         // Replace the file's permission array with an object
         if (file.permissions) {
-            overrides['permissions'] = createPermissionObject(file.permissions);
+            const permissionObjects = createPermissionObject(file.permissions);
+            overrides['permissions'] = permissionObjects.permissions;
+            overrides['permissionsRaw'] = permissionObjects.permissionsRaw;
         }
         // Replace the file's owners array with only the owner's email address
         if (file.sharingUser) {
@@ -225,17 +228,17 @@ createFileMap = function(driveIds, fileList) {
     }
     // Return the map of drive files
     return map;
-    // return Object.fromEntries(map);
 };
 
 /**
  * Converts an array of permissions into an object
  * @param {Object[]} permissionList - An list of Google Drive permission objects
- * @returns {Object} permissions - An object containing all of the file's permissions
+ * @returns {Object} permissions - Objects containing all of the file's permissions as strings and objects
  */
 createPermissionObject = function(permissionList) {
     // Object to store the permissions of a file
     const permissions = {};
+    const permissionsRaw = {};
     // Insert the permissions into permission object using '(emailAddress, role)' keys
     for (const permission of permissionList) {
         // String containing permission's user/group/domain/anyone address and role
@@ -251,11 +254,9 @@ createPermissionObject = function(permissionList) {
                 permissionString = `(anyone, ${permission.role})`;
         }
         permissions[permission.id] = permissionString;
+        permissionsRaw[permission.id] = permission;
     }
-    // for (const permission of permissionList) {
-    //     permissions[permission.id] = permission;
-    // }
-    return permissions;
+    return { permissions: permissions, permissionsRaw: permissionsRaw };
 };
 
 /**

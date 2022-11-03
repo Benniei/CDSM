@@ -15,7 +15,8 @@ const FileSchema = new Schema(
         root: { type: Boolean, required: false, default: false },                                       // Whether file is the drive's root folder
         parent: { type: String, required: false },                                                      // File Id of the file's parent folders
         children: { type: [String], required: false, default: () => { return null; } },                 // File Ids of the folder's children files
-        permissions: { type: Object, required: false },                                                 // List of the file's permissions taken from cloud provider
+        permissions: { type: Object, required: false },                                                 // List of the file's permissions as strings taken from cloud provider
+        permissionsRaw: { type: Object, required: false },                                              // List of the file's permissions as objects form taken from cloud provider
         permissionIds: { type: [String], required: false, default: () => { return null; } },            // Ids of the file's permissions taken from cloud provider
         lastModifiedTime: { type: String, required: false },                                            // Timestamp of when the file was last modified
         deviantPermissions: { type: Object, required: false, default: () => { return null; } },         // Permissions that deviate from those found in other files in the same folder
