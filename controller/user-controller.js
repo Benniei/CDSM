@@ -50,6 +50,96 @@ buildQuery = async function(req, res) {
     }
 };
 
+// do query
+doQuery = async function (req, res) {
+    function parseQuery(query) {
+        op_list = ['drive:', 'owner:', 'creator:', 'from:', 'to:', 'readable:', 'writable:', 'sharable:', 'name:', 'inFolder:', 'folder:', 'path:', 'sharing:']
+            
+        op_queries = []
+        
+        let nextColon = 0;
+        let endInd = 0;
+        while (op_list.some(v => query.includes(v))) {
+            nextColon = query.indexOf(':')+1
+            if (query.charAt(nextColon) === '"' ) {
+                endInd = query.indexOf('"', nextColon+1)+1
+                endInd = query.indexOf(' ', endInd)
+            } else {
+                endInd = query.indexOf(' ', nextColon)
+            }
+                
+            if (endInd === -1) {
+                endInd = query.length;
+            }
+                
+            op_str = query.substring(0, endInd);
+            if (op_str.indexOf('and') === 0) {
+                op_str = op_str.substring(4)
+            } 
+            if (op_str.indexOf('or') === 0) {
+                op_str = op_str.substring(3)
+            }
+            op_str = op_str.trim()
+            while (op_str.indexOf('(') === 0) {
+                op_str = op_str.substring(1)
+            }
+            while (op_str.indexOf(')', op_str.length-1) === (op_str.length-1)) {
+                op_str = op_str.substring(0, op_str.length - 1)
+            }
+            query = query.substring(endInd).trim();
+            
+            op_query = op_str.split(':')
+            op_query.push(op_query[0].charAt(0) === '-' ? true : false)
+            if (op_query[0].charAt(0) === '-') {
+                op_query[0] = op_query[0].substring(1)
+            }
+            if (op_query[1].charAt(0) === '"' && op_query[1].charAt(op_query[1].length-1) === '"' ) {
+                op_query[1] = op_query[1].substring(1, op_query[1].length-1)
+            }
+            
+            op_queries.push(op_query);
+        }
+        return op_queries
+    }
+    
+    function queryBuilder(query_list, snapshot_id) {
+        function negate(content, negate) {
+            return (negate ? { $ne: content } : content); 
+        }
+        
+        query = { snapshotId: { $regex: snapshot_id } }
+        for (op of query_list) {
+            
+            if (op[0] === 'inFolder') {
+                content = { $regex: op[1]+'\/$'}
+                query['path'] = negate(content, op[2])
+            } else if (op[0] === 'folder') {
+                content = { $regex: '\/'+op[1]}
+                query['path'] = negate(content, op[2])
+            } else if (op[0] === 'path') {
+                content = { $regex: op[1]}
+                query['path'] = negate(content, op[2])
+            } else {
+                query[op[0]] = negate(op[1], op[2])
+            }
+        }
+        return query
+    }
+    // for testing we hardcoded snapshot_id
+    // const {query, snapshot_id} = req.params;
+    const {query} = req.params
+    snapshot_id = '634cb4405445ff8fb73a6749-November 3rd 2022, 0:06:11'
+
+    try {
+        query = queryBuilder(parseQuery(txt), snapshot_id)
+        files = await File.find( query );
+        res.status(200).json({ success: true, files: files});
+    } catch(error) {
+        console.error('Failed to execute query: ' + error);
+        res.status(400).json({ success: false, error: error });
+    }
+}
+
 // User Functions
 updateACR = async (req, res) => {
     try {
