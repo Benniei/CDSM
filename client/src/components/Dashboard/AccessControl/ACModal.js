@@ -5,7 +5,10 @@ import AuthContext from '../../../auth/index.js';
 import NameBar from '../NameBar'
 
 // Imports from MUI
+import Switch from '@mui/material/Switch';
 import CloseIcon from '@mui/icons-material/Close';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import Modal from '@mui/material/Modal';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
@@ -40,10 +43,7 @@ function ACModal() {
     const [denyReaders, setDenyReaders] = useState([]);
     const [denyWrite, setDenyWrite] = useState("");
     const [denyWriters, setDenyWriters] = useState([]);
-
-    let flag = false;
-    if(store.accessModal)
-        flag = true;
+    const [flag, setFlag] = useState(false);
 
     useEffect(() => {
         let acr = auth.user.access_control_req;
@@ -52,9 +52,9 @@ function ACModal() {
             setAllowReaders(acr.AR);
             setDenyReaders(acr.DR);
             setDenyWriters(acr.DW);
-            flag = acr.Grp;
+            setFlag(acr.Grp);
         }
-    })
+    }, auth.user.access_control_req)
     
     function handleOpenBuilder(){
         store.openAccessControlSearch();
@@ -82,7 +82,7 @@ function ACModal() {
         setDenyReaders([]);
         setDenyWrite("");
         setDenyWriters([]);
-        flag=false;
+        setFlag(false);
     }
 
     function addAllowWrite(name){
@@ -125,9 +125,14 @@ function ACModal() {
         setDenyWriters(denyWriters.filter((obj) => obj !== name))
     }
 
+    function handleGrpFlag(event) {
+        console.log("Changing flag value from " + flag + " to " + event.target.checked)
+        setFlag(event.target.checked);
+    }
+
     return (
         <Modal
-            open={flag}
+            open={store.accessModal}
             aria-labelledby="modal-modal-snapshot"
             aria-describedby="modal-modal-snapshottake"
         >
@@ -191,6 +196,16 @@ function ACModal() {
                             )
                         }}
                     />
+                    <FormGroup>
+                        <FormControlLabel 
+                            control={
+                                <Switch 
+                                    onChange={event => handleGrpFlag(event)}
+                                    checked={flag}/>
+                            } 
+                            label="Include Groups? " 
+                            labelPlacement="start" />
+                    </FormGroup>
                 </Stack>
                 
                 {/* Access Control permissions */}
