@@ -229,7 +229,7 @@ function GlobalStoreContextProvider(props) {
                 path: path,
                 parents: [{folderid: folderid, permissions: response.data.perms}]
             };
-            // console.log(snapshot)
+            console.log(snapshot)
             storeReducer({
                 type:GlobalStoreActionType.GET_FOLDER,
                 payload: snapshot

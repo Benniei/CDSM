@@ -21,7 +21,7 @@ getFolder = async function(req, res) {
         const fileList = await File.find({ snapshotId: id, parent: folderid });
         let folderPerms = await File.find({fileId: folderid, snapshotId: id});
 
-        res.status(200).json({ success: true, folder: fileList, perms: folderPerms[0].permissions});
+        res.status(200).json({ success: true, folder: fileList, perms: folderPerms[0].permissionsRaw});
     } catch(error) {
         console.error('Failed to find folder: ' + error);
         res.status(400).json({ success: false, error: error });   
@@ -129,7 +129,7 @@ doQuery = async function (req, res) {
     // const {query, snapshot_id} = req.params;
     let {query} = req.body;
     console.log(parseQuery(query))
-    snapshot_id = '6358b63f68f6810c650732af-November 2nd 2022, 20:16:30'
+    snapshot_id = "634cb4405445ff8fb73a6749-November 3rd 2022, 5:53:45"
     try {
         builtQuery = queryBuilder(parseQuery(query), snapshot_id)
         console.log(query, builtQuery);

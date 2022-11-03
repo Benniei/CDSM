@@ -160,13 +160,12 @@ function FileTable(props){
             //console.log(file.name)
             // Intersection between the file and its parent's permissions
             // Step 1 Find out if File has Corresponding Parent
-            
             let parent = store.parents && store.parents.find(o => (o.folderid === file.parent)? o: null)
 
             // Gather all the file's permissions as an array
             let data = [[],[]]
-            for(let key in file.permissions){
-                data[0].push(file.permissions[key])
+            for(let key in file.permissionsRaw){
+                data[0].push(file.permissionsRaw[key])
             }
             if(parent)
                 for(let key in parent.permissions){
@@ -182,7 +181,7 @@ function FileTable(props){
             else{
                 directPerms = data[0].filter(item => item.role !== "owner")
             }
-            //console.log(inheritiedPerms, directPerms)
+            // console.log(inheritiedPerms, directPerms)
             rows.push(createData(file.name, file.children ? "Folder" : "File",
                 file.owner === auth.user.email ? "me": file.owner, file.lastModifiedTime, file.fileId, i++, inheritiedPerms, directPerms))
         };

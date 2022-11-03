@@ -130,7 +130,7 @@ function FileSharingModal(props) {
             if(selected.length > 0) {
                 let data = [];
                 for(let file of selected){
-                    let fileInfo = store.allItems[file.index].permissions;
+                    let fileInfo = store.allItems[file.index].permissionsRaw;
                     let setdata = [];
                     for(let key in fileInfo){
                         let obj = fileInfo[key]

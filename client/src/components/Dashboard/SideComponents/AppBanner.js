@@ -35,7 +35,6 @@ function AppBanner() {
 
     let searchHistory = [];
     if(auth.user) {
-        console.log(auth.user);
         searchHistory = auth.user.searchHistory;
     }
 
