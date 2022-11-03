@@ -22,10 +22,11 @@ function AccessControlView(){
             {/* Snapshot Bar on top to choose Snapshot + Create New Access Control Policy */}
             <ACBar />
 
-            {/* An AC Card for every Access Control Policy */}
-            { auth.user.access_control_req && auth.user.access_control_req != ' ' ? <ACCard /> : "" }
+            {/* Access Control Policy Card */}
+            { auth.user.access_control_req && auth.user.access_control_req !== ' ' ? <ACCard /> : "" }
             
-
+            {/* Violations found in AC Policy */}
+            
             {/* AC Modal */}
             <ACModal />
         </Box>

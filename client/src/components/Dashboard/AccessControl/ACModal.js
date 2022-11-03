@@ -141,10 +141,10 @@ function ACModal() {
                 >
                     <Typography 
                         variant="h5"
-                    >Create New Access Control Policy</Typography>
+                    >Edit Access Control Policy</Typography>
 
                     {/* Access Control Policy Name */}
-                    <TextField   
+                    {/* <TextField   
                         id="name"
                         label="Access Control Name"
                         name="name"
@@ -152,7 +152,7 @@ function ACModal() {
                         size="large"
                         onChange={(event) => setName(event.value.target)}
                         sx={{backgroundColor:"#FFFFFF", width:'85%', mt:3}}
-                    />
+                    /> */}
 
                     {/* Search Bar */}
                     <TextField   

@@ -15,7 +15,7 @@ function ACNameBar(props) {
         <Box sx={{
             display: 'flex',
             flexWrap: 'wrap',
-            alignContent: 'flex-start'}} mt={.5}>
+            alignContent: 'flex-start'}} mt={.5} ml={2}>
             <Stack direction='row' spacing={1}>
                 <Typography variant="h6" ml={2} mr>
                     <strong>{content}</strong> 
@@ -41,8 +41,7 @@ function ACCard() {
     const {store} = useContext(GlobalStoreContext);
     const {auth} = useContext(AuthContext);
     let data = {
-        name: auth.user.access_control_req.name,
-        query: "Search Query",
+        query: auth.user.access_control_req.query,
         allowWrite: auth.user.access_control_req.AW,
         allowRead: auth.user.access_control_req.AR,
         denyRead: auth.user.access_control_req.DR,
@@ -51,29 +50,28 @@ function ACCard() {
     
     return (
         <Box className="access-control-card" sx={{width: '87%'}} ml={3} mt={2}>
-            <Typography variant="h5">
-                <strong> {data.name} </strong>
-            </Typography>
-            <Typography variant="h6" ml={2} mb={-.5}>
+            <Typography variant="h4" ml={2} mb={1.5}>
                 <strong>Search Query: </strong> {data.query}
             </Typography>
             
-            {(data.allowWrite.length > 0) ? 
-                <ACNameBar
-                    content={"Allowed Writers: "}
-                    names={data.allowWrite} />:null}
-            {(data.allowRead.length > 0) ? 
-                <ACNameBar
-                    content={"Allowed Readers: "}
-                    names={data.allowRead} />:null}
-            {(data.denyRead.length > 0) ? 
-                <ACNameBar
-                    content={"Deny Readers: "}
-                    names={data.denyRead} />:null}
-            {(data.denyWrite.length > 0) ? 
-                <ACNameBar
-                    content={"Deny Writers: "}
-                    names={data.denyWrite} />:null}
+            <Typography variant="h6" ml={4} mb={.5}> 
+                <strong>Group Directive: </strong>
+            </Typography>
+            <ACNameBar
+                content={"Allowed Writers: "}
+                names={data.allowWrite} />
+        
+            <ACNameBar
+                content={"Allowed Readers: "}
+                names={data.allowRead} />
+        
+            <ACNameBar
+                content={"Deny Readers: "}
+                names={data.denyRead} />
+        
+            <ACNameBar
+                content={"Deny Writers: "}
+                names={data.denyWrite} />
                         
         </Box>
     );
