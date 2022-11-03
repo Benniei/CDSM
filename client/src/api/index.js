@@ -55,6 +55,14 @@ export const getFolder = (payload, id, folderid) => api.post('/snapshot/' + id +
     return error.response;
  });
 
+ export const doQuery = (payload) => api.post('/doQuery', payload)
+ .then(response => {
+    return response
+ })
+ .catch(error => {
+    return error.response;
+ });
+
  /* User */
  export const updateACR = (payload) => api.post('/acr', payload)
  .then(response => {
@@ -71,6 +79,7 @@ getSnapshot,
 getFolder,
 takeSnapshot,
 buildQuery,
+doQuery,
 updateACR
 };
 

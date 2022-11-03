@@ -61,7 +61,19 @@ function AppBanner() {
                 {/** Search Bar */}
                 <Autocomplete
                     disablePortal
-                    popupIcon={
+                    popupIcon={""}
+                    freeSolo={true}
+                    options={searchHistory}
+                    sx={{backgroundColor:"#FFFFFF", width:'50%', mt:1}}
+                    renderInput={(params) => 
+                        <TextField {...params} label="Search" />
+                    }
+                    onKeyPress={(event) => {
+                        if (event.key === 'Enter'){
+                            console.log(event.target.value);
+                            store.buildQuery(event.target.value);
+                        }
+                    }}/>     
                     <InputAdornment position="end">
                         <TuneOutlinedIcon 
                             sx={{
@@ -74,12 +86,7 @@ function AppBanner() {
                                 borderRadius: '50%'
                             }}
                             onClick={event =>  handleOpenBuilder()}/>
-                    </InputAdornment>}
-                    options={searchHistory}
-                    sx={{backgroundColor:"#FFFFFF", width:'50%', mt:1}}
-                    renderInput={(params) => 
-                        <TextField {...params} label="Search" />
-                    }/>     
+                    </InputAdornment>
                 <Box sx={{flexGrow:1}} />
                 {/* Logo + User Login Name */}
                 {driveIcon}

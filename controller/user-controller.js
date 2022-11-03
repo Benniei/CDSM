@@ -59,7 +59,7 @@ doQuery = async function (req, res) {
         
         let nextColon = 0;
         let endInd = 0;
-        while (op_list.some(v => query.includes(v))) {
+        while (op_list.some(v => query.toLowerCase().includes(v))) {
             nextColon = query.indexOf(':')+1
             if (query.charAt(nextColon) === '"' ) {
                 endInd = query.indexOf('"', nextColon+1)+1
@@ -127,13 +127,15 @@ doQuery = async function (req, res) {
     }
     // for testing we hardcoded snapshot_id
     // const {query, snapshot_id} = req.params;
-    const {query} = req.params
-    snapshot_id = '634cb4405445ff8fb73a6749-November 3rd 2022, 0:06:11'
-
+    let {query} = req.body;
+    console.log(parseQuery(query))
+    snapshot_id = '6358b63f68f6810c650732af-November 2nd 2022, 20:16:30'
     try {
-        query = queryBuilder(parseQuery(txt), snapshot_id)
-        files = await File.find( query );
-        res.status(200).json({ success: true, files: files});
+        builtQuery = queryBuilder(parseQuery(query), snapshot_id)
+        console.log(query, builtQuery);
+        files = await File.find( builtQuery );
+        //console.log(files);
+        res.status(200).json({ success: true, files: files, snapshot_id: snapshot_id});
     } catch(error) {
         console.error('Failed to execute query: ' + error);
         res.status(400).json({ success: false, error: error });

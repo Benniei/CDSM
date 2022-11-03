@@ -275,8 +275,28 @@ function GlobalStoreContextProvider(props) {
         console.log("Building query: " + query);
         const response = await api.buildQuery({query: query});
         if(response.status === 200) {
-            console.log(response.data);
-            // TODO
+            let query = response.data.query;
+            auth.doSearch(query);
+            store.doQuery(query);
+        }
+    }
+
+    store.doQuery = async function(query) {
+        console.log("Doing query: " + query);
+        const response = await api.doQuery({query: query});
+        if(response.status === 200) {
+            let snapshot = {
+                folder: response.data.files,
+                snapshotid: response.data.snapshot_id,
+                driveName: "My Drive"
+            };
+            console.log("Files found: ");
+            console.log(snapshot.folder);
+            store.closeModal();
+            storeReducer({
+                type:GlobalStoreActionType.GET_DRIVE,
+                payload: snapshot
+            });
         }
     }
 

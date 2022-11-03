@@ -10,7 +10,8 @@ export const AuthActionType = {
     USER_LOGIN: "USER_LOGIN",
     USER_LOGOUT: "USER_LOGOUT",
     USER_UPDATE_ACR: "USER_UPDATE_ACR",
-    USER_TAKE_SNAPSHOT: "USER_TAKE_SNAPSHOT"
+    USER_TAKE_SNAPSHOT: "USER_TAKE_SNAPSHOT",
+    USER_DO_SEARCH: "USER_DO_SEARCH"
 }
 
 function AuthContextProvider(props) {
@@ -53,6 +54,12 @@ function AuthContextProvider(props) {
                 })
             }
             case AuthActionType.USER_TAKE_SNAPSHOT: {
+                return setAuth({
+                    user: payload.user,
+                    loggedIn: payload.loggedIn
+                })
+            }
+            case AuthActionType.USER_DO_SEARCH: {
                 return setAuth({
                     user: payload.user,
                     loggedIn: payload.loggedIn
@@ -123,6 +130,24 @@ function AuthContextProvider(props) {
         } 
         authReducer({
             type: AuthActionType.USER_TAKE_SNAPSHOT,
+            payload: {
+                user: user,
+                loggedIn: true
+            }
+        })
+    }
+
+    auth.doSearch = async function(query) {
+        let user = auth.user;
+        if (user.searchHistory) {
+            user.searchHistory.unshift(query);
+            if(user.searchHistory.length > 5) 
+                user.searchHistory = user.searchHistory.slice(0, 5);
+        } else {
+            user.searchHistory = [query];
+        } 
+        authReducer({
+            type: AuthActionType.USER_DO_SEARCH,
             payload: {
                 user: user,
                 loggedIn: true

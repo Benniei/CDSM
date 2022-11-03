@@ -157,7 +157,7 @@ function FileTable(props){
 
         // Enter Data into the File Table
         for (let file of store.allItems) {
-            console.log(file.name)
+            //console.log(file.name)
             // Intersection between the file and its parent's permissions
             // Step 1 Find out if File has Corresponding Parent
             
@@ -182,7 +182,7 @@ function FileTable(props){
             else{
                 directPerms = data[0].filter(item => item.role !== "owner")
             }
-            console.log(inheritiedPerms, directPerms)
+            //console.log(inheritiedPerms, directPerms)
             rows.push(createData(file.name, file.children ? "Folder" : "File",
                 file.owner === auth.user.email ? "me": file.owner, file.lastModifiedTime, file.fileId, i++, inheritiedPerms, directPerms))
         };
@@ -209,7 +209,7 @@ function FileTable(props){
     const handleChangeFolder = (event, type, fileID, name) => {
         if(type === "Folder") {
             const snapshotID = store.currentSnapshot
-            console.log(snapshotID, fileID)
+            //console.log(snapshotID, fileID)
             store.getFolder(snapshotID, fileID, {name: name, id: fileID}, -1);
         }
     }
