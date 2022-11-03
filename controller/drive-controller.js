@@ -7,7 +7,7 @@ const User = require('../models/user-model');
 // Creates a FileSnapshot of the user's current drive
 createFileSnapshot = async (req, res) => {
     try {
-        const user = await User.findById(req.userId, {_id: 1, refreshToken: 1, filesnapshot: 1, cloudProvider: 1});
+        const user = await User.findById(req.userId, {_id: 1, refreshToken: 1, filesnapshot: 1, cloudProvider: 1, threshold: 1});
         if (!user) {
             throw new Error('Could not find User in database.');
         }

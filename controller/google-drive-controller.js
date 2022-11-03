@@ -54,10 +54,8 @@ createFileSnapshot = async function(req, res) {
             await File.create(newFile);
             console.log(`Added File (${newFile.fileId}) to database`);
         }));
-
         // Perform sharing analysis on the newly created snapshot
-        // Analyze.sharingAnalysis(snapshotId, driveMap, req.user.threshold);
-
+        Analyze.sharingAnalysis(snapshotId, req.user.threshold);
         // Add the FileSnapshot as the user's most recent FileSnapshot
         if (user.filesnapshot) {
             user.filesnapshot.unshift(snapshotId);
@@ -236,12 +234,27 @@ createFileMap = function(driveIds, fileList) {
  * @returns {Object} permissions - An object containing all of the file's permissions
  */
 createPermissionObject = function(permissionList) {
-    // Objectbject to store the permissions of a file
+    // Object to store the permissions of a file
     const permissions = {};
-    // Insert the permissions into permission map using map method
+    // Insert the permissions into permission object using '(emailAddress, role)' keys
     for (const permission of permissionList) {
-        permissions[permission.id] = permission;
+        // String containing permission's user/group/domain/anyone address and role
+        let permissionString = '';
+        switch(permission.type) {
+            case 'user' || 'group':
+                permissionString = `(${permission.type}, ${permission.emailAddress}, ${permission.role})`;
+                break;
+            case 'domain':
+                permissionString = `(domain, ${permission.domain}, ${permission.role})`;
+                break;
+            default:
+                permissionString = `(anyone, ${permission.role})`;
+        }
+        permissions[permission.id] = permissionString;
     }
+    // for (const permission of permissionList) {
+    //     permissions[permission.id] = permission;
+    // }
     return permissions;
 };
 
