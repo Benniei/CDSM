@@ -16,18 +16,18 @@ import Checkbox from '@mui/material/Checkbox';
 import ArticleIcon from '@mui/icons-material/Article';
 import FolderIcon from '@mui/icons-material/Folder';
 import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 
-
-
-/* For Testing */
-function createData(name, type, owner, lastModified, id, index) {
+function createData(name, type, owner, lastModified, id, index, inheritedperms, directperms) {
     return {
         name: name,
         type: type,
         owner: owner,
         lastModified: lastModified,
         id: id,
-        index: index
+        index: index,
+        inherited: inheritedperms,
+        direct: directperms
     };
 }
 
@@ -51,17 +51,17 @@ const headCells = [
         sort: false
     },
     {
-        id: 'directedperms',
+        id: 'directperms',
         disablePadding:false,
-        label: "Directed Permissions",
+        label: "Direct Permissions",
         sort:false
     },
-    {
-        id: 'lastModified',
-        disablePadding: false,
-        label: 'Last Modified',
-        sort:true
-    }
+    // {
+    //     id: 'lastModified',
+    //     disablePadding: false,
+    //     label: 'Last Modified',
+    //     sort:true
+    // }
 ]
 
 function arraySort(arr, order, orderBy){
@@ -117,6 +117,26 @@ function FileTableHead(props) {
     );
 }
 
+function PermissionsTab (props){
+    const {permissions} = props
+    return (
+        <Stack
+            direction="row"
+            sx={{maxWidth:600, overflowX: 'auto'}}>
+                {permissions.map((item) => (
+                    <Box 
+                        className="grey-button"
+                        ml={.25}
+                        mr={.25}
+                        wrap
+                    >
+                        <Typography sx={{ml:.2}} variant="h7">{item.emailAddress}</Typography>
+                    </Box>
+                ))}
+        </Stack>
+    );
+}
+
 // Overview of the whole table {resource: https://mui.com/material-ui/react-table/}
 function FileTable(props){
     const {store} = useContext(GlobalStoreContext);
@@ -127,12 +147,44 @@ function FileTable(props){
 
     
     let rows = [];
-    console.log(store.allItems)
+    let inheritiedPerms = [];
+    let directPerms = [];
     if (store.allItems) {
         let i = 0;
+        // Get Unique Parent ids (Used Primarily for Search when there are multiple files)
+        // let allParents=[]
+        // store.allItems.map((file) => allParents.indexOf(file.parent) === -1? allParents.push(file.parent): null)
+
+        // Enter Data into the File Table
         for (let file of store.allItems) {
+            console.log(file.name)
+            // Intersection between the file and its parent's permissions
+            // Step 1 Find out if File has Corresponding Parent
+            
+            let parent = store.parents && store.parents.find(o => (o.folderid === file.parent)? o: null)
+
+            // Gather all the file's permissions as an array
+            let data = [[],[]]
+            for(let key in file.permissions){
+                data[0].push(file.permissions[key])
+            }
+            if(parent)
+                for(let key in parent.permissions){
+                    data[1].push(parent.permissions[key])
+                }
+            // console.log(data)
+            // If there is parent, there can be inheritied and direct permissions
+            if(parent){
+                inheritiedPerms = data.reduce((a,b) => a.filter(c => c.role !== "owner" && b.some(item => item.emailAddress === c.emailAddress && item.role === c.role)))
+                directPerms = data.reduce((a,b) => a.filter(c => c.role !== "owner" && !b.some(item => ( item.emailAddress === c.emailAddress && item.role === c.role))))
+            }
+            // If no parent, all permissions are direct
+            else{
+                directPerms = data[0].filter(item => item.role !== "owner")
+            }
+            console.log(inheritiedPerms, directPerms)
             rows.push(createData(file.name, file.children ? "Folder" : "File",
-                file.owner === auth.user.email ? "me": file.owner, file.lastModifiedTime, file.fileId, i++));
+                file.owner === auth.user.email ? "me": file.owner, file.lastModifiedTime, file.fileId, i++, inheritiedPerms, directPerms))
         };
     }
 
@@ -243,9 +295,9 @@ function FileTable(props){
                                             </Stack>
                                         </TableCell>
                                         <TableCell align="left">{row.owner}</TableCell>
-                                        <TableCell align="left">{row.owner}</TableCell>
-                                        <TableCell align="left">{row.owner}</TableCell>
-                                        <TableCell align="left">{row.lastModified}</TableCell>
+                                        <TableCell align="left"><PermissionsTab permissions={inheritiedPerms} /></TableCell>
+                                        <TableCell align="left"><PermissionsTab permissions={directPerms} /></TableCell>
+                                        {/* <TableCell align="left">{row.lastModified}</TableCell> */}
                                     </TableRow>
                                 );
                             })}

@@ -14,7 +14,6 @@ export const GlobalStoreActionType = {
     OPEN_AC_MODAL: "OPEN_AC_MODAL",
     CLOSE_MODAL: "CLOSE_MODAL",
     OPEN_AC_SEARCH: "OPEN_AC_SEARCH",
-    OPEN_DRIVE: "OPEN_DRIVE",
     OPEN_ACCESS: "OPEN_ACCESS",
     OPEN_ANALYZE: "OPEN_ANALYZE"
 }
@@ -32,7 +31,8 @@ function GlobalStoreContextProvider(props) {
         openDrive: "MyDrive",
         openAccess: false,
         openAnalyze: false,
-        path: []
+        path: [],
+        parents: []
     });
 
     const storeReducer = (action) => {
@@ -49,7 +49,8 @@ function GlobalStoreContextProvider(props) {
                     openDrive: store.openDrive,
                     openAccess: store.openAccess,
                     openAnalyze: store.openAnalyze,
-                    path: payload.path
+                    path: payload.path,
+                    parents: payload.parents
                 })
             }
             case GlobalStoreActionType.GET_DRIVE: {
@@ -63,7 +64,8 @@ function GlobalStoreContextProvider(props) {
                     openDrive: payload.driveName,
                     openAccess: false,
                     openAnalyze: false,
-                    path: []
+                    path: [],
+                    parents: payload.parents
                 })
             }
             case GlobalStoreActionType.OPEN_QUERY_BUILDER: {
@@ -77,7 +79,8 @@ function GlobalStoreContextProvider(props) {
                     openDrive: store.openDrive,
                     openAccess: store.openAccess,
                     openAnalyze: store.openAnalyze,
-                    path: store.path
+                    path: store.path,
+                    parents: store.parents
                 })
             }
             case GlobalStoreActionType.OPEN_TAKE_SNAPSHOT_MODAL: {
@@ -91,7 +94,8 @@ function GlobalStoreContextProvider(props) {
                     openDrive: store.openDrive,
                     openAccess: store.openAccess,
                     openAnalyze: store.openAnalyze,
-                    path: store.path
+                    path: store.path,
+                    parents: store.parents
                 })
             }
             case GlobalStoreActionType.OPEN_UPDATE_SHARING: {
@@ -105,7 +109,8 @@ function GlobalStoreContextProvider(props) {
                     openDrive: store.openDrive,
                     openAccess: store.openAccess,
                     openAnalyze: store.openAnalyze,
-                    path: store.path
+                    path: store.path,
+                    parents: store.parents
                 })
             }
             case GlobalStoreActionType.OPEN_AC_MODAL: {
@@ -119,7 +124,8 @@ function GlobalStoreContextProvider(props) {
                     openDrive: store.openDrive,
                     openAccess: store.openAccess,
                     openAnalyze: store.openAnalyze,
-                    path: store.path
+                    path: store.path,
+                    parents: []
                 })
             }
             case GlobalStoreActionType.OPEN_AC_SEARCH: {
@@ -133,7 +139,8 @@ function GlobalStoreContextProvider(props) {
                     openDrive: store.openDrive,
                     openAccess: store.openAccess,
                     openAnalyze: store.openAnalyze,
-                    path: store.path
+                    path: store.path,
+                    parents: []
                 })
             }
             case GlobalStoreActionType.CLOSE_MODAL: {
@@ -147,7 +154,8 @@ function GlobalStoreContextProvider(props) {
                     openDrive: store.openDrive,
                     openAccess: store.openAccess,
                     openAnalyze: store.openAnalyze,
-                    path: store.path
+                    path: store.path,
+                    parents: store.parents
                 })
             }
             
@@ -162,7 +170,8 @@ function GlobalStoreContextProvider(props) {
                     openDrive: null,
                     openAccess: true,
                     openAnalyze: false,
-                    path: []
+                    path: [],
+                    parents: []
                 })
             }
             case GlobalStoreActionType.OPEN_ANALYZE: {
@@ -176,21 +185,8 @@ function GlobalStoreContextProvider(props) {
                     openDrive: null,
                     openAccess: false,
                     openAnalyze: true,
-                    path: []
-                })
-            }
-            case GlobalStoreActionType.OPEN_DRIVE: {
-                return setStore({
-                    allItems: [],
-                    currentSnapshot: store.currentSnapshot,
-                    queryBuilder: false,
-                    takeSnapshotModal: false,
-                    updateSharingModal: false,
-                    accessModal: false,
-                    openDrive: payload,
-                    openAccess: false,
-                    openAnalyze: false,
-                    path: []
+                    path: [],
+                    parents: []
                 })
             }
             default:
@@ -226,10 +222,12 @@ function GlobalStoreContextProvider(props) {
             else{
                 path = [...store.path, folderName]
             }
+            console.log(response.data)
             let snapshot = {
                 folder: response.data.folder,
                 id: snapshotid,
-                path: path
+                path: path,
+                parents: [{folderid: folderid, permissions: response.data.perms}]
             };
             // console.log(snapshot)
             storeReducer({
@@ -337,13 +335,6 @@ function GlobalStoreContextProvider(props) {
             storeReducer({
                 type: GlobalStoreActionType.CLOSE_MODAL
             });
-    }
-
-    store.openDriveView = async function (driveName) {
-        storeReducer({
-            type:GlobalStoreActionType.OPEN_DRIVE,
-            payload: driveName
-        })
     }
 
     store.openAccessView = async function () { 
