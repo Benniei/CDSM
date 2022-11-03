@@ -113,7 +113,7 @@
 
 .access-control-card {
   font-size: 16px;
-  border: 2px solid black;
+  border: 3.5px solid black;
   padding: 10px;
   border-radius: 25px;
 }
@@ -125,4 +125,10 @@
 
 .fileShareUser:hover{
   background-color: rgba(228, 228, 228, 0.595);
+}
+
+.analyzeOption{
+  border: 3.5px solid black;
+  padding: 10px;
+  border-radius: 25px;
 }

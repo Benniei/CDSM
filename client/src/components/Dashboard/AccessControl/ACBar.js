@@ -13,7 +13,7 @@ import Toolbar from '@mui/material/Toolbar';
 function ACBar() {
     const {store} = useContext(GlobalStoreContext);
     const {auth} = useContext(AuthContext);
-    const [snapshot, setSnapshot] = useState('Snapshot01');
+    const [snapshot, setSnapshot] = useState('');
 
     const handleSnapshotChange = (event) => {
         setSnapshot(event.target.value);
@@ -32,7 +32,7 @@ function ACBar() {
                 label="File Snapshot"
                 value={store.currentSnapshot}
                 onChange={handleSnapshotChange}
-                sx={{width:"50%"}}
+                sx={{width:"50%", ml:1}}
                 overflow='auto'
             >
                 {snapshotArray.map((option) => (

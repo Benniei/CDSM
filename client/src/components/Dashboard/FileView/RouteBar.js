@@ -1,5 +1,5 @@
 // Imports from React
-import {useContext, useState} from 'react';
+import {useContext} from 'react';
 import {GlobalStoreContext} from '../../../store';
 
 // Imports from Material-UI

@@ -57,7 +57,7 @@ function ACCard() {
             </Typography>
             
             <Typography variant="h6" ml={4} mb={.5}> 
-                <strong>Group Directive: </strong> { String(data.grp) }
+                <strong>Group Directive: </strong> { String(data.grp)== "true" ? "On" : "Off"}
             </Typography>
             <ACNameBar
                 content={"Allowed Writers: "}

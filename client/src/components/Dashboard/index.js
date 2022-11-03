@@ -8,6 +8,7 @@ import SnapshotView from './FileView/SnapshotView';
 import AccessControlView from './AccessControl/AccessControlView';
 import QueryBuilderModal from './QueryBuilderModal';
 import TakeSnapshotModal from './SideComponents/TakeSnapshotModal';
+import AnalyzeMainView from './AnalyzeView/AnalyzeMainView'
 
 // Imports from Material-UI
 import Box from '@mui/material/Box';
@@ -51,7 +52,7 @@ function Dashboard() {
             {/** Middle Component (Dynamic)*/}
             <Box component="main" sx={{flexGrow:1, p:3}}>
                 <Toolbar sx={{height: 80}}/>
-                {!driveFlag ? <SnapshotView/>: (store.openAccess? <AccessControlView/> : null)}
+                {!driveFlag ? <SnapshotView/>: (store.openAccess? <AccessControlView/> : <AnalyzeMainView />)}
             </Box>
 
             {/* Modals */}
