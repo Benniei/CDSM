@@ -10,10 +10,6 @@ import CloseIcon from '@mui/icons-material/Close';
 
 function NameBar(props){
     const [data, setData] = useState("");
-    // let label = this.props // Label for TextField
-    // let values = this.props.values // Array of values
-    // let submitData = this.props.submitData // Submit callback function
-    // let removeData = this.props.removeData // Remove callback function
     const {label, values, submitData, removeData} = props
 
     console.log(label, values);

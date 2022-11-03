@@ -33,7 +33,7 @@ function FileSharingUser(props) {
         <Box 
             className="fileFolderModal"
             display="flex"
-            key={user.email}
+            key={user.id}
             mt={1.5}
             >
             <Box
@@ -90,7 +90,7 @@ function FileSharingUser(props) {
                     fullWidth
                     overflow='auto'
                     sx={{width:'30%'}}
-                    justifyContent="flex-end"
+                    justifycontent="flex-end"
                     onChange={(event) => {
                         setUsers(users.map((item) => {
                             if (item.email === user.email) {

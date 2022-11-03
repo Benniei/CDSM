@@ -11,10 +11,6 @@ getSnapshot = async (req, res) => {
     res.status(200).json(snapshot).end();
 };
 
-dummy = async (req, res) => {
-
-};
-
 getFolder = async function(req, res) {
     const {id, folderid} = req.params;
     try {
@@ -23,7 +19,9 @@ getFolder = async function(req, res) {
             throw new Error('Could not find User in database.');
         }
         const fileList = await File.find({ snapshotId: id, parent: folderid });
-        res.status(200).json({ success: true, folder: fileList });
+        let folderPerms = await File.find({fileId: folderid, snapshotId: id});
+
+        res.status(200).json({ success: true, folder: fileList, perms: folderPerms[0].permissions});
     } catch(error) {
         console.error('Failed to find folder: ' + error);
         res.status(400).json({ success: false, error: error });   
