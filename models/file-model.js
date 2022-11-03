@@ -12,14 +12,14 @@ const FileSchema = new Schema(
         owner: { type: String, required: false },                                                       // Owner of the file taken from cloud provider
         creator: { type: String, required: false },                                                     // Creator of the file taken from cloud provider
         sharingUser: { type: String, required: false },                                                 // User who shared the file, taken from cloud provider
-        root: { type: Boolean, required: false },                                                       // Whether file is the drive's root folder
-        parent: { type: String, required: false },                                                     // File Id of the file's parent folders
+        root: { type: Boolean, required: false, default: false },                                       // Whether file is a drive's root folder
+        parent: { type: String, required: false },                                                      // File Id of the file's parent folders
         children: { type: [String], required: false, default: () => { return null; } },                 // File Ids of the folder's children files
         permissions: { type: Object, required: false },                                                 // List of the file's permissions taken from cloud provider
         permissionIds: { type: [String], required: false, default: () => { return null; } },            // Ids of the file's permissions taken from cloud provider
         lastModifiedTime: { type: String, required: false },                                            // Timestamp of when the file was last modified
         deviantPermissions: { type: [[Object]], required: false, default: () => { return null; } },     // Permissions that deviate from those found in other files in the same folder
-        fileFolderDifferences: { type: Object, required: false }                                        // Permissions that are different from those of the parent folder
+        fileFolderDifferences: { type: Object, required: false, default: () => { return null; } }       // Permissions that are different from those of the parent folder
     }
 );
 

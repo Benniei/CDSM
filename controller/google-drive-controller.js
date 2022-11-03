@@ -2,7 +2,6 @@
 const Analyze = require('./analyze-controller');
 const File = require('../models/file-model');
 const FileSnapshot = require('../models/filesnapshot-model');
-const User = require('../models/user-model');
 
 // Import modules
 const { google } = require('googleapis');
@@ -24,26 +23,18 @@ createFileSnapshot = async function(req, res) {
         const driveIds = await getDrives(driveAPI);
         // Retrieve a map of all files in the user's drives
         const driveMap = await getFiles(driveAPI, driveIds);
-
-        // Map-like object of all files in the user's drive
-        // const myDrive = await getMyDrive(user.refreshToken);
         // Create a File Snapshot in our database to obtain a snapshotId
-        let myDriveId = Object.keys(driveIds).find(key => driveIds[key] === 'MyDrive');
-
         const newSnapshot = new FileSnapshot({
             owner: req.user.id,
             snapshotId: req.user.id + '-' + moment().format('MMMM Do YYYY, H:mm:ss'),
-            driveIds: driveIds,
-            // This will only send back root folders (drives) and their ids.
-            myDrive: myDriveId
+            driveIds: driveIds
         });
-
         await FileSnapshot.create(newSnapshot);
         console.log(`Added FileSnapshot (${newSnapshot.snapshotId}) to database`); 
         // Retrieve the File Snapshot's snapshotId
         snapshotId = newSnapshot.snapshotId;
         // Create a File Document for each file in the user's drive
-        await Promise.all(Object.values(driveMap).map(async (file) => {
+        await Promise.all(Object.values(Object.fromEntries(driveMap)).map(async (file) => {
             const newFile = new File({
                 snapshotId: newSnapshot.snapshotId,
                 fileId: file.id,
@@ -67,13 +58,13 @@ createFileSnapshot = async function(req, res) {
         // Perform sharing analysis on the newly created snapshot
         // Analyze.sharingAnalysis(snapshotId, driveMap, req.user.threshold);
 
+        // Add the FileSnapshot as the user's most recent FileSnapshot
         if (user.filesnapshot) {
             user.filesnapshot.unshift(snapshotId);
         } else {
             user.filesnapshot = [snapshotId];
         }     
         user.save();
-
         // Send the newly created FileSnapshot's id and owner to the client
         res.status(200).json({ success: true, fileSnapshot: newSnapshot }); 
     } catch(error) {
@@ -123,7 +114,7 @@ getDrives = async function(driveAPI) {
  * Retrieves all files from the user's drives
  * @param {Object} driveAPI - Instance of Google Drive API service
  * @param {Object} driveIds - Name and Ids of all of the user's drives
- * @returns {Object} map - Map of all files in the user's drives
+ * @returns {Map} map - Map of all files in the user's drives
  */
 getFiles = async function(driveAPI, driveIds) {
     // List of files retrieved from Google Drive API (including root folder of the user's 'My Drive' collection)
@@ -162,7 +153,7 @@ getFiles = async function(driveAPI, driveIds) {
  * Creates a map-like object of all files in the user's drives
  * @param {Object} driveIds - The name and Ids of all of the user's drives
  * @param {Objectp[]} fileList - Array of file objects
- * @returns {Object} map - Map object of all files in the user's drives
+ * @returns {Map} map - Map of all files in the user's drives
  */
 createFileMap = function(driveIds, fileList) {
     // Map object used to store the files
@@ -207,11 +198,14 @@ createFileMap = function(driveIds, fileList) {
             }
             // File is part of the 'Shared With Me' file collection
             else {
-                overrides['parents'] = 'SharedWithMe';
                 overrides['driveId'] = 'SharedWithMe';
-                // Add file as a child of the 'Shared With Me' file collection
-                let parent = map.get('SharedWithMe');
-                map.set(parent.id, { ...parent, children: [...parent.children, file.id] });
+                // Set Parent to 'SharedWithMe' root folder if one doesn't exist
+                if (!file.parents) {
+                    overrides['parents'] = 'SharedWithMe';
+                    // Add file as a child of the 'Shared With Me' file collection
+                    let parent = map.get('SharedWithMe');
+                    map.set(parent.id, { ...parent, children: [...parent.children, file.id] });
+                }
             }
         }
         // If the file already has an entry in the map (because it's the parent folder of some file that was already added into the map), update the entry with the file's other fields (parents, permissions, etc.)
@@ -232,7 +226,8 @@ createFileMap = function(driveIds, fileList) {
         getPath(map.get(file.id), map);
     }
     // Return the map of drive files
-    return Object.fromEntries(map);
+    return map;
+    // return Object.fromEntries(map);
 };
 
 /**
@@ -240,7 +235,7 @@ createFileMap = function(driveIds, fileList) {
  * @param {Object[]} permissionList - An list of Google Drive permission objects
  * @returns {Object} permissions - An object containing all of the file's permissions
  */
- createPermissionObject = function (permissionList) {
+createPermissionObject = function(permissionList) {
     // Objectbject to store the permissions of a file
     const permissions = {};
     // Insert the permissions into permission map using map method
@@ -253,9 +248,11 @@ createFileMap = function(driveIds, fileList) {
 /**
  * Recursively retrieves the file's path from the drive's root folder
  * @param {Object} file - The file who's path is being returned
+ * @param {Object} end - The file who originally called getPath()
+ * @param {Map} map - Map of all files in the user's drives
  * @returns {string} path - The path of the file from the drive's root folder
  */
- getPath = function(file, map) {
+getPath = function(file, map) {
     // Have root folders return their fileId
     if (!file.parents) {
     //   return `/${file.id}/`;
@@ -265,12 +262,14 @@ createFileMap = function(driveIds, fileList) {
     if (file.path) {
       return file.path;
     }
+    // Parent of file
+    const parent = map.get(file.parents);
     // Otherwise, create a path using the file's parent folder's path
-    let path = getPath(map.get(file.parents), map);
-    // Append fileId to path if file is a folder
-    if (file.mimeType == 'application/vnd.google-apps.folder') {
+    let path = getPath(parent, map);
+    // If the file's parent is not a root folder, add its parent's name to the path
+    if (parent.mimeType == 'application/vnd.google-apps.folder' && !parent.root) {
         // path += `${file.id}/`;
-        path += `${file.name}/`;
+        path += `${parent.name}/`;
     }
     // If the file's map entry does not a path property set, add it 
     if (!map.get(file.id).path) {
@@ -280,15 +279,6 @@ createFileMap = function(driveIds, fileList) {
     return path;
 };
 
-
-// Delete all files stored in the database
-// deleteFiles = async function(req, res) {
-//     await File.deleteMany({});
-//     await FileSnapshot.deleteMany({});
-//     res.send('All files deleted');
-// };
-
 module.exports = {
     createFileSnapshot
-    // deleteFiles
 };
