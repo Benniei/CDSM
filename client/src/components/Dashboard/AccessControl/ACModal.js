@@ -1,6 +1,7 @@
 // Local Imports
-import {useContext, useState} from 'react';
+import {useContext, useState, useEffect} from 'react';
 import {GlobalStoreContext} from '../../../store';
+import AuthContext from '../../../auth/index.js';
 import NameBar from '../NameBar'
 
 // Imports from MUI
@@ -30,7 +31,7 @@ const style = {
 
 function ACModal() {
     const {store} = useContext(GlobalStoreContext);
-    const [name, setName] = useState("");
+    const {auth} = useContext(AuthContext);
     const [allowWrite, setAllowWrite] = useState("");
     const [allowWriters, setAllowWriters] = useState([]);
     const [allowRead, setAllowRead] = useState("");
@@ -43,6 +44,17 @@ function ACModal() {
     let flag = false;
     if(store.accessModal)
         flag = true;
+
+    useEffect(() => {
+        let acr = auth.user.access_control_req;
+        if(acr && acr !== ' ') {
+            setAllowWriters(acr.AW);
+            setAllowReaders(acr.AR);
+            setDenyReaders(acr.DR);
+            setDenyWriters(acr.DW);
+            flag = acr.Grp;
+        }
+    })
     
     function handleOpenBuilder(){
         store.openAccessControlSearch();
@@ -50,7 +62,6 @@ function ACModal() {
 
     function handleSave() {
         let access_control_req = {
-            name: name,
             AW: allowWriters,
             AR: allowReaders,
             DW: denyWriters,
