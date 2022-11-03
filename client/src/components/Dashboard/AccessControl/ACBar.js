@@ -63,7 +63,7 @@ function ACBar() {
                     <Typography 
                         display="inline" 
                         sx={{color:'black'}}> 
-                        <strong> Create New Access Control Policy </strong> 
+                        <strong> Edit Access Control Policy </strong> 
                     </Typography>
                 </center>
             </Box>
