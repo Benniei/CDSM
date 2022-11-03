@@ -172,5 +172,6 @@ module.exports = {
     listSnapshots,
     getSnapshot,
     getFolder,
-    buildQuery
+    buildQuery,
+    doQuery
 };

@@ -8,7 +8,9 @@ import { ReactComponent as MicrosoftOneDriveIcon } from '../../../assets/Microso
 
 // Imports from Material-UI
 import AppBar from '@mui/material/AppBar';
+import Autocomplete from '@mui/material/Autocomplete';
 import Box from '@mui/material/Box';
+import MenuItem from '@mui/material/MenuItem';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
@@ -31,6 +33,12 @@ function AppBanner() {
         email = auth.user.email;
     }
 
+    let searchHistory = [];
+    if(auth.user) {
+        console.log(auth.user);
+        searchHistory = auth.user.searchHistory;
+    }
+
     return (
         <AppBar 
             position="fixed"
@@ -51,31 +59,27 @@ function AppBanner() {
                     src="https://i.imgur.com/TXlPK0j.png" />
 
                 {/** Search Bar */}
-                <TextField   
-                    id="search"
-                    label="Search"
-                    name="search"
-                    autoComplete="Search"
-                    size="large"
+                <Autocomplete
+                    disablePortal
+                    popupIcon={
+                    <InputAdornment position="end">
+                        <TuneOutlinedIcon 
+                            sx={{
+                                ':hover': {
+                                    bgcolor: 'grey.300',
+                                    color: 'black'
+                                },
+                                color: 'black',
+                                p:1,
+                                borderRadius: '50%'
+                            }}
+                            onClick={event =>  handleOpenBuilder()}/>
+                    </InputAdornment>}
+                    options={searchHistory}
                     sx={{backgroundColor:"#FFFFFF", width:'50%', mt:1}}
-                    InputProps={{
-                        endAdornment: (
-                            <InputAdornment position="end">
-                                <TuneOutlinedIcon 
-                                    sx={{
-                                        ':hover': {
-                                            bgcolor: 'grey.300',
-                                            color: 'black'
-                                        },
-                                        color: 'black',
-                                        p:1,
-                                        borderRadius: '50%'
-                                    }}
-                                    onClick={event =>  handleOpenBuilder()}/>
-                            </InputAdornment>
-                        )
-                      }}
-                />                
+                    renderInput={(params) => 
+                        <TextField {...params} label="Search" />
+                    }/>     
                 <Box sx={{flexGrow:1}} />
                 {/* Logo + User Login Name */}
                 {driveIcon}

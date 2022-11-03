@@ -53,13 +53,13 @@ function QueryBuilderModal() {
             query += queryOp[op].operator + ':' + queryOp[op].target + ' and '
         }
         for (let op in readableUser) {
-            query += 'readable:' + op + ' and '
+            query += 'readable:' + readableUser[op] + ' and '
         }
         for (let op in writableUser) {
-            query += 'writable:' + op + ' and '
+            query += 'writable:' + writableUser[op] + ' and '
         }
         for (let op in sharableUser) {
-            query += 'sharable:' + op + ' and '
+            query += 'sharable:' + sharableUser[op] + ' and '
         }
         query = query.substring(0, query.lastIndexOf(' and '));
         store.buildQuery(query);
