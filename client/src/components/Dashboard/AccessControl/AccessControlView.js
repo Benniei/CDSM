@@ -23,7 +23,7 @@ function AccessControlView(){
             <ACBar />
 
             {/* An AC Card for every Access Control Policy */}
-            <ACCard />
+            { auth.user.access_control_req && auth.user.access_control_req != ' ' ? <ACCard /> : "" }
             
 
             {/* AC Modal */}
