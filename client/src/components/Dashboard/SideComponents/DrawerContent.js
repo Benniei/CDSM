@@ -76,6 +76,7 @@ function DrawerContent(){
                         </ListItemButton>
                     </ListItem>
                     {/* Other Shared Drives (Have to populate) */}
+
                     <ListItem key='otherdrive' disablePadding>
                         <ListItemButton>
                             <ListItemIcon sx={{ml: 1}}>
@@ -84,6 +85,8 @@ function DrawerContent(){
                             <ListItemText primary='Other Drives' sx={{ml: -1.5}} />
                         </ListItemButton>
                     </ListItem>
+
+
                 </List>
 
                 <Divider sx={{mb: -3}}> Functionality </Divider>

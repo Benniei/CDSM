@@ -125,10 +125,10 @@ function PermissionsTab (props){
             sx={{maxWidth:600, overflowX: 'auto'}}>
                 {permissions.map((item) => (
                     <Box 
+                        key={item.id}
                         className="grey-button"
                         ml={.25}
                         mr={.25}
-                        wrap
                     >
                         <Typography sx={{ml:.2}} variant="h7">{item.emailAddress}</Typography>
                     </Box>
