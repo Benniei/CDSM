@@ -1,6 +1,7 @@
 // Local Imports
 import {useContext, useState} from 'react';
 import {GlobalStoreContext} from '../../../store';
+import AuthContext from '../../../auth/index.js';
 
 // Imports from MUI
 import TextField from'@mui/material/TextField';
@@ -9,28 +10,16 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Toolbar from '@mui/material/Toolbar';
 
-const snapshotArray = [
-    {
-        id: 'Snapshot01'
-    },
-    {
-        id: 'Snapshot02'
-    },
-    {
-        id: 'Snapshot03'
-    },
-    {
-        id: 'Snapshot04'
-    },
-]
-
 function ACBar() {
     const {store} = useContext(GlobalStoreContext);
+    const {auth} = useContext(AuthContext);
     const [snapshot, setSnapshot] = useState('Snapshot01');
 
     const handleSnapshotChange = (event) => {
         setSnapshot(event.target.value);
     }
+
+    const snapshotArray = auth.user.filesnapshot;
 
     return (
         <Toolbar sx={{mb:3}}>
@@ -41,14 +30,14 @@ function ACBar() {
                 select
                 display="inline"
                 label="File Snapshot"
-                value={snapshot}
+                value={store.currentSnapshot}
                 onChange={handleSnapshotChange}
                 sx={{width:"50%"}}
                 overflow='auto'
             >
                 {snapshotArray.map((option) => (
-                    <MenuItem key={option.id} value={option.id}>
-                        {option.id}
+                    <MenuItem key={option} value={option}>
+                        {option}
                     </MenuItem>
                 ))}
             </TextField>
