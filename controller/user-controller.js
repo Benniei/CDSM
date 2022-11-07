@@ -127,9 +127,11 @@ doQuery = async function (req, res) {
     }
     // for testing we hardcoded snapshot_id
     // const {query, snapshot_id} = req.params;
-    let {query} = req.body;
+    let {query, snapshotid} = req.body;
+    console.log(req.body)
+    let snapshot_id = snapshotid
     console.log(parseQuery(query))
-    snapshot_id = "634cb4405445ff8fb73a6749-November 3rd 2022, 5:53:45"
+    
     try {
         builtQuery = queryBuilder(parseQuery(query), snapshot_id)
         console.log(query, builtQuery);

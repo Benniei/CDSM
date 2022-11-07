@@ -283,7 +283,7 @@ function GlobalStoreContextProvider(props) {
 
     store.doQuery = async function(query) {
         console.log("Doing query: " + query);
-        const response = await api.doQuery({query: query});
+        const response = await api.doQuery({query: query, snapshotid: store.currentSnapshot});
         if(response.status === 200) {
             let snapshot = {
                 folder: response.data.files,
