@@ -273,7 +273,7 @@ function GlobalStoreContextProvider(props) {
 
     store.buildQuery = async function(query) {
         console.log("Building query: " + query);
-        const response = await api.buildQuery({query: query});
+        const response = await api.buildQuery({query: query, snapshotid: store.currentSnapshot});
         if(response.status === 200) {
             let query = response.data.query;
             auth.doSearch(query);
@@ -283,7 +283,7 @@ function GlobalStoreContextProvider(props) {
 
     store.doQuery = async function(query) {
         console.log("Doing query: " + query);
-        const response = await api.doQuery({query: query, snapshotid: store.currentSnapshot});
+        const response = await api.doQuery({query: query, snapshotid: String(store.currentSnapshot)});
         if(response.status === 200) {
             let snapshot = {
                 folder: response.data.files,

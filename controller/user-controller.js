@@ -116,9 +116,9 @@ doQuery = async function (req, res) {
             } else if (op[0] === 'folder') {
                 content = { $regex: '\/'+op[1]}
                 query['path'] = negate(content, op[2])
-            } else if (op[0] === 'path') {
+            } else if (op[0] === 'name') {
                 content = { $regex: op[1]}
-                query['path'] = negate(content, op[2])
+                query['name'] = negate(content, op[2])
             } else {
                 query[op[0]] = negate(op[1], op[2])
             }
