@@ -294,8 +294,8 @@ function FileTable(props){
                                             </Stack>
                                         </TableCell>
                                         <TableCell align="left">{row.owner}</TableCell>
-                                        <TableCell align="left"><PermissionsTab permissions={inheritiedPerms} /></TableCell>
-                                        <TableCell align="left"><PermissionsTab permissions={directPerms} /></TableCell>
+                                        <TableCell align="left"><PermissionsTab permissions={row.inherited} /></TableCell>
+                                        <TableCell align="left"><PermissionsTab permissions={row.direct} /></TableCell>
                                         {/* <TableCell align="left">{row.lastModified}</TableCell> */}
                                     </TableRow>
                                 );
