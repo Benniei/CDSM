@@ -37,7 +37,7 @@ function SnapshotBar(){
             >
                 {snapshotArray.map((option) => (
                     <MenuItem key={option} value={option}>
-                        {option}
+                        {option.substring(option.indexOf('-')+1)}
                     </MenuItem>
                 ))}
             </TextField>

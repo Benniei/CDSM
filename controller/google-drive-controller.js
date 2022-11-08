@@ -239,22 +239,23 @@ createPermissionObject = function(permissionList) {
     // Object to store the permissions of a file
     const permissions = {};
     const permissionsRaw = {};
-    // Insert the permissions into permission object using '(emailAddress, role)' keys
+    // Insert the permissions into permission object as '(type, emailAddress/domain, role)' values
     for (const permission of permissionList) {
-        // String containing permission's user/group/domain/anyone address and role
-        let permissionString = '';
         switch(permission.type) {
+            // Files shared to individual users or groups have email addresses
             case 'user' || 'group':
-                permissionString = `(${permission.type}, ${permission.emailAddress}, ${permission.role})`;
+                permissions[permission.id] = `(${permission.type}, ${permission.emailAddress}, ${permission.role})`;
                 break;
+            // Files shared with a domain have domain addresses
             case 'domain':
-                permissionString = `(domain, ${permission.domain}, ${permission.role})`;
+                permissions[permission.id] = `(domain, ${permission.domain}, ${permission.role})`;
                 break;
+            // Files shared via links do not have email or domain addresses
             default:
-                permissionString = `(anyone, ${permission.role})`;
+                permissions[permission.id] = `(anyone, ${permission.role})`;
         }
-        permissions[permission.id] = permissionString;
-        permissionsRaw[permission.id] = permission;
+        // Remove unnecessary data from Google Drive API permission objects
+        permissionsRaw[permission.id] = { id: permission.id, type: permission.type, emailAddress: permission.emailAddress, domain: permission.domain, role: permission.role, displayName: permission.displayName, permissionDetails: permission.permissionDetails };
     }
     return { permissions: permissions, permissionsRaw: permissionsRaw };
 };
@@ -264,13 +265,12 @@ createPermissionObject = function(permissionList) {
  * @param {Object} file - The file who's path is being returned
  * @param {Object} end - The file who originally called getPath()
  * @param {Map} map - Map of all files in the user's drives
- * @returns {string} path - The path of the file from the drive's root folder
+ * @returns {Object} path - The path (by fileId and name) of the file from the drive's root folder
  */
 getPath = function(file, map) {
-    // Have root folders return their fileId
+    // Have root folders return their fileId/name
     if (!file.parents) {
-    //   return `/${file.id}/`;
-        return `/${file.name}/`
+        return { id: `/${file.id}/`, name: `/${file.name}/` };
     }
     // If a file has a path, return it
     if (file.path) {
@@ -280,12 +280,11 @@ getPath = function(file, map) {
     const parent = map.get(file.parents);
     // Otherwise, create a path using the file's parent folder's path
     let path = getPath(parent, map);
-    // If the file's parent is not a root folder, add its parent's name to the path
+    // If the file's parent is not a root folder, add its parent's fileId/name to the path
     if (parent.mimeType == 'application/vnd.google-apps.folder' && !parent.root) {
-        // path += `${file.id}/`;
-        path += `${parent.name}/`;
+        path = { id: path.id + `${parent.id}/`, name: path.name + `${parent.name}/` };
     }
-    // If the file's map entry does not a path property set, add it 
+    // If the file's map entry does not a path property, add the file's path 
     if (!map.get(file.id).path) {
         map.set(file.id, { ...map.get(file.id), path: path });
     }

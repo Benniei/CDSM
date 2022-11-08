@@ -8,7 +8,7 @@ const FileSchema = new Schema(
         fileId: { type: String, required: true },                                                       // Unique file Id taken from cloud provider
         name: { type: String, required: true },                                                         // Name of file taken from cloud provider
         driveId: { type: String, required: false },                                                     // Type of drive: 'My Drive', 'Shared With Me', or Shared Drive ID taken from cloud provider
-        path: { type: String, required: false },                                                        // Path from the drive's root folder
+        path: { type: Object, required: false },                                                        // Path from the drive's root folder
         owner: { type: String, required: false },                                                       // Owner of the file taken from cloud provider
         creator: { type: String, required: false },                                                     // Creator of the file taken from cloud provider
         sharingUser: { type: String, required: false },                                                 // User who shared the file, taken from cloud provider

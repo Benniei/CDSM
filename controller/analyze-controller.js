@@ -53,16 +53,15 @@ fileFolderDifferences = async function(snapshotId, file, folder) {
     for (const permissionId of folderExclusiveIds) {
         folderExclusivePermissions.push(folderPermissions[permissionId]);
     }
-    // Check if permissions associated with common ids have identical email(?) and role
-    for (const permissionId of commonPermissionIds) {
-        // Continue loop if either file and folder does not have a permission objects (possible in Shared Drive folders)
-        if (!filePermissions || !folderPermissions) {
-            continue;
-        }
-        // If email and role fields are not identical, add the corresponding permission to both exclusive arrays
-        if (filePermissions[permissionId] != folderPermissions[permissionId]) {
-            fileExclusivePermissions.push(filePermissions[permissionId]);
-            folderExclusivePermissions.push(folderPermissions[permissionId]);
+    // If both file and folder have permissions:
+    if (filePermissions && folderPermissions) {
+        // Verify that permissions that appear in both file and folder are equivalent in type, email and role
+        for (const permissionId of commonPermissionIds) {
+            // If email and role fields are not identical, add the corresponding permission to both exclusive arrays
+            if (filePermissions[permissionId] != folderPermissions[permissionId]) {
+                fileExclusivePermissions.push(filePermissions[permissionId]);
+                folderExclusivePermissions.push(folderPermissions[permissionId]);
+            }
         }
     }
     // Update fileFolderDifferences property of file
@@ -79,7 +78,6 @@ fileFolderDifferences = async function(snapshotId, file, folder) {
  * @param {number} threshold - Threshold value that determines what percentage of files count as a majority
  */
 deviantPermissionAnalysis = async function(snapshotId, folder, threshold) {
-    console.log(`Threshold: ${threshold}`);
     // Retrieve children of the folder
     let children = await File.find({ snapshotId: snapshotId, parent: folder.fileId });
     // Map of file permission string arrays
