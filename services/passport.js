@@ -25,7 +25,7 @@ passport.use(new GoogleStrategy({
 async function(accessToken, refreshToken, profile, done) {
     try{
         // Check if the User already exists
-        let user = await User.findOne({ cloudProvider: profile.provider, profileId: profile.id }, '-profileId -refreshToken -__v');
+        let user = await User.findOne({ cloudProvider: profile.provider, profileId: profile.id });
         // If they do, attempt to redirect them to the dashboard immediately
         if (user) {
             console.log(`User (${profile.provider}, ${profile.id}) found.`);
@@ -63,7 +63,7 @@ passport.use(new MicrosoftStrategy({
 async function(accessToken, refreshToken, profile, done) {
     try{
         // Check if the User already exists
-        let user = await User.findOne({ cloudProvider: profile.provider, profileId: profile.id }, '-profileId -refreshToken -__v');
+        let user = await User.findOne({ cloudProvider: profile.provider, profileId: profile.id });
         // If they do, attempt to redirect them to the dashboard immediately
         if (user) {
             console.log(`User (${profile.provider}, ${profile.id}) found.`);
