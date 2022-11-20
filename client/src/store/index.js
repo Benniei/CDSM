@@ -1,9 +1,11 @@
-import {createContext, useState} from 'react';
-import api from '../api'
-import AuthContext from '../auth/index.js';
-import {useContext} from 'react';
+// Imports from React
+import {createContext, useContext, useState} from 'react';
 
-export const GlobalStoreContext = createContext({})
+// Local imports
+import api from '../api';
+import AuthContext from '../auth/index.js';
+
+export const GlobalStoreContext = createContext({});
 
 export const GlobalStoreActionType = {
     GET_FOLDER: "GET_FOLDER",
@@ -16,7 +18,7 @@ export const GlobalStoreActionType = {
     OPEN_AC_SEARCH: "OPEN_AC_SEARCH",
     OPEN_ACCESS: "OPEN_ACCESS",
     OPEN_ANALYZE: "OPEN_ANALYZE"
-}
+};
 
 function GlobalStoreContextProvider(props) {
     const {auth} = useContext(AuthContext);
@@ -37,7 +39,7 @@ function GlobalStoreContextProvider(props) {
 
     const storeReducer = (action) => {
         const {type, payload} = action;
-        switch(type){
+        switch(type) {
             case GlobalStoreActionType.GET_FOLDER: {
                 return setStore({
                     allItems: payload.folder,
@@ -51,7 +53,7 @@ function GlobalStoreContextProvider(props) {
                     openAnalyze: store.openAnalyze,
                     path: payload.path,
                     parents: payload.parents
-                })
+                });
             }
             case GlobalStoreActionType.GET_DRIVE: {
                 return setStore({
@@ -66,7 +68,7 @@ function GlobalStoreContextProvider(props) {
                     openAnalyze: false,
                     path: [],
                     parents: payload.parents
-                })
+                });
             }
             case GlobalStoreActionType.OPEN_QUERY_BUILDER: {
                 return setStore({
@@ -81,7 +83,7 @@ function GlobalStoreContextProvider(props) {
                     openAnalyze: store.openAnalyze,
                     path: store.path,
                     parents: store.parents
-                })
+                });
             }
             case GlobalStoreActionType.OPEN_TAKE_SNAPSHOT_MODAL: {
                 return setStore({
@@ -96,7 +98,7 @@ function GlobalStoreContextProvider(props) {
                     openAnalyze: store.openAnalyze,
                     path: store.path,
                     parents: store.parents
-                })
+                });
             }
             case GlobalStoreActionType.OPEN_UPDATE_SHARING: {
                 return setStore({
@@ -111,7 +113,7 @@ function GlobalStoreContextProvider(props) {
                     openAnalyze: store.openAnalyze,
                     path: store.path,
                     parents: store.parents
-                })
+                });
             }
             case GlobalStoreActionType.OPEN_AC_MODAL: {
                 return setStore({
@@ -126,7 +128,7 @@ function GlobalStoreContextProvider(props) {
                     openAnalyze: store.openAnalyze,
                     path: store.path,
                     parents: []
-                })
+                });
             }
             case GlobalStoreActionType.OPEN_AC_SEARCH: {
                 return setStore({
@@ -141,7 +143,7 @@ function GlobalStoreContextProvider(props) {
                     openAnalyze: store.openAnalyze,
                     path: store.path,
                     parents: []
-                })
+                });
             }
             case GlobalStoreActionType.CLOSE_MODAL: {
                 return setStore({
@@ -156,7 +158,7 @@ function GlobalStoreContextProvider(props) {
                     openAnalyze: store.openAnalyze,
                     path: store.path,
                     parents: store.parents
-                })
+                });
             }
             
             case GlobalStoreActionType.OPEN_ACCESS: {
@@ -172,7 +174,7 @@ function GlobalStoreContextProvider(props) {
                     openAnalyze: false,
                     path: [],
                     parents: []
-                })
+                });
             }
             case GlobalStoreActionType.OPEN_ANALYZE: {
                 return setStore({
@@ -187,12 +189,12 @@ function GlobalStoreContextProvider(props) {
                     openAnalyze: true,
                     path: [],
                     parents: []
-                })
+                });
             }
             default:
                 return store;
         }
-    }
+    };
 
     /**
      * The user clicks on the Take Snapshot button.
@@ -209,82 +211,91 @@ function GlobalStoreContextProvider(props) {
             store.getDrive(snapshot.snapshotId, driveID, "My Drive");
 
         }
-    }
-
-    store.getFolder = async function(snapshotid, folderid, folderName, prevFile) {
-        console.log("Get Folder " + folderName.name + " with ID " + folderid + " from Snapshot " + snapshotid)
-        const response = await api.getFolder(auth.user, snapshotid, folderid);
-        if(response.status === 200) {
-            let path;
-            if(prevFile > -1){
-                path = store.path.filter((item, index) => index <= prevFile)
-            }
-            else{
-                path = [...store.path, folderName]
-            }
-            console.log(response.data)
-            let snapshot = {
-                folder: response.data.folder,
-                id: snapshotid,
-                path: path,
-                parents: [{folderid: folderid, permissions: response.data.perms}]
-            };
-            console.log(snapshot)
-            storeReducer({
-                type:GlobalStoreActionType.GET_FOLDER,
-                payload: snapshot
-            })
-        }
-    }
-
-    store.getDrive = async function(snapshotid, driveID, driveName) {
-        console.log("Get " + driveName + " with ID " + driveID + " from Snapshot " + driveID)
-        const response = await api.getFolder(auth.user, snapshotid, driveID);
-        if(response.status === 200) {
-            let snapshot = {
-                folder: response.data.folder,
-                snapshotid: snapshotid,
-                driveName: driveName
-            };
-            // console.log(snapshot)
-            storeReducer({
-                type:GlobalStoreActionType.GET_DRIVE,
-                payload: snapshot
-            })
-        }
-    }
+    };
 
     /**
-     * The user retrieves a snapshot and sets it to 
-     * the current snapshot.
-     */
+    * The user retrieves a snapshot and sets it to 
+    * the current snapshot.
+    */
     store.getSnapshot = async function(snapshotId, driveName) {
-        console.log("Get Snapshot " + snapshotId + " in " + driveName)
+        console.log(`Get snapshot '${snapshotId}' in drive '${driveName}'`);
         const response = await api.getSnapshot({ id: snapshotId });
-        if(response.status === 200) {
-            let snapshot = response.data;
+        if (response.status === 200) {
+            let snapshot = response.data.snapshot;
             let driveIds = snapshot.driveIds;
             let driveId = Object.keys(driveIds).find((key) => driveIds[key] === driveName);
             if (driveId) {
                 store.getDrive(snapshotId, driveId, driveName);
             }
         }
-    }
+    };
+
+    store.getFiles = async function(snapshotId, fileIds) {
+        console.log(`Getting files ${fileIds} in snapshot '${snapshotId}'`);
+        const response = await api.getFiles({ fileIds: fileIds }, snapshotId);
+        if (response.status === 200) {
+            // TODO: do something with files
+            console.log(response.data.files);
+        }
+    };
+
+    store.getFolder = async function(snapshotId, folderId, folderName, prevFile) {
+        console.log(`Get folder '${folderName.name}' (${folderId}) from snapshot '${snapshotId}'`);
+        const response = await api.getFolder(auth.user, snapshotId, folderId);
+        if (response.status === 200) {
+            let path;
+            if (prevFile > -1) {
+                path = store.path.filter((item, index) => index <= prevFile);
+            }
+            else{
+                path = [...store.path, folderName];
+            }
+            console.log(response.data)
+            let snapshot = {
+                folder: response.data.folder,
+                id: snapshotId,
+                path: path,
+                parents: [{folderid: folderId, permissions: response.data.perms}]
+            };
+            console.log(snapshot);
+            storeReducer({
+                type:GlobalStoreActionType.GET_FOLDER,
+                payload: snapshot
+            });
+        }
+    };
+
+    store.getDrive = async function(snapshotId, driveID, driveName) {
+        console.log(`Get drive '${driveName}' (${driveID}) from snapshot '${snapshotId}'`);
+        const response = await api.getFolder(auth.user, snapshotId, driveID);
+        if (response.status === 200) {
+            let snapshot = {
+                folder: response.data.folder,
+                snapshotid: snapshotId,
+                driveName: driveName
+            };
+            // console.log(snapshot)
+            storeReducer({
+                type:GlobalStoreActionType.GET_DRIVE,
+                payload: snapshot
+            });
+        }
+    };
 
     store.buildQuery = async function(query) {
-        console.log("Building query: " + query);
-        const response = await api.buildQuery({query: query, snapshotid: store.currentSnapshot});
-        if(response.status === 200) {
+        console.log(`Building query: ${query}`);
+        const response = await api.buildQuery({ query: query, snapshotid: store.currentSnapshot });
+        if (response.status === 200) {
             let query = response.data.query;
             auth.doSearch(query);
             store.doQuery(query);
         }
-    }
+    };
 
     store.doQuery = async function(query) {
-        console.log("Doing query: " + query);
-        const response = await api.doQuery({query: query, snapshotid: String(store.currentSnapshot)});
-        if(response.status === 200) {
+        console.log(`Doing query: ${query}`);
+        const response = await api.doQuery({ query: query, snapshotid: String(store.currentSnapshot) });
+        if (response.status === 200) {
             let snapshot = {
                 folder: response.data.files,
                 snapshotid: response.data.snapshot_id,
@@ -298,17 +309,16 @@ function GlobalStoreContextProvider(props) {
                 payload: snapshot
             });
         }
-    }
+    };
 
     store.updateACR = async function(access_control_req) {
         const response = await api.updateACR(access_control_req);
-        if(response.status === 200) {
+        if (response.status === 200) {
             let acr = response.data.acr;
             auth.updateACR(acr);
             store.closeModal();
         }
-    }
-
+    };
 
     /**!SECTION Functions for managing the view/state of the application */
     store.openQueryBuilder = async function () {
@@ -316,35 +326,35 @@ function GlobalStoreContextProvider(props) {
         storeReducer({
             type: GlobalStoreActionType.OPEN_QUERY_BUILDER
         });
-    }
+    };
 
     store.openTakeSnapshot = async function () {
-        console.log("Open Take Snapshot Modal")
+        console.log("Open Take Snapshot Modal");
         storeReducer({
             type: GlobalStoreActionType.OPEN_TAKE_SNAPSHOT_MODAL
         });
-    }
+    };
 
     store.openUpdateSharing = async function () {
-        console.log("Open Update Sharing Modal")
+        console.log("Open Update Sharing Modal");
         storeReducer({
             type: GlobalStoreActionType.OPEN_UPDATE_SHARING
         });
-    }
+    };
 
     store.openCreateAccessControl = async function () { 
-        console.log("Open Access Control Modal")
+        console.log("Open Access Control Modal");
         storeReducer({
             type: GlobalStoreActionType.OPEN_AC_MODAL
-        })
-    }
+        });
+    };
 
     store.openAccessControlSearch = async function () {
-        console.log("Open Query Builder with Access Control")
+        console.log("Open Query Builder with Access Control");
         storeReducer({
             type: GlobalStoreActionType.OPEN_AC_SEARCH
-        })
-    }
+        });
+    };
 
     store.closeModal = async function () {
         if(store.accessModal && store.queryBuilder)
@@ -355,31 +365,28 @@ function GlobalStoreContextProvider(props) {
             storeReducer({
                 type: GlobalStoreActionType.CLOSE_MODAL
             });
-    }
+    };
 
     store.openAccessView = async function () { 
-        console.log("Open Access Control Policy View")
+        console.log("Open Access Control Policy View");
         storeReducer({
             type: GlobalStoreActionType.OPEN_ACCESS
-        })
-    }
+        });
+    };
 
     store.openAnalyzeView = async function () {
-        console.log("Open Analyze View")
+        console.log("Open Analyze View");
         storeReducer({
             type:GlobalStoreActionType.OPEN_ANALYZE
-        })
-    }
-
+        });
+    };
 
     return (
-        <GlobalStoreContext.Provider value={{
-            store
-        }}>
-            {props.children}
+        <GlobalStoreContext.Provider value={{ store }}>
+            { props.children }
         </GlobalStoreContext.Provider>
     );
-}
+};
 
 export default GlobalStoreContext;
 export { GlobalStoreContextProvider };
