@@ -1,32 +1,6 @@
 // Local imports
-const FileSnapshot = require('../models/filesnapshot-model');
 const File = require('../models/file-model');
 const User = require('../models/user-model');
-
-// Non-Specific Drive Functions
-getSnapshot = async (req, res) => {
-    const id = req.body.id;
-    console.log(id);
-    const snapshot = await FileSnapshot.findOne({snapshotId: id});
-    res.status(200).json(snapshot).end();
-};
-
-getFolder = async function(req, res) {
-    const {id, folderid} = req.params;
-    try {
-        const user = await User.findById(req.userId, { _id: 0, refreshToken: 1 });
-        if (!user) {
-            throw new Error('Could not find User in database.');
-        }
-        const fileList = await File.find({ snapshotId: id, parent: folderid });
-        let folderPerms = await File.find({fileId: folderid, snapshotId: id});
-
-        res.status(200).json({ success: true, folder: fileList, perms: folderPerms[0].permissionsRaw});
-    } catch(error) {
-        console.error('Failed to find folder: ' + error);
-        res.status(400).json({ success: false, error: error });   
-    }
-};
 
 buildQuery = async function(req, res) {
     const query = req.body.query;
@@ -174,8 +148,6 @@ listSnapshots = async (req, res) => {
 module.exports = {
     updateACR,
     listSnapshots,
-    getSnapshot,
-    getFolder,
     buildQuery,
     doQuery
 };
