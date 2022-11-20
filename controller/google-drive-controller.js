@@ -22,11 +22,11 @@ createFileSnapshot = async function(req, res) {
         // Retrieve the name and Ids of all of the user's drives
         const driveIds = await getDrives(driveAPI);
         // Retrieve a map of all files in the user's drives
-        const driveMap = await getFiles(driveAPI, driveIds);
+        const driveMap = await getDriveFiles(driveAPI, driveIds);
         // Create a File Snapshot in our database to obtain a snapshotId
         const newSnapshot = new FileSnapshot({
-            owner: req.user.id,
-            snapshotId: req.user.id + '-' + moment().format('MMMM Do YYYY, H:mm:ss'),
+            owner: user._id,
+            snapshotId: user._id + '-' + moment().format('MMMM Do YYYY, H:mm:ss'),
             driveIds: driveIds
         });
         await FileSnapshot.create(newSnapshot);
@@ -56,7 +56,7 @@ createFileSnapshot = async function(req, res) {
             console.log(`Added File (${newFile.fileId}) to database`);
         }));
         // Perform sharing analysis on the newly created snapshot
-        Analyze.sharingAnalysis(snapshotId, req.user.threshold);
+        Analyze.sharingAnalysis(snapshotId, user.threshold);
         // Add the FileSnapshot as the user's most recent FileSnapshot
         if (user.filesnapshot) {
             user.filesnapshot.unshift(snapshotId);
@@ -115,7 +115,7 @@ getDrives = async function(driveAPI) {
  * @param {Object} driveIds - Name and Ids of all of the user's drives
  * @returns {Map} map - Map of all files in the user's drives
  */
-getFiles = async function(driveAPI, driveIds) {
+getDriveFiles = async function(driveAPI, driveIds) {
     // List of files retrieved from Google Drive API (including root folder of the user's 'My Drive' collection)
     let fileList = [];
     // Add each shared drive's Id and name into driveId object
