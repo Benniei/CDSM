@@ -1,15 +1,16 @@
 // Import modules
-const auth = require('../auth')
 const express = require('express');
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
 const passport = require('passport');
 
+// Local imports
+const auth = require('../auth');
 const User = require('../models/user-model');
 
 // Create router instance
 const router = express.Router();
 
-// Attempt authentication with Google during login; "prompt: 'select_account'" forces account selection screen to appear every time
+// Authenticate user with Google
 router.get('/auth/google', passport.authenticate('google', { accessType: 'offline', prompt: 'select_account', scope: ['profile', 'email', 'https://www.googleapis.com/auth/drive'] } ));
 // Redirect based on Google authentication response
 router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: process.env.CLIENT_BASE_URL }), function(req, res) {
@@ -21,13 +22,14 @@ router.get('/auth/google/callback', passport.authenticate('google', { failureRed
     // res.redirect('http://localhost:3000/dashboard');
 });
 
+// Authenticate user with Microsoft
 router.get('/auth/microsoft', passport.authenticate('microsoft', { accessType: 'offline', prompt: 'select_account', scope: 'user.read' } ));
+// Redirect based on Microsoft authentication response
 router.get('/auth/microsoft/callback', passport.authenticate('microsoft', { failureRedirect: process.env.CLIENT_BASE_URL }), function(req, res) {
     console.log("Successfully authenticated with microsoft.");
     res.redirect(process.env.CLIENT_BASE_URL + 'dashboard');
     // res.redirect('http://localhost:3000/dashboard');
 });
-
 
 // Checks if session exists, if yes, returns user.
 router.get('/loggedIn', function(req, res, next) {
@@ -37,14 +39,13 @@ router.get('/loggedIn', function(req, res, next) {
         auth.verify(req, res, async function () {
             let verified = null;
             let loggedInUser = null;
-            if(req.cookies.token) {
+            if (req.cookies.token) {
                 verified = jwt.verify(req.cookies.token, process.env.JWT_SECRET);
-                loggedInUser = await User.findOne({ _id: verified.userId });
+                loggedInUser = await User.findOne({ _id: verified.userId }, '-profileId -refreshToken -__v');
+            } else {
+                loggedInUser = await User.findOne({ _id: req.userId }, '-profileId -refreshToken -__v');
             }
-            else{
-                loggedInUser = await User.findOne({ _id: req.userId });
-            }
-            if(loggedInUser){
+            if (loggedInUser) {
                 return res.status(200).json({
                     loggedIn: true,
                     user: loggedInUser
@@ -73,13 +74,5 @@ router.get('/logout', function(req, res, next) {
         // res.redirect('http://localhost:3000');    
     });
 });
-
-// router.get('/test', function(req, res, next) {
-//     if (req.user) {
-//         console.log(req.user);
-//     } else {
-//         console.log('User not authenticated.');
-//     }
-// });
 
 module.exports = router;
