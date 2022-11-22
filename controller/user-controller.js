@@ -26,88 +26,105 @@ buildQuery = async function(req, res) {
 
 // do query
 doQuery = async function (req, res) {
-    function parseQuery(query) {
-        op_list = ['drive:', 'owner:', 'creator:', 'from:', 'to:', 'readable:', 'writable:', 'sharable:', 'name:', 'inFolder:', 'folder:', 'path:', 'sharing:']
-            
-        op_queries = []
-        
-        let nextColon = 0;
-        let endInd = 0;
-        while (op_list.some(v => query.toLowerCase().includes(v))) {
-            nextColon = query.indexOf(':')+1
-            if (query.charAt(nextColon) === '"' ) {
-                endInd = query.indexOf('"', nextColon+1)+1
-                endInd = query.indexOf(' ', endInd)
-            } else {
-                endInd = query.indexOf(' ', nextColon)
-            }
-                
-            if (endInd === -1) {
-                endInd = query.length;
-            }
-                
-            op_str = query.substring(0, endInd);
-            if (op_str.indexOf('and') === 0) {
-                op_str = op_str.substring(4)
-            } 
-            if (op_str.indexOf('or') === 0) {
-                op_str = op_str.substring(3)
-            }
-            op_str = op_str.trim()
-            while (op_str.indexOf('(') === 0) {
-                op_str = op_str.substring(1)
-            }
-            while (op_str.indexOf(')', op_str.length-1) === (op_str.length-1)) {
-                op_str = op_str.substring(0, op_str.length - 1)
-            }
-            query = query.substring(endInd).trim();
-            
-            op_query = op_str.split(':')
-            op_query.push(op_query[0].charAt(0) === '-' ? true : false)
-            if (op_query[0].charAt(0) === '-') {
-                op_query[0] = op_query[0].substring(1)
-            }
-            if (op_query[1].charAt(0) === '"' && op_query[1].charAt(op_query[1].length-1) === '"' ) {
-                op_query[1] = op_query[1].substring(1, op_query[1].length-1)
-            }
-            
-            op_queries.push(op_query);
+    function objectify(op) {
+        let op_statement = op;
+        let toInvert = false;;
+        if (op_statement.charAt(0) === '-') {
+            toInvert = true;
+            op_statement = op_statement.substring(1);
         }
-        return op_queries
+        
+        field = op_statement.substring(0, op_statement.indexOf(':'));
+        value = op_statement.substring(op_statement.indexOf(':')+1);
+        if (value.charAt(0) === '"' && value.charAt(value.length-1) === '"') {
+            value = value.slice(1, -1);
+        }
+        query = {};
+    
+        if (field === 'name') {
+            regexValue = { $regex: value };
+            query['name'] = toInvert ? { $ne: regexValue } : regexValue;
+        } else if (field === 'inFolder') {
+            regexValue = { $regex: '\/'+value+'\/$' };
+            query['path'] = toInvert ? { $ne: regexValue } : regexValue;
+        } else if (field === 'folder') {
+            regexValue = { $regex: '\/'+value };
+            query['path'] = toInvert ? { $ne: regexValue } : regexValue;
+        } else {
+            query[field] = toInvert ? { $ne: value } : value;
+        }
+        return query;
     }
     
-    function queryBuilder(query_list, snapshot_id) {
-        function negate(content, negate) {
-            return (negate ? { $ne: content } : content); 
-        }
+    function combine(bool, b, a) {
+        combined = {};
+        ab = [a, b];
+        combined["$"+bool] = ab;
+        return combined;
+    }
+    
+    function parseQuery(query) {
+        /*
+        Regex explanation:
+        ( and | or |\(|\))  : match " and " or " or " or "(" or ")"
+         (?=                : lookahead, match if its followed by
+          (?:               : these
+           [^"]*"           : any number of not ", and then "
+           [^"]*"           : same, make sure there two "
+          )*                : any even amount of "
+          [^"]*             : and then only non quotes
+          $                 : until the end
+         )                  : end of lookahead
+        */
+        regex = /( and | or |\(|\))(?=(?:[^"]*"[^"]*")*[^"]*$)/
+        parseable = query.split(regex);
+        parseable = parseable.filter(x => x.length>0);
+        parseable = parseable.map(x => x.trim());
         
-        query = { snapshotId: { $regex: snapshot_id } }
-        for (op of query_list) {
-            
-            if (op[0] === 'inFolder') {
-                content = { $regex: op[1]+'\/$'}
-                query['path'] = negate(content, op[2])
-            } else if (op[0] === 'folder') {
-                content = { $regex: '\/'+op[1]}
-                query['path'] = negate(content, op[2])
-            } else if (op[0] === 'name') {
-                content = { $regex: op[1]}
-                query['name'] = negate(content, op[2])
-            } else {
-                query[op[0]] = negate(op[1], op[2])
+        opStack = [];
+        valueStack = [];
+    
+        while (parseable.length) {
+            next = parseable.shift();
+            //console.log('Next: '+next)
+            //console.log(opStack)
+            //console.log(valueStack)
+            switch(next) {
+                case '(':
+                    opStack.push(next)
+                    break;
+                case ')':
+                    while (opStack.length && opStack.slice(-1)[0]  !== '(') {
+                        valueStack.push(combine(opStack.pop(), valueStack.pop(), valueStack.pop()))
+                    }
+                    opStack.pop()
+                    break;
+                case 'and':
+                case 'or':
+                    while (opStack.length && opStack.slice(-1)[0]  !== '(') {
+                        valueStack.push(combine(opStack.pop(), valueStack.pop(), valueStack.pop()))
+                    }
+                    opStack.push(next)
+                    break;
+                default:
+                    valueStack.push(objectify(next))
+                    break;
             }
         }
-        return query
+        while (opStack.length) {
+            valueStack.push(combine(opStack.pop(), valueStack.pop(), valueStack.pop()))
+        }
+        return valueStack.pop()
     }
-    // for testing we hardcoded snapshot_id
+    
     // const {query, snapshot_id} = req.params;
     let {query, snapshotid} = req.body;
     console.log(req.body)
     let snapshot_id = snapshotid
-    console.log(parseQuery(query))
     
     try {
-        builtQuery = queryBuilder(parseQuery(query), snapshot_id)
+        builtQuery = parseQuery(query)
+        builtQuery['snapshotId'] = snapshot_id
         console.log(query, builtQuery);
         files = await File.find( builtQuery );
         //console.log(files);
