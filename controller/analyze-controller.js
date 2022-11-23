@@ -16,7 +16,7 @@ sharingAnalysis = async function(snapshotId, threshold) {
         // Perform file-folder difference analysis on non-root folders
         if (!folder.root) {
             for (const file of children) {
-                await fileFolderDifferences(snapshotId, file, folder);
+                await fileFolderDifferencesAnalysis(snapshotId, file, folder);
             }
         }
         // Perform deviant permission analysis on all folders
@@ -31,39 +31,11 @@ sharingAnalysis = async function(snapshotId, threshold) {
  * @param {Object} file - The file being analyzed
  * @param {Object} folder - The parent of the file being analyzed
  */
-fileFolderDifferences = async function(snapshotId, file, folder) {
-    // PermissionsIds exclusive to file
-    const fileExclusiveIds = (file.permissionIds).filter((permission) => !(folder.permissionIds).includes(permission));
-    // PermissionsIds exclusive to folder
-    const folderExclusiveIds = (folder.permissionIds).filter((permission) => !(file.permissionIds).includes(permission));
-    // PermissionsIds found in both files (Permissions associated with Ids may not be identical)
-    const commonPermissionIds = (file.permissionIds).filter((permission) => (folder.permissionIds).includes(permission));
-    // Convert file and folder permission objects into maps
-    const filePermissions = file.permissions;
-    const folderPermissions = folder.permissions;
-    // Permissions exclusive to file
-    const fileExclusivePermissions = [];
-    // Permissions exclusive to folder
-    const folderExclusivePermissions = [];
-    // Retrieve all permissions exclusive to file
-    for (const permissionId of fileExclusiveIds) {
-        fileExclusivePermissions.push(filePermissions[permissionId]);
-    }
-    // Retrieve all permissions exclusive to file
-    for (const permissionId of folderExclusiveIds) {
-        folderExclusivePermissions.push(folderPermissions[permissionId]);
-    }
-    // If both file and folder have permissions:
-    if (filePermissions && folderPermissions) {
-        // Verify that permissions that appear in both file and folder are equivalent in type, email and role
-        for (const permissionId of commonPermissionIds) {
-            // If email and role fields are not identical, add the corresponding permission to both exclusive arrays
-            if (filePermissions[permissionId] != folderPermissions[permissionId]) {
-                fileExclusivePermissions.push(filePermissions[permissionId]);
-                folderExclusivePermissions.push(folderPermissions[permissionId]);
-            }
-        }
-    }
+fileFolderDifferencesAnalysis = async function(snapshotId, file, folder) {
+    // Identify sharing permission differences between the file and folder
+    const fileDifferences = compareFiles(file, folder);
+    const fileExclusivePermissions = fileDifferences[0];
+    const folderExclusivePermissions = fileDifferences[1];
     // Update fileFolderDifferences property of file
     if (fileExclusivePermissions.length > 0 || folderExclusivePermissions.length > 0) {
         const updatedFile = await File.findOneAndUpdate({ snapshotId: snapshotId, fileId: file.fileId }, { $set:{ fileFolderDifferences: { 'fileExclusivePermissions': fileExclusivePermissions, 'folderExclusivePermissions': folderExclusivePermissions } } });
@@ -72,8 +44,61 @@ fileFolderDifferences = async function(snapshotId, file, folder) {
 };
 
 /**
+ * Compare the sharing permissions of two files
+ * @param {Object} file1 - The first of the two files being compared
+ * @param {Object} file2 - The second of the two files being compared
+ * @returns {Object[][]} fileDifferences - Array containing each file's exclusive permissions
+ */
+compareFiles = function(file1, file2) {
+    // If files do not have permission or permissionId fields, fill them in with empty arrays
+    for (const file of [file1, file2]) {
+        if (!file.permissionIds) {
+            file.permissionIds = [];
+        }
+    }
+    // PermissionsIds exclusive to file1
+    const file1ExclusiveIds = (file1.permissionIds).filter((permission) => !(file2.permissionIds).includes(permission));
+    // PermissionsIds exclusive to file2
+    const file2ExclusiveIds = (file2.permissionIds).filter((permission) => !(file1.permissionIds).includes(permission));
+    // PermissionsIds found in both files (Permissions associated with Ids may not be identical)
+    const commonPermissionIds = (file1.permissionIds).filter((permission) => (file2.permissionIds).includes(permission));
+    // Retrieve sharing permissions of the two files
+    const file1Permissions = file1.permissions;
+    const file2Permissions = file2.permissions;
+    // Permissions exclusive to file1
+    const file1ExclusivePermissions = [];
+    // Permissions exclusive to file2
+    const file2ExclusivePermissions = [];
+    // Retrieve all permissions exclusive to file1
+    if (file1Permissions) {
+        for (const permissionId of file1ExclusiveIds) {
+            file1ExclusivePermissions.push(file1Permissions[permissionId]);
+        }
+    }
+    // Retrieve all permissions exclusive to file2
+    if (file2Permissions) {
+        for (const permissionId of file2ExclusiveIds) {
+            file2ExclusivePermissions.push(file2Permissions[permissionId]);
+        }
+    }
+    // If both files have permissions (placeholder):
+    if (file1Permissions && file2Permissions) {
+        // Verify that permissions that appear in both files are equivalent in type, email/domain, and role
+        for (const permissionId of commonPermissionIds) {
+            // If the permission properties are not identical, add the corresponding permission to both files' exclusive permission arrays
+            if ( (file1Permissions[permissionId] && file2Permissions[permissionId]) && (file1Permissions[permissionId] !== file2Permissions[permissionId]) ) {
+                file1ExclusivePermissions.push(file1Permissions[permissionId]);
+                file2ExclusivePermissions.push(file2Permissions[permissionId]);
+            }
+        }
+    }
+    // Return the file differences as an array containing the files' exclusive permission arrays
+    return [file1ExclusivePermissions, file2ExclusivePermissions];
+};
+
+/**
  * Identifies sharing permissions that deviate from those found in the majority
- * @param {string} snapshotId - Id of the snapshot the folder belongs to
+ * @param {string} snapshotId - Id of the FileSnapshot the folder belongs to
  * @param {Object} folder - The folder whose content is being analyzed
  * @param {number} threshold - Threshold value that determines what percentage of files count as a majority
  */
@@ -127,6 +152,63 @@ deviantPermissionAnalysis = async function(snapshotId, folder, threshold) {
     }
 };
 
+// Identifies file sharing differences between two FileSnapshots
+snapshotAnalysis = async function(req, res) {
+    // Retrieve snapshot Ids from request
+    const { snapshot1, snapshot2 } = req.params;
+    try {
+        // Retrieve all files (excluding root folders) associated with the selected file snapshots
+        const snapshot1FileList = await File.find({ snapshotId: snapshot1, root: false });
+        const snapshot2FileList = await File.find({ snapshotId: snapshot2, root: false });
+        // Create file maps from the retrieved files
+        const snapshot1Map = createFileMap(snapshot1FileList);
+        // List of new files (files that exist in the second snapshot, but not in the first)
+        let newFiles = [];
+        // Object storing the differences in file sharing permissions between the two snapshots
+        let permissionDifferences = {};
+        // Iterate through the files of the second file snapshot
+        for (const file of snapshot2FileList) {
+            // If the file is not in the first snapshot, label it as a new file in the second snapshot
+            if (!snapshot1Map.has(file.fileId)) {
+                newFiles.push(file);
+                continue;
+            }
+            // If the file is found exists in both snapshots, compare file sharing permissions
+            const fileDifferences = compareFiles(snapshot1Map.get(file.fileId), file);
+            const snapshot1ExclusivePermissions = fileDifferences[0];
+            const snapshot2ExclusivePermissions = fileDifferences[1];
+            // If there are any differences in the file's permissions between the two snapshots, add these differences to the sharing differences object
+            if (snapshot1ExclusivePermissions.length > 0 || snapshot2ExclusivePermissions.length > 0) {
+                permissionDifferences[file.fileId] = [snapshot1ExclusivePermissions, snapshot2ExclusivePermissions];
+                console.log(`Found snapshot sharing differences for file (${file.fileId})`);
+            }
+        }
+        // Return the file sharing differences between the two snapshots as an object
+        const sharingDifferences = { 'newFiles': newFiles, 'permissionDifferences': permissionDifferences };
+        res.status(200).json({ success: true, differences: sharingDifferences });
+    } catch(error) {
+        console.error(`Failed to analyze snapshots: ${error}`);
+        res.status(400).json({ success: false, error: error });
+    }
+};
+
+/**
+ * Creates a map-like object of all files associated with a given file snapshot
+ * @param {Object[]} fileList - Array of all files associated with the given snapshot
+ * @returns {Object} map - Map of all files present in the user's drive at the time the snapshot was taken
+ */
+createFileMap = function(fileList) {
+    // Map object storing all files in the snapshot
+    const map = new Map();
+    // Insert the files into the map
+    for (const file of fileList) {
+        map.set(file.fileId, file);
+    }
+    // Return the map of files
+    return map;
+}
+
 module.exports = {
-    sharingAnalysis
+    sharingAnalysis,
+    snapshotAnalysis
 };
