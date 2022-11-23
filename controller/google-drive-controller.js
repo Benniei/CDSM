@@ -20,9 +20,9 @@ createFileSnapshot = async function(req, res) {
         // Initialize Google Drive API
         const driveAPI = google.drive({ version: 'v3', auth: oauth2Client });
         // Retrieve the name and Ids of all of the user's drives
-        const driveIds = await getDrives(driveAPI);
+        const driveIds = await GD_getDrives(driveAPI);
         // Retrieve a map of all files in the user's drives
-        const driveMap = await getDriveFiles(driveAPI, driveIds);
+        const driveMap = await GD_getDriveFiles(driveAPI, driveIds);
         // Create a File Snapshot in our database to obtain a snapshotId
         const newSnapshot = new FileSnapshot({
             owner: user._id,
@@ -77,7 +77,7 @@ createFileSnapshot = async function(req, res) {
  * @param {Object} driveAPI - Instance of Google Drive API service
  * @returns {Object} driveIds - Name and Ids of all of the user's drives 
  */
-getDrives = async function(driveAPI) {
+GD_getDrives = async function(driveAPI) {
     // Object to store fileIds of all drives' root folder
     let driveIds = {};
     // Retrieve root folder of user's 'My Drive' collection
@@ -115,7 +115,7 @@ getDrives = async function(driveAPI) {
  * @param {Object} driveIds - Name and Ids of all of the user's drives
  * @returns {Map} map - Map of all files in the user's drives
  */
-getDriveFiles = async function(driveAPI, driveIds) {
+GD_getDriveFiles = async function(driveAPI, driveIds) {
     // List of files retrieved from Google Drive API (including root folder of the user's 'My Drive' collection)
     let fileList = [];
     // Add each shared drive's Id and name into driveId object
@@ -145,16 +145,17 @@ getDriveFiles = async function(driveAPI, driveIds) {
     // Log file data
     console.log(`Retrieived ${fileList.length} files`);
     // Return map of all files in the user's drives
-    return createFileMap(driveIds, fileList);
+    return await GD_createFileMap(driveAPI, driveIds, fileList);
 }
 
 /**
  * Creates a map-like object of all files in the user's drives
+ * @param {Object} driveAPI - Instance of Google Drive API service
  * @param {Object} driveIds - The name and Ids of all of the user's drives
  * @param {Objectp[]} fileList - Array of file objects
  * @returns {Map} map - Map of all files in the user's drives
  */
-createFileMap = function(driveIds, fileList) {
+GD_createFileMap = async function(driveAPI, driveIds, fileList) {
     // Map object used to store the files
     const map = new Map();
     // Insert the files into map
@@ -180,12 +181,6 @@ createFileMap = function(driveIds, fileList) {
         if (file.owners) {
             overrides['owners'] = file.owners[0].emailAddress;
         }
-        // Replace the file's permission array with an object
-        if (file.permissions) {
-            const permissionObjects = createPermissionObject(file.permissions);
-            overrides['permissions'] = permissionObjects.permissions;
-            overrides['permissionsRaw'] = permissionObjects.permissionsRaw;
-        }
         // Replace the file's owners array with only the owner's email address
         if (file.sharingUser) {
             overrides['sharingUser'] = file.sharingUser.emailAddress;
@@ -208,6 +203,26 @@ createFileMap = function(driveIds, fileList) {
                     map.set(parent.id, { ...parent, children: [...parent.children, file.id] });
                 }
             }
+        }
+        // Retrieve the file's hidden permissions if it is a Shared Drive file
+        if (!file.permissions && !file.root) {
+            try {
+                const response = await driveAPI.permissions.list({
+                    fileId: file.id,
+                    supportsAllDrives: true,
+                    fields: 'permissions(id, type, role, emailAddress, domain, displayName)'
+                });
+                file.permissions = response.data.permissions;
+                console.log(`Retrieved hidden permissions for file ${file.id}`);
+            } catch(error) {
+                console.error(`User did not have sufficient permission to access the hidden permissions for this file (${file.id}).`);
+            }
+        }
+        // Replace the file's permission array with an object
+        if (file.permissions) {
+            const permissionObjects = GD_createPermissionObject(file.permissions);
+            overrides['permissions'] = permissionObjects.permissions;
+            overrides['permissionsRaw'] = permissionObjects.permissionsRaw;
         }
         // If the file already has an entry in the map (because it's the parent folder of some file that was already added into the map), update the entry with the file's other fields (parents, permissions, etc.)
         if (map.get(file.id)) { 
@@ -235,7 +250,7 @@ createFileMap = function(driveIds, fileList) {
  * @param {Object[]} permissionList - An list of Google Drive permission objects
  * @returns {Object} permissions - Objects containing all of the file's permissions as strings and objects
  */
-createPermissionObject = function(permissionList) {
+GD_createPermissionObject = function(permissionList) {
     // Object to store the permissions of a file
     const permissions = {};
     const permissionsRaw = {};
@@ -255,7 +270,7 @@ createPermissionObject = function(permissionList) {
                 permissions[permission.id] = `(anyone, ${permission.role})`;
         }
         // Remove unnecessary data from Google Drive API permission objects
-        permissionsRaw[permission.id] = { id: permission.id, type: permission.type, emailAddress: permission.emailAddress, domain: permission.domain, role: permission.role, displayName: permission.displayName, permissionDetails: permission.permissionDetails };
+        permissionsRaw[permission.id] = { id: permission.id, type: permission.type, emailAddress: permission.emailAddress, domain: permission.domain, role: permission.role, displayName: permission.displayName };
     }
     return { permissions: permissions, permissionsRaw: permissionsRaw };
 };
