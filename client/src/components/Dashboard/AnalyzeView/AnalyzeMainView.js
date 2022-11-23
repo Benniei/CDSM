@@ -121,7 +121,7 @@ function AnalyzeMainView() {
                             >
                                 {snapshotArray.map((option) => (
                                     <MenuItem key={option} value={option}>
-                                        {option}
+                                        {option.substring(option.indexOf('-')+1)}
                                     </MenuItem>
                                 ))}
                             </TextField>
@@ -137,7 +137,7 @@ function AnalyzeMainView() {
                             >
                                 {snapshotArray.map((option) => (
                                     <MenuItem key={option} value={option}>
-                                        {option}
+                                        {option.substring(option.indexOf('-')+1)}
                                     </MenuItem>
                                 ))}
                             </TextField>
@@ -147,7 +147,10 @@ function AnalyzeMainView() {
                             <Box 
                             className="black-button" 
                             sx={{width:'100px', height:'25px', mt:1}}
-                            onClick={event => {console.log("Sharing Differences")}}
+                            // onClick={event => {console.log("Sharing Differences")}}
+                            onClick={event => {store.analyzeSnapshots(snapshot1, snapshot2)}}
+                            // onClick={event => {store.analyzeSnapshots('63622af03f1cede505453ce6-November 23rd 2022, 3:54:25', '63622af03f1cede505453ce6-November 23rd 2022, 3:55:44')}}
+                            // onClick={event => {store.analyzeSnapshots('63622af03f1cede505453ce6-November 23rd 2022, 3:55:44', '63622af03f1cede505453ce6-November 23rd 2022, 3:56:46')}}
                             >
                                 <center>
                                     <Typography 
