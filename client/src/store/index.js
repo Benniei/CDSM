@@ -282,6 +282,17 @@ function GlobalStoreContextProvider(props) {
         }
     };
 
+    store.analyzeSnapshots = async function(snapshot1Id, snapshot2Id) {
+        console.log(`Analyzing file sharing differences between snapshots '${snapshot1Id}' and '${snapshot2Id}'`);
+        const response = await api.analyzeSnapshots(auth.user, snapshot1Id, snapshot2Id);
+        if (response.status === 200) {
+            // TODO: do something with analysis
+            const differences = response.data.differences;
+            console.log(differences.newFiles);
+            console.log(differences.permissionDifferences);
+        }
+    }
+
     store.buildQuery = async function(query) {
         console.log(`Building query: ${query}`);
         const response = await api.buildQuery({ query: query, snapshotid: store.currentSnapshot });
