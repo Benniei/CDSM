@@ -27,6 +27,12 @@ export const takeSnapshot = (payload) => api.post('/snapshot/create', payload).t
    return error.response;
 });
 
+export const analyzeSnapshots = (payload, snapshot1Id, snapshot2Id) => api.post(`/snapshots/${snapshot1Id}/${snapshot2Id}/analyze`, payload).then(response => {
+   return response;
+}).catch(error => {
+   return error.response;
+});
+
 // File related requests
 export const getFiles = (payload, snapshotId) => api.post(`/snapshot/${snapshotId}/files`, payload).then(response => {
    return response;
@@ -61,6 +67,7 @@ export const updateACR = (payload) => api.post('/acr', payload).then(response =>
 });
  
 const apis = {
+   analyzeSnapshots,
    buildQuery,
    doQuery,
    getFiles,
