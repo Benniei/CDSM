@@ -123,60 +123,58 @@ function FileSharingModal(props) {
     let flag = store.updateSharingModal;
 
     useEffect(() => {
+        // Computes the Unique Permissions and Mixed Permissions Amongst Files
         if(store.updateSharingModal && selected.length > 0){
             // Get all permissions across all files
-            let mixedResult = [];
-            let uniqueResult = [];
-            if(selected.length > 0) {
-                let data = [];
-                for(let file of selected){
-                    let fileInfo = store.allItems[file.index].permissionsRaw;
-                    let setdata = [];
-                    for(let key in fileInfo){
-                        let obj = fileInfo[key]
-                        let permission = {
-                            role: obj.role,
-                            type: obj.type,
-                            email: obj.emailAddress,
-                            name: obj.displayName,
-                            id: obj.emailAddress+obj.role
-                        }
-                        setdata.push(permission);
+            let mixedResult = []; // User has mixed roles amongst selected files
+            let uniqueResult = []; // User roles are consistent
+            let data = [];
+            for(let file of selected){
+                let fileInfo = store.allItems[file.index].permissionsRaw;
+                let setdata = [];
+                for(let key in fileInfo){
+                    let obj = fileInfo[key]
+                    let permission = {
+                        role: obj.role,
+                        type: obj.type,
+                        email: obj.emailAddress,
+                        name: obj.displayName,
+                        id: obj.emailAddress+obj.role
                     }
-                    data.push(setdata);
+                    setdata.push(permission);
                 }
-                // console.log(data);
-                uniqueResult = data.reduce((a, b) => a.filter(c => b.some(item => item.id === c.id)));
-                // console.log("Unique Results ", uniqueResult);
-                // Get all the owners on top 
-                // -1 means owner is before the others, so we sort by owner as priority and then by group
-                uniqueResult.sort(function(x,y) { return (x.role==="owner"?-1 : y.role ==="owner" ? 1: 0) || (x.type === "group"?-1: y.type==="group"?1:0)});
-
-                // Get all emails in unique Results
-                let set = new Set();
-                for(let user of uniqueResult){
-                    set.add(user.email);
-                }
-
-                // Get all emails from users with mixed results
-                for(let file of data){
-                    for(let perm of file){
-                        if(!set.has(perm.email)){
-                            set.add(perm.email);
-                            mixedResult.push({
-                                name: perm.name,
-                                email: perm.email,
-                                type: perm.type,
-                                role: "Mixed Values"
-                            });
-                        }
-                    }
-                }
-                // console.log("mixedResult ",  mixedResult);
-                // console.log(uniqueResult, mixedResult)
-                setUniqueUsers(uniqueResult)
-                setMixedUsers(mixedResult)
+                data.push(setdata);
             }
+
+            // Get all the Users who have consistent roles over all files
+            uniqueResult = data.reduce((a, b) => a.filter(c => b.some(item => item.id === c.id)));
+
+            // Get all the owners on top 
+            // -1 means owner is before the others, so we sort by owner as priority and then by group
+            uniqueResult.sort(function(x,y) { return (x.role==="owner"?-1 : y.role ==="owner" ? 1: 0) || (x.type === "group"?-1: y.type==="group"?1:0)});
+
+            // Get all emails in unique Results
+            let set = new Set();
+            for(let user of uniqueResult){
+                set.add(user.email);
+            }
+
+            // Get all emails from users with mixed results
+            for(let file of data){
+                for(let perm of file){
+                    if(!set.has(perm.email)){
+                        set.add(perm.email);
+                        mixedResult.push({
+                            name: perm.name,
+                            email: perm.email,
+                            type: perm.type,
+                            role: "Mixed Values"
+                        });
+                    }
+                }
+            }
+            setUniqueUsers(uniqueResult)
+            setMixedUsers(mixedResult)
         }
     }, [store.updateSharingModal]);
     // Sanatize the user and split them into unique and mixed users
