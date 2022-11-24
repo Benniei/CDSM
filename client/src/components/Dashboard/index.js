@@ -24,10 +24,11 @@ function Dashboard() {
 
     useEffect(() => {
         if(auth.loggedIn){
-            if (auth.user.filesnapshot)
+            console.log(store);
+            if (auth.user.filesnapshot && !store.search)
                 store.getSnapshot(auth.user.filesnapshot[0], store.openDrive)
         }
-    }, [auth]);
+    }, [auth.loggedIn]);
     
 
     let driveFlag = store.openAccess || store.openAnalyze;

@@ -1,5 +1,5 @@
 // Imports from React
-import {useState, useContext} from 'react';
+import {useState, useContext, useEffect} from 'react';
 import AuthContext from '../../../auth/index.js';
 import {GlobalStoreContext} from '../../../store';
 
@@ -55,13 +55,7 @@ const headCells = [
         disablePadding:false,
         label: "Direct Permissions",
         sort:false
-    },
-    // {
-    //     id: 'lastModified',
-    //     disablePadding: false,
-    //     label: 'Last Modified',
-    //     sort:true
-    // }
+    }
 ]
 
 function arraySort(arr, order, orderBy){
@@ -142,50 +136,56 @@ function FileTable(props){
     const {store} = useContext(GlobalStoreContext);
     const {auth} = useContext(AuthContext);
     const [order, setOrder] = useState('asc')
+    const [rows, setRows] = useState([])
     const [orderBy, setOrderBy] = useState('name')
     const {selected, setSelected} = props;
 
-    
-    let rows = [];
-    let inheritiedPerms = [];
-    let directPerms = [];
-    if (store.allItems) {
-        let i = 0;
-        // Get Unique Parent ids (Used Primarily for Search when there are multiple files)
-        // let allParents=[]
-        // store.allItems.map((file) => allParents.indexOf(file.parent) === -1? allParents.push(file.parent): null)
+    useEffect(() => {
+        setRows([])
+        let rowPrototype = [];
+        let inheritiedPerms = [];
+        let directPerms = [];
+        if (store.allItems) {
+            let i = 0;
+            // Get Unique Parent ids (Used Primarily for Search when there are multiple files)
+            // let allParents=[]
+            // store.allItems.map((file) => allParents.indexOf(file.parent) === -1? allParents.push(file.parent): null)
 
-        // Enter Data into the File Table
-        for (let file of store.allItems) {
-            //console.log(file.name)
-            // Intersection between the file and its parent's permissions
-            // Step 1 Find out if File has Corresponding Parent
-            let parent = store.parents && store.parents.find(o => (o.folderid === file.parent)? o: null)
+            // Enter Data into the File Table
+            for (let file of store.allItems) {
+                //console.log(file.name)
+                // Intersection between the file and its parent's permissions
+                // Step 1 Find out if File has Corresponding Parent
+                let parent = store.parents && store.parents.find(o => (o.folderid === file.parent)? o: null)
 
-            // Gather all the file's permissions as an array
-            let data = [[],[]]
-            for(let key in file.permissionsRaw){
-                data[0].push(file.permissionsRaw[key])
-            }
-            if(parent)
-                for(let key in parent.permissions){
-                    data[1].push(parent.permissions[key])
+                // Gather all the file's permissions as an array
+                let data = [[],[]]
+                for(let key in file.permissionsRaw){
+                    data[0].push(file.permissionsRaw[key])
                 }
-            // console.log(data)
-            // If there is parent, there can be inheritied and direct permissions
-            if(parent){
-                inheritiedPerms = data.reduce((a,b) => a.filter(c => c.role !== "owner" && b.some(item => item.emailAddress === c.emailAddress && item.role === c.role)))
-                directPerms = data.reduce((a,b) => a.filter(c => c.role !== "owner" && !b.some(item => ( item.emailAddress === c.emailAddress && item.role === c.role))))
+                if(parent)
+                    for(let key in parent.permissions){
+                        data[1].push(parent.permissions[key])
+                    }
+                // console.log(data)
+                // If there is parent, there can be inheritied and direct permissions
+                if(parent){
+                    inheritiedPerms = data.reduce((a,b) => a.filter(c => c.role !== "owner" && b.some(item => item.emailAddress === c.emailAddress && item.role === c.role)))
+                    directPerms = data.reduce((a,b) => a.filter(c => c.role !== "owner" && !b.some(item => ( item.emailAddress === c.emailAddress && item.role === c.role))))
+                }
+                // If no parent, all permissions are direct
+                else{
+                    directPerms = data[0].filter(item => item.role !== "owner")
+                }
+                // console.log(inheritiedPerms, directPerms)
+                rowPrototype.push(createData(file.name, file.children ? "Folder" : "File",
+                file.owner === auth.user.email ? "me": file.owner, file.lastModifiedTime, file.fileId, i++, inheritiedPerms, directPerms));
+                
             }
-            // If no parent, all permissions are direct
-            else{
-                directPerms = data[0].filter(item => item.role !== "owner")
-            }
-            // console.log(inheritiedPerms, directPerms)
-            rows.push(createData(file.name, file.children ? "Folder" : "File",
-                file.owner === auth.user.email ? "me": file.owner, file.lastModifiedTime, file.fileId, i++, inheritiedPerms, directPerms))
-        };
-    }
+            console.log(rowPrototype)
+            setRows(rowPrototype);
+        }
+    }, [store.allItems]);
 
     
     // Change the order direction or the field
@@ -271,7 +271,7 @@ function FileTable(props){
                                         role="checkbox"
                                         aria-checked={isItemSelected}
                                         tabIndex={-1}
-                                        key={row.name}
+                                        key={row.name + index}
                                         selected={isItemSelected}>
                                         <TableCell padding='checkbox'>
                                             <Checkbox

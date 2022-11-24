@@ -121,8 +121,8 @@ function FileSharingModal(props) {
     const uniqueSelections = ["Reader", "Commenter", "Writer", "Remove Access"]
     const mixedSelections = ["Mixed Values", "Reader", "Commenter", "Writer", "Remove Access"]
     let flag = store.updateSharingModal;
-
     useEffect(() => {
+        
         // Computes the Unique Permissions and Mixed Permissions Amongst Files
         if(store.updateSharingModal && selected.length > 0){
             // Get all permissions across all files
