@@ -30,6 +30,8 @@ const Root = styled('div')(({ theme }) => ({
 function DrawerContent(){
     const {store} = useContext(GlobalStoreContext);
 
+    const drives = store.otherDrive
+    // console.log(drives)
     return(
         <Root>
                 <center>
@@ -75,16 +77,26 @@ function DrawerContent(){
                             <ListItemText primary='Shared With Me' sx={{ml: -1.5}} />
                         </ListItemButton>
                     </ListItem>
-                    {/* Other Shared Drives (Have to populate) */}
-
-                    <ListItem key='otherdrive' disablePadding>
-                        <ListItemButton>
-                            <ListItemIcon sx={{ml: 1}}>
-                                <FilterDramaIcon />
-                            </ListItemIcon>
-                            <ListItemText primary='Other Drives' sx={{ml: -1.5}} />
-                        </ListItemButton>
-                    </ListItem>
+                    {/* Other Shared Drives */}
+                    {drives.map((item, i) => {
+                        let driveName = item[0]
+                        let driveID = item[1]
+                        return(
+                            <ListItem key={driveID} disablePadding
+                                onClick={(event)=>{
+                                    console.log("Open " + driveName)
+                                    store.getDrive(store.currentSnapshot, driveID, driveName)
+                                    // store.openDriveView('SharedWithMe')
+                                }}>
+                                <ListItemButton>
+                                    <ListItemIcon sx={{ml: 1}}>
+                                        <FilterDramaIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary={driveName} sx={{ml: -1.5}} />
+                                </ListItemButton>
+                            </ListItem>
+                        )
+                    })}
 
 
                 </List>

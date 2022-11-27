@@ -18,7 +18,8 @@ export const GlobalStoreActionType = {
     CLOSE_MODAL: "CLOSE_MODAL",
     OPEN_AC_SEARCH: "OPEN_AC_SEARCH",
     OPEN_ACCESS: "OPEN_ACCESS",
-    OPEN_ANALYZE: "OPEN_ANALYZE"
+    OPEN_ANALYZE: "OPEN_ANALYZE",
+    SET_DRIVES: "SET_DRIVES"
 };
 
 function GlobalStoreContextProvider(props) {
@@ -36,7 +37,8 @@ function GlobalStoreContextProvider(props) {
         openAccess: false,
         openAnalyze: false,
         path: [],
-        parents: []
+        parents: [],
+        otherDrive: []
     });
 
     const storeReducer = (action) => {
@@ -55,7 +57,8 @@ function GlobalStoreContextProvider(props) {
                     openAccess: store.openAccess,
                     openAnalyze: store.openAnalyze,
                     path: payload.path,
-                    parents: payload.parents
+                    parents: payload.parents,
+                    otherDrive: store.otherDrive
                 });
             }
             case GlobalStoreActionType.GET_DRIVE: {
@@ -71,7 +74,25 @@ function GlobalStoreContextProvider(props) {
                     openAccess: false,
                     openAnalyze: false,
                     path: [],
-                    parents: payload.parents
+                    parents: payload.parents,
+                    otherDrive: store.otherDrive
+                });
+            }
+            case GlobalStoreActionType.SET_DRIVES: {
+                return setStore({
+                    allItems: payload.folder,
+                    currentSnapshot: payload.snapshotid,
+                    queryBuilder: false,
+                    takeSnapshotModal: false,
+                    updateSharingModal: false,
+                    accessModal: false,
+                    search: false,
+                    openDrive: payload.driveName,
+                    openAccess: false,
+                    openAnalyze: false,
+                    path: [],
+                    parents: payload.parents,
+                    otherDrive: payload.otherDrive
                 });
             }
             case GlobalStoreActionType.SHOW_SEARCH: {
@@ -87,7 +108,8 @@ function GlobalStoreContextProvider(props) {
                     openAccess: false,
                     openAnalyze: false,
                     path: null,
-                    parents: []
+                    parents: [],
+                    otherDrive: store.otherDrive
                 });
             }
             case GlobalStoreActionType.OPEN_QUERY_BUILDER: {
@@ -103,7 +125,8 @@ function GlobalStoreContextProvider(props) {
                     openAccess: store.openAccess,
                     openAnalyze: store.openAnalyze,
                     path: store.path,
-                    parents: store.parents
+                    parents: store.parents,
+                    otherDrive: store.otherDrive
                 });
             }
             case GlobalStoreActionType.OPEN_TAKE_SNAPSHOT_MODAL: {
@@ -119,7 +142,8 @@ function GlobalStoreContextProvider(props) {
                     openAccess: store.openAccess,
                     openAnalyze: store.openAnalyze,
                     path: store.path,
-                    parents: store.parents
+                    parents: store.parents,
+                    otherDrive: store.otherDrive
                 });
             }
             case GlobalStoreActionType.OPEN_UPDATE_SHARING: {
@@ -135,7 +159,8 @@ function GlobalStoreContextProvider(props) {
                     openAccess: store.openAccess,
                     openAnalyze: store.openAnalyze,
                     path: store.path,
-                    parents: store.parents
+                    parents: store.parents,
+                    otherDrive: store.otherDrive
                 });
             }
             case GlobalStoreActionType.OPEN_AC_MODAL: {
@@ -151,7 +176,8 @@ function GlobalStoreContextProvider(props) {
                     openAccess: store.openAccess,
                     openAnalyze: store.openAnalyze,
                     path: store.path,
-                    parents: []
+                    parents: [],
+                    otherDrive: store.otherDrive
                 });
             }
             case GlobalStoreActionType.OPEN_AC_SEARCH: {
@@ -167,7 +193,8 @@ function GlobalStoreContextProvider(props) {
                     openAccess: store.openAccess,
                     openAnalyze: store.openAnalyze,
                     path: store.path,
-                    parents: []
+                    parents: [],
+                    otherDrive: store.otherDrive
                 });
             }
             case GlobalStoreActionType.CLOSE_MODAL: {
@@ -182,7 +209,8 @@ function GlobalStoreContextProvider(props) {
                     openAccess: store.openAccess,
                     openAnalyze: store.openAnalyze,
                     path: store.path,
-                    parents: store.parents
+                    parents: store.parents,
+                    otherDrive: store.otherDrive
                 });
             }
             
@@ -199,7 +227,8 @@ function GlobalStoreContextProvider(props) {
                     openAccess: true,
                     openAnalyze: false,
                     path: [],
-                    parents: []
+                    parents: [],
+                    otherDrive: store.otherDrive
                 });
             }
             case GlobalStoreActionType.OPEN_ANALYZE: {
@@ -215,7 +244,8 @@ function GlobalStoreContextProvider(props) {
                     openAccess: false,
                     openAnalyze: true,
                     path: [],
-                    parents: []
+                    parents: [],
+                    otherDrive: store.otherDrive
                 });
             }
             default:
@@ -233,7 +263,8 @@ function GlobalStoreContextProvider(props) {
         if(response.status === 200) {
             let snapshot = response.data.fileSnapshot;
             // Retrieve fileId of root folder of 'My Drive' file collection
-            let driveID = snapshot.myDrive;
+            let driveIds = snapshot.driveIds;
+            let driveID = Object.keys(driveIds).find((key) => driveIds[key] === "MyDrive");
             auth.takeSnapshot(snapshot.snapshotId);
             store.getDrive(snapshot.snapshotId, driveID, "My Drive");
 
@@ -251,12 +282,37 @@ function GlobalStoreContextProvider(props) {
             let snapshot = response.data.snapshot;
             let driveIds = snapshot.driveIds;
             let driveId = Object.keys(driveIds).find((key) => driveIds[key] === driveName);
-            if (driveId && !store.search) {
+            if (driveName === 'MyDrive') {
+                let otherDrives = []
+                for (const property in driveIds){
+                    if (driveIds[property] !== "MyDrive" && driveIds[property] !== "SharedWithMe")
+                        otherDrives.push([driveIds[property], property])
+                }
+                console.log(otherDrives)
+                const response = await api.getFolder(auth.user, snapshotId, driveId);
+                if (response.status === 200) {
+                    let snapshot = {
+                        folder: response.data.folder,
+                        snapshotid: snapshotId,
+                        driveName: driveName,
+                        otherDrive: otherDrives
+                    };
+                    storeReducer({
+                        type:GlobalStoreActionType.SET_DRIVES,
+                        payload: snapshot
+                    });
+                }
+                
+            }
+            else if (driveId && !store.search) {
                 store.getDrive(snapshotId, driveId, driveName);
             }
         }
     };
 
+    /**
+     * The user gets all the Files in the Snapshot
+     */
     store.getFiles = async function(snapshotId, fileIds) {
         console.log(`Getting files ${fileIds} in snapshot '${snapshotId}'`);
         const response = await api.getFiles({ fileIds: fileIds }, snapshotId);
@@ -301,7 +357,7 @@ function GlobalStoreContextProvider(props) {
                 snapshotid: snapshotId,
                 driveName: driveName
             };
-            // console.log(snapshot)
+            console.log(store.otherDrive)
             storeReducer({
                 type:GlobalStoreActionType.GET_DRIVE,
                 payload: snapshot
