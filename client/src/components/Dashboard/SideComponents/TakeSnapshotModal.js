@@ -64,23 +64,6 @@ function FileSnapshot() {
                     sx={{ml: 2, mt: 1.7, width: '70%'}}>
                     <strong> {email} </strong>
                 </Typography>
-
-                {/* Adding Snapshot ID
-                <Typography 
-                    display="flex"
-                    variant="h6"
-                    sx={{ml: 2, width: '28%', mt: 1.7, pr:2.5}}
-                    justifyContent="flex-end">
-                    <strong>Snapshot ID:</strong>
-                </Typography>
-                <TextField
-                    id={"SnapshotID"}
-                    label="Snapshot ID"
-                    value={snapshotID}
-                    sx={{width: '70%',}}
-                    overflow='auto'
-                    onChange= {(event) => {setSnapshotID(event.target.value)}}
-                /> */}
             </Stack>
             <Box 
                 className="black-button" 

@@ -29,6 +29,28 @@ const style = {
 function FileSharingUser(props) {
     const {user, selectValues, users, setUsers} = props
 
+    let userItem;
+    if (user.type === "user" || user.type === "domain") {
+        userItem = <Box>
+            <Typography variant="h6">
+                <strong>{user.email}</strong>
+            </Typography>
+            <Typography variant="h7">
+                <strong>{user.type}</strong>
+            </Typography>
+        </Box>
+    }
+    else if (user.type === "group") {
+        userItem = <Box>
+            <Typography variant="h6">
+                <strong>{user.email}</strong>
+            </Typography>
+            <Typography variant="h7">
+                <strong>{user.type}</strong>
+            </Typography>
+        </Box>
+    }
+
     return (
         <Box 
             className="fileFolderModal"
@@ -40,20 +62,7 @@ function FileSharingUser(props) {
                 ml={1}>
                 <Stack
                     direction='row'>
-                    {user.type === "user"?
-                        <Box>
-                            <Typography variant="h6">
-                                <strong>{user.email}</strong>
-                            </Typography>
-                            <Typography variant="h7">
-                                <strong>{user.type}</strong>
-                            </Typography>
-                        </Box>
-                        :
-                        <Typography variant="h6">
-                            <strong>{user.email}</strong>
-                        </Typography>
-                    }
+                    {userItem}
                 </Stack>
                 <Stack
                     direction='row'>
@@ -130,13 +139,14 @@ function FileSharingModal(props) {
             let data = [];
             for(let file of selected){
                 let fileInfo = store.allItems[file.index].permissionsRaw;
+                console.log(store.allItems[file.index])
                 let setdata = [];
                 for(let key in fileInfo){
                     let obj = fileInfo[key]
                     let permission = {
                         role: obj.role,
                         type: obj.type,
-                        email: obj.emailAddress,
+                        email: obj.emailAddress || obj.domain,
                         name: obj.displayName,
                         id: obj.emailAddress+obj.role
                     }

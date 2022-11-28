@@ -124,7 +124,7 @@ function PermissionsTab (props){
                         ml={.25}
                         mr={.25}
                     >
-                        <Typography sx={{ml:.2}} variant="h7">{item.emailAddress}</Typography>
+                        <Typography sx={{ml:.2}} variant="h7">{item.emailAddress || item.domain}</Typography>
                     </Box>
                 ))}
         </Stack>
@@ -167,11 +167,11 @@ function FileTable(props){
                     for(let key in parent.permissions){
                         data[1].push(parent.permissions[key])
                     }
-                // console.log(data)
+                console.log(data)
                 // If there is parent, there can be inheritied and direct permissions
                 if(parent){
-                    inheritiedPerms = data.reduce((a,b) => a.filter(c => c.role !== "owner" && b.some(item => item.emailAddress === c.emailAddress && item.role === c.role)))
-                    directPerms = data.reduce((a,b) => a.filter(c => c.role !== "owner" && !b.some(item => ( item.emailAddress === c.emailAddress && item.role === c.role))))
+                    inheritiedPerms = data.reduce((a,b) => a.filter(c => c.role !== "owner" && b.some(item => (item.emailAddress || item.domain) === (c.emailAddress || item.domain) && item.role === c.role)))
+                    directPerms = data.reduce((a,b) => a.filter(c => c.role !== "owner" && !b.some(item => ( (item.emailAddress || item.domain) === (c.emailAddress || item.domain) && item.role === c.role))))
                 }
                 // If no parent, all permissions are direct
                 else{

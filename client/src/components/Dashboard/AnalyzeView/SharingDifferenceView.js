@@ -12,7 +12,7 @@ function SharingDifferenceView(props) {
         <Box>
             <Stack direction="row" spacing={2}>
                 <ArrowBackIcon sx={{fontSize:54}} onClick={mainView}/>
-                <Typography variant="h3"><strong>Sharing Differences</strong></Typography>
+                <Typography variant="h3"><strong>Sharing Differences Analysis</strong></Typography>
             </Stack>
         </Box>
     )

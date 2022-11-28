@@ -56,26 +56,6 @@ function SnapshotBar(){
                     </Typography>
                 </center>
             </Box>
-
-
-            {/* Select Group Snapshot Dropdown Menu */}
-            {/* <Grid item xs={4.5}>
-                <TextField
-                    id="select-group-snapshot"
-                    select
-                    label="Group Snapshot"
-                    value={groupsnapshot}
-                    onChange={handleGroupChange}
-                    fullWidth
-                    overflow='auto'
-                >
-                    {groupSnapshotArray.map((option) => (
-                        <MenuItem key={option.id} value={option.id}>
-                            {option.id}
-                        </MenuItem>
-                    ))}
-                </TextField>
-            </Grid> */}
         </Toolbar>
     );
 }
