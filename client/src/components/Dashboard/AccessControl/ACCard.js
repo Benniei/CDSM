@@ -10,7 +10,6 @@ import Stack from '@mui/material/Stack';
 
 function ACNameBar(props) {
     const {content, names} = props;
-    console.log(content, names);
     return (
         <Box sx={{
             display: 'flex',
@@ -48,7 +47,6 @@ function ACCard() {
         denyRead: auth.user.access_control_req.DR,
         denyWrite: auth.user.access_control_req.DW
     }
-    console.log(data.grp);
     
     return (
         <Box className="access-control-card" sx={{width: '87%'}} ml={3} mt={2}>
@@ -57,7 +55,7 @@ function ACCard() {
             </Typography>
             
             <Typography variant="h6" ml={4} mb={.5}> 
-                <strong>Group Directive: </strong> { String(data.grp)== "true" ? "On" : "Off"}
+                <strong>Group Directive: </strong> { String(data.grp) === "true" ? "On" : "Off"}
             </Typography>
             <ACNameBar
                 content={"Allowed Writers: "}

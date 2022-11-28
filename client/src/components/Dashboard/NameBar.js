@@ -12,8 +12,6 @@ function NameBar(props){
     const [data, setData] = useState("");
     const {label, values, submitData, removeData} = props
 
-    console.log(label, values);
-
     return (
         <Stack spacing={1}>
             <TextField

@@ -33,7 +33,6 @@ function FileSharingUser(props) {
         <Box 
             className="fileFolderModal"
             display="flex"
-            key={user.id}
             mt={1.5}
             >
             <Box
@@ -75,7 +74,7 @@ function FileSharingUser(props) {
                         disabled={true}
                     >
                         {selectValues.map((item, index) => (
-                            <MenuItem key={index} value={item}>
+                            <MenuItem key={item + index} value={item}>
                                 {item}
                             </MenuItem>
                         ))}

@@ -3,7 +3,7 @@ import {useContext, useState} from 'react';
 import {GlobalStoreContext} from '../../../store';
 import AuthContext from '../../../auth/index.js';
 import DeviantView from "./DeviantView";
-import SharingChangesView from "./SharingChangesView";
+import FileSharingChangesView from "./FileSharingChangesView";
 import SharingDifferenceView from "./SharingDifferenceView";
 
 
@@ -17,17 +17,29 @@ import MenuItem from '@mui/material/MenuItem';
 function AnalyzeMainView() {
     const {store} = useContext(GlobalStoreContext);
     const {auth} = useContext(AuthContext);
-    const [deviant, setDeviant] = useState("");
+    const [deviant, setDeviant] = useState(".51");
     const [view, setView] = useState("Normal");
-    const [snapshot1, setSnapshot1] = useState('');
-    const [snapshot2, setSnapshot2] = useState('');
+    const [snapshot1, setSnapshot1] = useState(store.currentSnapshot);
+    const [snapshot2, setSnapshot2] = useState(store.currentSnapshot);
 
-    const handleSnapshotChange1 = (event) => {
-        setSnapshot1(event.target.value);
+    function mainView() {
+        setView("Normal")
     }
-    const handleSnapshotChange2 = (event) => {
-        setSnapshot2(event.target.value);
+
+    function openDeviant(event) {
+        if(deviant >= .51)
+            setView("Deviant")
     }
+     
+    function openSharingChanges(event) {
+        setView("SharingChanges")
+    }
+
+    function openSharingDifferences(event) {
+        setView("SharingDifferences")
+    }
+
+
 
     const snapshotArray = auth.user.filesnapshot;
 
@@ -51,13 +63,14 @@ function AnalyzeMainView() {
                         <Stack direction="row">
                             <TextField 
                                 label={"Threshold"}
-                                sx={{width:'35%'}}>
-                            </TextField>
+                                sx={{width:'35%'}} 
+                                value={deviant}
+                                onChange={(event) => setDeviant(event.target.value)}/>
                             <Box sx={{flexGrow: .98}} />
                             <Box 
                             className="black-button" 
                             sx={{width:'100px', height:'25px', mt:1}}
-                            onClick={event => {console.log("Deviant Sharing")}}
+                            onClick={openDeviant}
                             >
                                 <center>
                                     <Typography 
@@ -84,7 +97,7 @@ function AnalyzeMainView() {
                             <Box 
                             className="black-button" 
                             sx={{width:'100px', height:'25px', mt:1}}
-                            onClick={event => {console.log("File-Folder Sharing Differences")}}
+                            onClick={openSharingChanges}
                             >
                                 <center>
                                     <Typography 
@@ -114,8 +127,8 @@ function AnalyzeMainView() {
                                 select
                                 display="inline"
                                 label="File Snapshot"
-                                value={store.currentSnapshot}
-                                onChange={handleSnapshotChange1}
+                                value={snapshot1}
+                                onChange={(event) => setSnapshot1(event.target.value)}
                                 sx={{width:"43%", mr:3}}
                                 overflow='auto'
                             >
@@ -130,8 +143,8 @@ function AnalyzeMainView() {
                                 select
                                 display="inline"
                                 label="File Snapshot"
-                                value={store.currentSnapshot}
-                                onChange={handleSnapshotChange2}
+                                value={snapshot2}
+                                onChange={(event) => setSnapshot2(event.target.value)}
                                 sx={{width:"43%"}}
                                 overflow='auto'
                             >
@@ -147,8 +160,7 @@ function AnalyzeMainView() {
                             <Box 
                             className="black-button" 
                             sx={{width:'100px', height:'25px', mt:1}}
-                            // onClick={event => {console.log("Sharing Differences")}}
-                            onClick={event => {store.analyzeSnapshots(snapshot1, snapshot2)}}
+                            onClick={openSharingDifferences}
                             // onClick={event => {store.analyzeSnapshots('63622af03f1cede505453ce6-November 23rd 2022, 3:54:25', '63622af03f1cede505453ce6-November 23rd 2022, 3:55:44')}}
                             // onClick={event => {store.analyzeSnapshots('63622af03f1cede505453ce6-November 23rd 2022, 3:55:44', '63622af03f1cede505453ce6-November 23rd 2022, 3:56:46')}}
                             >
@@ -165,13 +177,16 @@ function AnalyzeMainView() {
     }
     
     else if(view === "Deviant"){
-        content = <DeviantView/>
+        content = <DeviantView
+                    mainView={mainView}/>
     }
     else if(view === "SharingChanges") {
-        content = <SharingChangesView />
+        content = <FileSharingChangesView 
+                    mainView={mainView}/>
     }
     else if(view === "SharingDifferences") {
-        content = <SharingDifferenceView />
+        content = <SharingDifferenceView 
+                    mainView={mainView}/>
     }
 
     return(

@@ -54,7 +54,7 @@ function ACModal() {
             setDenyWriters(acr.DW);
             setFlag(acr.Grp);
         }
-    }, auth.user.access_control_req)
+    }, [auth.user.access_control_req])
     
     function handleOpenBuilder(){
         store.openAccessControlSearch();
