@@ -23,10 +23,12 @@ router.get('/auth/google/callback', passport.authenticate('google', { failureRed
 });
 
 // Authenticate user with Microsoft
-router.get('/auth/microsoft', passport.authenticate('microsoft', { accessType: 'offline', prompt: 'select_account', scope: 'user.read' } ));
+router.get('/auth/microsoft', passport.authenticate('microsoft', { accessType: 'offline', prompt: 'select_account', scope: ['user.read', 'offline_access'] } ));
 // Redirect based on Microsoft authentication response
 router.get('/auth/microsoft/callback', passport.authenticate('microsoft', { failureRedirect: process.env.CLIENT_BASE_URL }), function(req, res) {
     console.log("Successfully authenticated with microsoft.");
+    const token = auth.signToken(req.session.passport.user);
+    res.cookie('token', token, { maxAge: null, httpOnly: false });
     res.redirect(process.env.CLIENT_BASE_URL + 'dashboard');
     // res.redirect('http://localhost:3000/dashboard');
 });
@@ -69,7 +71,7 @@ router.get('/logout', function(req, res, next) {
         }
         // Redirect user to landing page
         console.log('User logged out.');
-        res.clearCookie('cookieName');
+        res.clearCookie('token');
         res.redirect(process.env.CLIENT_BASE_URL);
         // res.redirect('http://localhost:3000');    
     });
