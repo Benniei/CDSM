@@ -18,7 +18,7 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 function AnalyzeMainView() {
     const {store} = useContext(GlobalStoreContext);
     const {auth} = useContext(AuthContext);
-    const [deviant, setDeviant] = useState(".51");
+    const [deviant, setDeviant] = useState(".80");
     const [view, setView] = useState("Normal");
     const [snapshot, setSnapshot] = useState(store.currentSnapshot);
     const [snapshot1, setSnapshot1] = useState(store.currentSnapshot);
