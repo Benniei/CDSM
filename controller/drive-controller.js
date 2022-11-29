@@ -8,7 +8,6 @@ const moment = require('moment');
 const AnalysisController = require('../controller/analyze-controller');
 const File = require('../models/file-model');
 const FileSnapshot = require('../models/filesnapshot-model');
-const GoogleDriveController = require('../controller/google-drive-controller');
 const User = require('../models/user-model');
 
 
