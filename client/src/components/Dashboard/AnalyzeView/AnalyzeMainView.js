@@ -27,7 +27,7 @@ function AnalyzeMainView() {
     }
 
     function openDeviant(event) {
-        if(deviant >= .51)
+        if(+deviant >= .51 && +deviant <= 1)
             setView("Deviant")
     }
      
@@ -65,6 +65,7 @@ function AnalyzeMainView() {
                                 label={"Threshold"}
                                 sx={{width:'35%'}} 
                                 value={deviant}
+                                error={!(+deviant && +deviant >= .51 && +deviant <= 1)}
                                 onChange={(event) => setDeviant(event.target.value)}/>
                             <Box sx={{flexGrow: .98}} />
                             <Box 

@@ -150,7 +150,7 @@ function FileTable(props){
             // Get Unique Parent ids (Used Primarily for Search when there are multiple files)
             // let allParents=[]
             // store.allItems.map((file) => allParents.indexOf(file.parent) === -1? allParents.push(file.parent): null)
-
+            
             // Enter Data into the File Table
             for (let file of store.allItems) {
                 //console.log(file.name)
@@ -167,7 +167,7 @@ function FileTable(props){
                     for(let key in parent.permissions){
                         data[1].push(parent.permissions[key])
                     }
-                console.log(data)
+                // console.log(data)
                 // If there is parent, there can be inheritied and direct permissions
                 if(parent){
                     inheritiedPerms = data.reduce((a,b) => a.filter(c => c.role !== "owner" && b.some(item => (item.emailAddress || item.domain) === (c.emailAddress || item.domain) && item.role === c.role)))

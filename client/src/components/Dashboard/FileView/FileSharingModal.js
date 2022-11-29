@@ -89,6 +89,21 @@ function FileSharingUser(props) {
                         ))}
                     </TextField>
                 :
+                user.id === "special"?
+                <TextField
+                    display="flex"
+                    id={"roles"}
+                    label="Role"
+                    value={user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                    fullWidth
+                    overflow='auto'
+                    sx={{width:'30%', "& .MuiInputBase-input.Mui-disabled": {
+                        WebkitTextFillColor: "black",
+                    }}}
+                    justifycontent="flex-end"
+                    disabled={true}
+                />
+                :
                 <TextField
                     display="flex"
                     id={"roles"}
@@ -119,6 +134,29 @@ function FileSharingUser(props) {
     )
 }
 
+function FileSharingViolations(props) {
+    const {store} = useContext(GlobalStoreContext);
+    const {selected} = props;
+    let violations = [];
+    
+    useEffect(() => {
+        for(let file of selected){
+            let fileInfo = store.allItems[file.index].permissionsRaw;
+            for(let key in fileInfo){
+                let obj = fileInfo[key]
+                // TODO: Find Violations and Push to violations array ({file, role, violation})
+            }
+        }
+    }, [store.updateSharingModal])
+    
+    return(
+        <Box ml={2} mt={1.5}>
+            <Typography variant="h5"><strong>Access Control Requirement Violations</strong></Typography>
+            {/* List of Violations */}
+        </Box>
+    )
+}
+
 function FileSharingModal(props) {
     const {store} = useContext(GlobalStoreContext);
     const {selected} = props
@@ -136,11 +174,22 @@ function FileSharingModal(props) {
             // Get all permissions across all files
             let mixedResult = []; // User has mixed roles amongst selected files
             let uniqueResult = []; // User roles are consistent
+            let owners = []
             let data = [];
             for(let file of selected){
                 let fileInfo = store.allItems[file.index].permissionsRaw;
-                console.log(store.allItems[file.index])
                 let setdata = [];
+                if(fileInfo===undefined || Object.keys(fileInfo).length === 0){
+                    console.log(store.allItems[file.index])
+                    let permission = {
+                        role: "owner",
+                        type: "user",
+                        email: store.allItems[file.index].owner,
+                        id: store.allItems[file.index].fileID
+                    }
+                    setdata.push(permission)
+                    owners.push(permission.email)
+                }
                 for(let key in fileInfo){
                     let obj = fileInfo[key]
                     let permission = {
@@ -150,11 +199,13 @@ function FileSharingModal(props) {
                         name: obj.displayName,
                         id: obj.emailAddress+obj.role
                     }
+                    if (permission.role === "owner")
+                        owners.push(permission.email)
                     setdata.push(permission);
                 }
                 data.push(setdata);
             }
-
+            console.log(owners)
             // Get all the Users who have consistent roles over all files
             uniqueResult = data.reduce((a, b) => a.filter(c => b.some(item => item.id === c.id)));
 
@@ -173,15 +224,28 @@ function FileSharingModal(props) {
                 for(let perm of file){
                     if(!set.has(perm.email)){
                         set.add(perm.email);
-                        mixedResult.push({
-                            name: perm.name,
-                            email: perm.email,
-                            type: perm.type,
-                            role: "Mixed Values"
-                        });
+                        if(owners.includes(perm.email))
+                            mixedResult.push({
+                                name: perm.name,
+                                email: perm.email,
+                                type: perm.type,
+                                role: "Mixed Values",
+                                id: "special"
+                            });
+                        else
+                            mixedResult.push({
+                                name: perm.name,
+                                email: perm.email,
+                                type: perm.type,
+                                role: "Mixed Values",
+                                id: "notspecial"
+                            });
                     }
                 }
             }
+            // Move all "owner" special values to the top
+            mixedResult.sort(function(x,y) { return (x.id==="special"?-1 : y.id ==="special" ? 1: 0)});
+            
             setUniqueUsers(uniqueResult)
             setMixedUsers(mixedResult)
         }
@@ -292,6 +356,10 @@ function FileSharingModal(props) {
                             }
                         </Stack>
                 </Box>
+
+                <FileSharingViolations 
+                    selected={selected}/>
+
                 <Box 
                 className="black-button" 
                 sx={{width:'100px', ml: '83%', mt:3}}
@@ -302,7 +370,7 @@ function FileSharingModal(props) {
                         <strong> Confirm </strong> 
                     </Typography>
                 </center>
-            </Box>
+                </Box>
             </Box>
         </Modal>
     )

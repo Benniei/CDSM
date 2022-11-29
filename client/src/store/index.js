@@ -357,7 +357,6 @@ function GlobalStoreContextProvider(props) {
                 snapshotid: snapshotId,
                 driveName: driveName
             };
-            console.log(store.otherDrive)
             storeReducer({
                 type:GlobalStoreActionType.GET_DRIVE,
                 payload: snapshot
