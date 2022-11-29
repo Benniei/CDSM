@@ -20,7 +20,15 @@ const FileSchema = new Schema(
         permissionsRaw: { type: Object, required: false },                                              // List of the file's permissions as objects form taken from cloud provider
         lastModifiedTime: { type: String, required: false },                                            // Timestamp of when the file was last modified
         deviantPermissions: { type: Object, required: false, default: () => { return null; } },         // Permissions that deviate from those found in other files in the same folder
-        fileFolderDifferences: { type: Object, required: false, default: () => { return null; } }       // Permissions that are different from those of the parent folder
+        fileFolderDifferences: { type: Object, required: false, default: () => { return null; } },      // Permissions that are different from those of the parent folder
+        readable: {type: [String], required: false},                                                    // list of email addresses with readable permission
+        writable: {type: [String], required: false},                                                    // list of email addresses with writable permission
+        sharable: {type: [String], required: false},                                                    // list of email addresses with sharable permission
+        from: {type: [String], required: false},                                                        // list of email addresses that have shared this file
+        to: {type: [String], required: false},                                                          // list of email addresses that were the target of sharing (shared to these people)
+        sharingType: {type: String, required: true, default: () => { return null; } },                  // type of grantee of sharing (user, group, domain, anyone)
+        sharingEmail: {type: [String], required: false},                                                // if type is user, list of users that this file has been shared to
+        sharingDomain: {type: String, required: false}                                                  // if type is domain, name of domain
     }, { minimize: false }                                                                              // Allow empty objects to be valid field values
 );
 
