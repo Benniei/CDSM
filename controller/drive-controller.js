@@ -1,3 +1,6 @@
+// Being changed to a wrapper.
+const GoogleDriveController = require('../controller/google-drive-controller');
+const MicrosoftDriveController = require('../controller/onedrive-controller');
 // Import modules
 const moment = require('moment');
 
@@ -5,7 +8,6 @@ const moment = require('moment');
 const AnalysisController = require('../controller/analyze-controller');
 const File = require('../models/file-model');
 const FileSnapshot = require('../models/filesnapshot-model');
-const GoogleDriveController = require('../controller/google-drive-controller');
 const User = require('../models/user-model');
 
 
@@ -27,6 +29,9 @@ async function createFileSnapshot(req, res) {
                 const driveAPI = await GoogleDriveController.GD_initializeAPI(user.refreshToken);
                 driveIds = await GoogleDriveController.GD_getDrives(driveAPI);
                 fileMap = await GoogleDriveController.GD_getFileMap(driveAPI, driveIds);
+                break;
+            case 'microsoft':
+                MicrosoftDriveController.createFileSnapshot(req, res);
                 break;
             default:
                 throw new Error('Could not find listed cloud provider.');
