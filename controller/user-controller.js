@@ -50,6 +50,9 @@ doQuery = async function (req, res) {
         } else if (field === 'folder') {
             regexValue = { $regex: '\/'+value };
             query['path'] = toInvert ? { $ne: regexValue } : regexValue;
+        } else if (field === 'drive') {
+            regexValue = { $regex: '^\/'+value };
+            query['path'] = toInvert ? { $ne: regexValue } : regexValue;
         } else {
             query[field] = toInvert ? { $ne: value } : value;
         }
