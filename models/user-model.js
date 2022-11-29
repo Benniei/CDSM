@@ -10,12 +10,12 @@ const UserSchema = new Schema(
     {
         profileId: { type: String, required: true },                                            // Unique profile ID taken from cloud provider
         cloudProvider: { type: String, required: true },                                        // Drive service selected by the user
+        refreshToken: { type: String, required: false },                                        // Refresh token provided by cloud provider
         displayName: { type: String, required: true },                                          // First and last name taken from cloud provider
         email: { type: String, required: true },                                                // Email taken from cloud provider
         threshold: { type: Number, required: true },                                            // Threshold value for deviant check
-        refreshToken: { type: String, required: false },                                        // Refresh token provided by cloud provider
-        access_control_req: { type: Object, required: false},                                   // Access control requirements assigned by the user
-        searchHistory: { type: [String], required: true },                                      // History of search queries made by the user
+        access_control_req: { type: Object, required: false },                                  // Access control requirements assigned by the user
+        searchHistory: { type: [String], required: false },                                     // History of search queries made by the user
         filesnapshot: { type: [String], required: false },
         groupsnapshot: { type: Schema.Types.ObjectId, ref:'GroupSnapshot', required: false }
     },

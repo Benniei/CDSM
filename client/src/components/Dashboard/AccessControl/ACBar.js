@@ -13,14 +13,9 @@ import Toolbar from '@mui/material/Toolbar';
 function ACBar() {
     const {store} = useContext(GlobalStoreContext);
     const {auth} = useContext(AuthContext);
-    const [snapshot, setSnapshot] = useState('');
+    const [snapshot, setSnapshot] = useState(store.currentSnapshot);
 
-    const handleSnapshotChange = (event) => {
-        setSnapshot(event.target.value);
-    }
-
-    const snapshotArray = auth.user.filesnapshot;
-
+    const snapshotArray = auth.user?auth.user.filesnapshot:[];
     return (
         <Toolbar sx={{mb:3}}>
 
@@ -30,14 +25,14 @@ function ACBar() {
                 select
                 display="inline"
                 label="File Snapshot"
-                value={store.currentSnapshot}
-                onChange={handleSnapshotChange}
+                value={snapshot}
+                onChange={(event) => setSnapshot(event.target.value)}
                 sx={{width:"50%", ml:1}}
                 overflow='auto'
             >
                 {snapshotArray.map((option) => (
                     <MenuItem key={option} value={option}>
-                        {option}
+                        {option.substring(option.indexOf('-')+1)}
                     </MenuItem>
                 ))}
             </TextField>

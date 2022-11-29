@@ -12,6 +12,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+import LinearProgress from '@mui/material/LinearProgress';
 
 
 const SnapshotType=["File Snapshot", "Group Snapshot"]
@@ -33,6 +34,7 @@ const style = {
 function FileSnapshot() {
     const {store} = useContext(GlobalStoreContext);
     const {auth} = useContext(AuthContext);
+    const [loading, setLoading] = useState(false)
 
     let email = ""
     if(auth.loggedIn)
@@ -68,7 +70,7 @@ function FileSnapshot() {
             <Box 
                 className="black-button" 
                 sx={{width:'100px', ml: '80%', mt:3}}
-                onClick={event => {store.takeSnapshot()}}>
+                onClick={event => {store.takeSnapshot(); setLoading(true)}}>
                 <center>
                     <Typography 
                         sx={{color:'black'}}> 
@@ -76,6 +78,7 @@ function FileSnapshot() {
                     </Typography>
                 </center>
             </Box>
+            {loading?<LinearProgress sx={{mt:2}}/>: null}
         </Box>
     )
 }
