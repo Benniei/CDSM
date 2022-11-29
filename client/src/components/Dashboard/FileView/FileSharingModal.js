@@ -283,94 +283,100 @@ function FileSharingModal(props) {
                     }} 
                     onClick={event => closeModal()}/>
                 
-                {/* Title */}
-                <Stack 
-                    direction = "row"
-                    alignItems = "center"
-                    justifyContent = "center"
-                    sx={{mb:2}}
-                    >
-                        <Typography 
-                            variant="h5"
-                        >Sharing Files</Typography>
-                    </Stack>
+                {selected.length === 0?
+                <Typography variant="h4"> <strong> No Files Selected </strong> </Typography>
+                :
+                <Box>
+                    {/* Title */}
+                    <Stack 
+                        direction = "row"
+                        alignItems = "center"
+                        justifyContent = "center"
+                        sx={{mb:2}}
+                        >
+                            <Typography 
+                                variant="h5"
+                            >Sharing Files</Typography>
+                        </Stack>
 
-                <Box
-                    display="flex">
-                        {/* Left Column -- Shows all Selected Files */}
-                        <Stack
-                            sx={{width: '30%'}}>
-                                <Typography variant="h5" mb={1.2}>
-                                    <strong>Selected Items</strong>
-                                </Typography>
-                                {
-                                    selected.map((item) => {
+                    <Box
+                        display="flex">
+                            {/* Left Column -- Shows all Selected Files */}
+                            <Stack
+                                sx={{width: '30%'}}>
+                                    <Typography variant="h5" mb={1.2}>
+                                        <strong>Selected Items</strong>
+                                    </Typography>
+                                    {
+                                        selected.map((item) => {
+                                            return(
+                                                <Typography key={item.name} variant="h6" ml ={1} mt={.2}>
+                                                    <strong>{item.name}</strong>
+                                                </Typography>
+                                            )
+                                        })
+                                    }
+                                </Stack>
+                            <Divider orientation="vertical" flexItem/>
+                            {/* Right Column -- Show all Shared Users */}
+                            <Stack
+                                sx={{width: '70%'}}>
+                                    <TextField
+                                        id={"user"}
+                                        label={"Add User or Group"}
+                                        fullWidth
+                                        overflow='auto' 
+                                        value={data}
+                                        sx={{width: '90%', ml:3, mb:1}}
+                                        onChange= {(event) => {setData(event.target.value)}}
+                                        onKeyPress={(event) => {
+                                            if (event.key === 'Enter'){
+                                                newUser(data);
+                                                setData("");
+                                            }
+                                        }}/>
+                                {/* TODO: Compute selected users */}
+                                { 
+                                    uniqueUsers.map((item) => {
                                         return(
-                                            <Typography key={item.name} variant="h6" ml ={1} mt={.2}>
-                                                <strong>{item.name}</strong>
-                                            </Typography>
+                                            <FileSharingUser 
+                                                user={item}
+                                                selectValues={uniqueSelections} 
+                                                users={uniqueUsers}
+                                                setUsers={setUniqueUsers} />
+                                        )
+                                    })
+                                }
+                                {
+                                    mixedUsers.map((item) => {
+                                        return(
+                                            <FileSharingUser 
+                                                user={item}
+                                                selectValues={mixedSelections} 
+                                                users={mixedUsers}
+                                                setUsers={setMixedUsers} />
                                         )
                                     })
                                 }
                             </Stack>
-                        <Divider orientation="vertical" flexItem/>
-                        {/* Right Column -- Show all Shared Users */}
-                        <Stack
-                            sx={{width: '70%'}}>
-                                <TextField
-                                    id={"user"}
-                                    label={"Add User or Group"}
-                                    fullWidth
-                                    overflow='auto' 
-                                    value={data}
-                                    sx={{width: '90%', ml:3, mb:1}}
-                                    onChange= {(event) => {setData(event.target.value)}}
-                                    onKeyPress={(event) => {
-                                        if (event.key === 'Enter'){
-                                            newUser(data);
-                                            setData("");
-                                        }
-                                    }}/>
-                            {/* TODO: Compute selected users */}
-                            { 
-                                uniqueUsers.map((item) => {
-                                    return(
-                                        <FileSharingUser 
-                                            user={item}
-                                            selectValues={uniqueSelections} 
-                                            users={uniqueUsers}
-                                            setUsers={setUniqueUsers} />
-                                    )
-                                })
-                            }
-                            {
-                                mixedUsers.map((item) => {
-                                    return(
-                                        <FileSharingUser 
-                                            user={item}
-                                            selectValues={mixedSelections} 
-                                            users={mixedUsers}
-                                            setUsers={setMixedUsers} />
-                                    )
-                                })
-                            }
-                        </Stack>
-                </Box>
+                    </Box>
 
-                <FileSharingViolations 
-                    selected={selected}/>
+                    <FileSharingViolations 
+                        selected={selected}/>
 
-                <Box 
-                className="black-button" 
-                sx={{width:'100px', ml: '83%', mt:3}}
-                onClick={event => {store.takeSnapshot()}}>
-                <center>
-                    <Typography 
-                        sx={{color:'black'}}> 
-                        <strong> Confirm </strong> 
-                    </Typography>
-                </center>
+                    <Box 
+                    className="black-button" 
+                    sx={{width:'100px', ml: '83%', mt:3}}
+                    onClick={event => {store.takeSnapshot()}}>
+                    <center>
+                        <Typography 
+                            sx={{color:'black'}}> 
+                            <strong> Confirm </strong> 
+                        </Typography>
+                    </center>
+                    </Box>
                 </Box>
+                }
             </Box>
         </Modal>
     )
