@@ -1,5 +1,6 @@
 // Being changed to a wrapper.
 const GoogleDriveController = require('../controller/google-drive-controller');
+const MicrosoftDriveController = require('../controller/onedrive-controller');
 const File = require('../models/file-model');
 const FileSnapshot = require('../models/filesnapshot-model');
 const User = require('../models/user-model');
@@ -15,6 +16,9 @@ createFileSnapshot = async function(req, res) {
         switch (req.user.cloudProvider) {
             case 'google':
                 GoogleDriveController.createFileSnapshot(req, res);
+                break;
+            case 'microsoft':
+                MicrosoftDriveController.createFileSnapshot(req, res);
                 break;
             default:
                 throw new Error('Could not find listed cloud provider');
