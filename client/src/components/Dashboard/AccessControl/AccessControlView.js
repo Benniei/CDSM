@@ -2,6 +2,7 @@
 import ACBar from './ACBar'
 import ACCard from './ACCard'
 import ACModal from './ACModal'
+import ACViolations from './ACViolations'
 import {useContext} from 'react';
 import AuthContext from '../../../auth/index.js';
 
@@ -26,7 +27,11 @@ function AccessControlView(){
             { auth.user.access_control_req && auth.user.access_control_req !== ' ' ? <ACCard /> : "" }
             
             {/* Violations found in AC Policy */}
-            
+            <Typography variant='h4' mb={2} mt={3}>
+                <strong>Violations</strong>
+            </Typography>
+            <ACViolations />
+
             {/* AC Modal */}
             <ACModal />
         </Box>

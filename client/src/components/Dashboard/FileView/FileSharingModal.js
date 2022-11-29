@@ -151,7 +151,7 @@ function FileSharingViolations(props) {
     
     return(
         <Box ml={2} mt={1.5}>
-            <Typography variant="h5"><strong>Access Control Requirement Violations</strong></Typography>
+            <Typography variant="h5"><strong>Access Control Requirement Conflicts</strong></Typography>
             {/* List of Violations */}
         </Box>
     )
@@ -245,7 +245,7 @@ function FileSharingModal(props) {
             }
             // Move all "owner" special values to the top
             mixedResult.sort(function(x,y) { return (x.id==="special"?-1 : y.id ==="special" ? 1: 0)});
-            
+
             setUniqueUsers(uniqueResult)
             setMixedUsers(mixedResult)
         }
