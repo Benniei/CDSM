@@ -66,7 +66,7 @@ doQuery = async function (req, res) {
         return combined;
     }
     
-    function parseQuery(query) {
+    function parseQuery(query, email) {
         /*
         Regex explanation:
         ( and | or |\(|\))  : match " and " or " or " or "(" or ")"
@@ -117,7 +117,11 @@ doQuery = async function (req, res) {
         while (opStack.length) {
             valueStack.push(combine(opStack.pop(), valueStack.pop(), valueStack.pop()))
         }
-        return valueStack.pop()
+        query = valueStack.pop()
+        if (Object.keys(query)[0] == '') {
+            query['name'] = { '$regex': query[''] }
+        }
+        return query
     }
     
     // const {query, snapshot_id} = req.params;
@@ -126,8 +130,12 @@ doQuery = async function (req, res) {
     let snapshot_id = snapshotid
     
     try {
-        builtQuery = parseQuery(query)
+        let user = await User.findById(req.userId, { email: 1 });
+        let email = user.email
+
+        builtQuery = parseQuery(query, email)
         builtQuery['snapshotId'] = snapshot_id
+        console.log('Input Query, Output Query')
         console.log(query, builtQuery);
         files = await File.find( builtQuery );
         //console.log(files);
