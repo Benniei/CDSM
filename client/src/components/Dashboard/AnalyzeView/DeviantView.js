@@ -21,14 +21,14 @@ function DeviantCard(props) {
 }
 
 function DeviantView(props) {
-    const{mainView} = props
+    const{mainView, snapshot} = props
     return(
         <Box>
             <Stack direction="row" spacing={2}>
                 <ArrowBackIcon sx={{fontSize:54}} onClick={mainView}/>
                 <Typography variant="h3"><strong>Deviant Sharing Analysis</strong></Typography>
             </Stack>
-
+            <Typography variant="h5" ml={3} mt={.5}><strong>Snapshot: </strong> {snapshot.substring(snapshot.indexOf('-')+1)}</Typography>
             <DeviantCard />
         </Box>
     )

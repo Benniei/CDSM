@@ -6,21 +6,25 @@ import DeviantView from "./DeviantView";
 import FileSharingChangesView from "./FileSharingChangesView";
 import SharingDifferenceView from "./SharingDifferenceView";
 
-
 // Imports from MUI
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TextField from'@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
+import Popover from '@mui/material/Popover';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
 function AnalyzeMainView() {
     const {store} = useContext(GlobalStoreContext);
     const {auth} = useContext(AuthContext);
     const [deviant, setDeviant] = useState(".51");
     const [view, setView] = useState("Normal");
+    const [snapshot, setSnapshot] = useState(store.currentSnapshot);
     const [snapshot1, setSnapshot1] = useState(store.currentSnapshot);
     const [snapshot2, setSnapshot2] = useState(store.currentSnapshot);
+    const [diffError, setDiffError] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
 
     function mainView() {
         setView("Normal")
@@ -36,19 +40,49 @@ function AnalyzeMainView() {
     }
 
     function openSharingDifferences(event) {
-        setView("SharingDifferences")
+        if(snapshot1 !== snapshot2){
+            setView("SharingDifferences")
+            setDiffError(false)
+        }
+        else
+            setDiffError(true)
     }
 
+    const handlePopoverOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
 
+    const handlePopoverClose = () => {
+        setAnchorEl(null);
+    };
 
-    const snapshotArray = auth.user.filesnapshot;
+    const snapshotArray = auth.user?auth.user.filesnapshot:[];
+    const open = Boolean(anchorEl);
 
     let content
     if (view === "Normal"){
         content = 
         <Box mt={3}>
             <Typography variant="h3"><strong>Analytics</strong></Typography>
+            <TextField
+                        id="select-snapshot"
+                        select
+                        display="inline"
+                        label="File Snapshot"
+                        value={snapshot}
+                        InputLabelProps={{shrink: true}}
+                        onChange={(event) => setSnapshot(event.target.value)}
+                        sx={{width:"50%"}}
+                        overflow='auto'
+                    >
+                        {snapshotArray.map((option) => (
+                            <MenuItem key={option} value={option}>
+                                {option.substring(option.indexOf('-')+1)}
+                            </MenuItem>
+                        ))}
+                    </TextField>
             <Box display="flex" sx={{mt: 3}}>
+                    
                     <Stack 
                         direction="column" 
                         className="analyzeOption"
@@ -129,7 +163,7 @@ function AnalyzeMainView() {
                                 display="inline"
                                 label="File Snapshot"
                                 value={snapshot1}
-                                onChange={(event) => setSnapshot1(event.target.value)}
+                                onChange={(event) => {setSnapshot1(event.target.value); setDiffError(false);}}
                                 sx={{width:"43%", mr:3}}
                                 overflow='auto'
                             >
@@ -145,7 +179,7 @@ function AnalyzeMainView() {
                                 display="inline"
                                 label="File Snapshot"
                                 value={snapshot2}
-                                onChange={(event) => setSnapshot2(event.target.value)}
+                                onChange={(event) => {setSnapshot2(event.target.value); setDiffError(false);}}
                                 sx={{width:"43%"}}
                                 overflow='auto'
                             >
@@ -156,14 +190,17 @@ function AnalyzeMainView() {
                                 ))}
                             </TextField>
                         </Stack>
-                        <Stack direction="row">
+                        <Stack direction="row" spacing={1} justifyContent="center" alignItems="center" >
                             <Box sx={{flexGrow: .98}} />
+                            {diffError &&
+                                <ErrorOutlineIcon style={{color: 'red', fontSize:40}}
+                                onMouseEnter={handlePopoverOpen}
+                                onMouseLeave={handlePopoverClose}/>
+                            }
                             <Box 
                             className="black-button" 
                             sx={{width:'100px', height:'25px', mt:1}}
                             onClick={openSharingDifferences}
-                            // onClick={event => {store.analyzeSnapshots('63622af03f1cede505453ce6-November 23rd 2022, 3:54:25', '63622af03f1cede505453ce6-November 23rd 2022, 3:55:44')}}
-                            // onClick={event => {store.analyzeSnapshots('63622af03f1cede505453ce6-November 23rd 2022, 3:55:44', '63622af03f1cede505453ce6-November 23rd 2022, 3:56:46')}}
                             >
                                 <center>
                                     <Typography 
@@ -172,6 +209,26 @@ function AnalyzeMainView() {
                                     </Typography>
                                 </center>
                             </Box>
+                            <Popover
+                                id="mouse-over-popover"
+                                sx={{
+                                pointerEvents: 'none',
+                                }}
+                                open={open}
+                                anchorEl={anchorEl}
+                                anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'left',
+                                }}
+                                transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'left',
+                                }}
+                                onClose={handlePopoverClose}
+                                disableRestoreFocus
+                            >
+                                <Typography sx={{p:1}}>Please Choose Two Different Snapshots</Typography>
+                            </Popover>
                         </Stack>
             </Box>
         </Box>
@@ -179,15 +236,19 @@ function AnalyzeMainView() {
     
     else if(view === "Deviant"){
         content = <DeviantView
-                    mainView={mainView}/>
+                    mainView={mainView}
+                    snapshot={snapshot}/>
     }
     else if(view === "SharingChanges") {
         content = <FileSharingChangesView 
-                    mainView={mainView}/>
+                    mainView={mainView}
+                    snapshot={snapshot}/>
     }
     else if(view === "SharingDifferences") {
         content = <SharingDifferenceView 
-                    mainView={mainView}/>
+                    mainView={mainView}
+                    snapshot1={snapshot1}
+                    snapshot2={snapshot2}/>
     }
 
     return(

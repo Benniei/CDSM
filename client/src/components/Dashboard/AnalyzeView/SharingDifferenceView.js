@@ -21,14 +21,17 @@ function SharingDifferencesCard(props) {
 }
 
 function SharingDifferenceView(props) {
-    const{mainView} = props
+    const{mainView, snapshot1, snapshot2} = props
     return(
         <Box>
             <Stack direction="row" spacing={2}>
                 <ArrowBackIcon sx={{fontSize:54}} onClick={mainView}/>
                 <Typography variant="h3"><strong>Sharing Differences Analysis</strong></Typography>
             </Stack>
-
+            <Box display="flex" sx={{mt: .5}}>
+                <Typography variant="h5" ml={3} mt={.5}><strong>Snapshot 1: </strong> {snapshot1.substring(snapshot1.indexOf('-')+1)}</Typography>
+                <Typography variant="h5" ml={3} mt={.5}><strong>Snapshot 2: </strong> {snapshot2.substring(snapshot2.indexOf('-')+1)}</Typography>
+            </Box>
             <SharingDifferencesCard />
         </Box>
     )
