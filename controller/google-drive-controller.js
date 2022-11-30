@@ -298,6 +298,8 @@ async function GD_getFileMap(driveAPI, driveIds) {
             }
             // Replace the file's permission array with an object
             let type = [];
+            let from = [];
+            let to = [];
             if (file.permissions) {
                 const permissionObjects = GD_createPermissionObject(file.permissions);
                 overrides['permissions'] = permissionObjects.permissions;
@@ -308,7 +310,6 @@ async function GD_getFileMap(driveAPI, driveIds) {
                 const sharable = [];
                 // For-loop to add each user to the appropriate access array
                 for (const permission of file.permissions) {
-                    console.log(permission)
                     switch (permission.role) {
                         case 'owner':
                             sharable.push(permission.emailAddress);
@@ -324,6 +325,7 @@ async function GD_getFileMap(driveAPI, driveIds) {
                                 break;
                             }
                             type.push('individual');
+                            to.push(permission.emailAddress)
                             break;
                         case 'group':
                             // no specific instruction how to deal with group
@@ -340,11 +342,16 @@ async function GD_getFileMap(driveAPI, driveIds) {
                 overrides['readable'] = readable;
                 overrides['writable'] = writable;
                 overrides['sharable'] = sharable;
+                if (file.sharingUser) {
+                    from.push(file.sharingUser.emailAddress)
+                }
             }
             if (type.length === 0) {
                 type.push('none')
             }
-            overrides['sharing'] = type
+            overrides['sharing'] = type;
+            overrides['from'] = [...new Set(from)];
+            overrides['to'] = [...new Set(to)];
             // If the file already has an entry in the map (because it's the parent folder of some file in the map), update the entry with the file's other fields (parents, permissions, etc.)
             if (map.get(file.id)) { 
                 map.set(file.id, { ...map.get(file.id), ...file, ...overrides });
