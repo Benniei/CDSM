@@ -20,7 +20,6 @@ import Typography from '@mui/material/Typography';
 import Popper from '@mui/material/Popper';
 import Fade from '@mui/material/Fade';
 import Paper from '@mui/material/Paper';
-import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 function createData(name, type, owner, lastModified, id, index, inheritedperms, directperms) {
     return {
@@ -351,7 +350,6 @@ function FileTable(props){
                                         <TableCell align="left">{row.owner}</TableCell>
                                         <TableCell align="left"><PermissionsTab permissions={row.inherited} /></TableCell>
                                         <TableCell align="left"><PermissionsTab permissions={row.direct} /></TableCell>
-                                        {/* <TableCell align="left">{row.lastModified}</TableCell> */}
                                     </TableRow>
                                 );
                             })}

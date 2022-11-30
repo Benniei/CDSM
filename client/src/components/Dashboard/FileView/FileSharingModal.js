@@ -11,6 +11,9 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import MenuItem from '@mui/material/MenuItem';
+import Popper from '@mui/material/Popper';
+import Fade from '@mui/material/Fade';
+import Paper from '@mui/material/Paper';
 
 const style = {
     position: 'absolute',
@@ -27,7 +30,19 @@ const style = {
 };
 
 function FileSharingUser(props) {
+    const {store} = useContext(GlobalStoreContext);
     const {user, selectValues, users, setUsers} = props
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [open, setOpen] = useState(false)
+    const [placement, setPlacement] = useState()
+    const [group, setGroup] = useState([])
+
+    const handleClick = (newPlacement) => (event) => {
+        setAnchorEl(event.currentTarget);
+        setOpen((prev) => placement !== newPlacement || !prev);
+        setPlacement(newPlacement);
+        setGroup(store.groups[newPlacement])
+      };
 
     let userItem;
     if (user.type === "user" || user.type === "domain") {
@@ -41,11 +56,11 @@ function FileSharingUser(props) {
         </Box>
     }
     else if (user.type === "group") {
-        userItem = <Box>
+        userItem = <Box onClick={handleClick(user.email)}>
             <Typography variant="h6">
                 <strong>{user.email}</strong>
             </Typography>
-            <Typography variant="h7">
+            <Typography variant="h7" sx={{color: '#39acac'}}>
                 <strong>{user.type}</strong>
             </Typography>
         </Box>
@@ -67,6 +82,26 @@ function FileSharingUser(props) {
             display="flex"
             mt={1.5}
             >
+            <Popper open={open} anchorEl={anchorEl} placement={'left'} transition
+                sx={{overflowY: "auto", maxHeight: 600, boxShadow: 1}}
+                style={{zIndex:1300}}>
+                {({ TransitionProps }) => (
+                <Fade {...TransitionProps} timeout={350}
+                onClose={handleClick}>
+                    <Paper>
+                        {
+                            group.map((item) => {
+                                return(
+                                    <Typography ml={1} key={"filetable" + item} sx={{fontsize: 20}} mt={.2}>
+                                        {item}
+                                    </Typography> 
+                                )
+                            })
+                        }
+                    </Paper>
+                </Fade>
+                )}
+            </Popper>
             <Box
                 sx={{width:'70%'}}
                 ml={1}>
