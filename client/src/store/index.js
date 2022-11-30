@@ -20,7 +20,8 @@ export const GlobalStoreActionType = {
     OPEN_AC_SEARCH: "OPEN_AC_SEARCH",
     OPEN_ACCESS: "OPEN_ACCESS",
     OPEN_ANALYZE: "OPEN_ANALYZE",
-    SET_DRIVES: "SET_DRIVES"
+    SET_DRIVES: "SET_DRIVES",
+    OPEN_ANALYZE_VIEW: "OPEN_ANALYZE_VIEW"
 };
 
 function GlobalStoreContextProvider(props) {
@@ -40,7 +41,8 @@ function GlobalStoreContextProvider(props) {
         path: [],
         parents: [],
         otherDrive: [],
-        groups: {}
+        groups: {},
+        analyze: []
     });
 
     const storeReducer = (action) => {
@@ -61,7 +63,8 @@ function GlobalStoreContextProvider(props) {
                     path: payload.path,
                     parents: payload.parents,
                     otherDrive: store.otherDrive,
-                    groups: {}
+                    groups: {},
+                    analyze: []
                 });
             }
             case GlobalStoreActionType.GET_DRIVE: {
@@ -79,7 +82,8 @@ function GlobalStoreContextProvider(props) {
                     path: [],
                     parents: payload.parents,
                     otherDrive: store.otherDrive,
-                    groups: {}
+                    groups: {},
+                    analyze: []
                 });
             }
             case GlobalStoreActionType.SET_DRIVES: {
@@ -97,7 +101,8 @@ function GlobalStoreContextProvider(props) {
                     path: [],
                     parents: payload.parents,
                     otherDrive: payload.otherDrive,
-                    groups: {}
+                    groups: {},
+                    analyze: []
                 });
             }
             case GlobalStoreActionType.SHOW_SEARCH: {
@@ -115,7 +120,8 @@ function GlobalStoreContextProvider(props) {
                     path: null,
                     parents: payload.parents,
                     otherDrive: store.otherDrive,
-                    groups: store.groups
+                    groups: store.groups,
+                    analyze: []
                 });
             }
             case GlobalStoreActionType.OPEN_QUERY_BUILDER: {
@@ -133,7 +139,8 @@ function GlobalStoreContextProvider(props) {
                     path: store.path,
                     parents: store.parents,
                     otherDrive: store.otherDrive,
-                    groups: store.groups
+                    groups: store.groups,
+                    analyze: []
                 });
             }
             case GlobalStoreActionType.OPEN_TAKE_SNAPSHOT_MODAL: {
@@ -151,7 +158,8 @@ function GlobalStoreContextProvider(props) {
                     path: store.path,
                     parents: store.parents,
                     otherDrive: store.otherDrive,
-                    groups: store.groups
+                    groups: store.groups,
+                    analyze: []
                 });
             }
             case GlobalStoreActionType.CLOSE_TAKE_SNAPSHOT_MODAL: {
@@ -169,7 +177,8 @@ function GlobalStoreContextProvider(props) {
                     path: store.path,
                     parents: store.parents,
                     otherDrive: store.otherDrive,
-                    groups: store.groups
+                    groups: store.groups,
+                    analyze: []
                 });
             }
             case GlobalStoreActionType.OPEN_UPDATE_SHARING: {
@@ -187,7 +196,8 @@ function GlobalStoreContextProvider(props) {
                     path: store.path,
                     parents: store.parents,
                     otherDrive: store.otherDrive,
-                    groups: store.groups
+                    groups: store.groups,
+                    analyze: []
                 });
             }
             case GlobalStoreActionType.OPEN_AC_MODAL: {
@@ -205,7 +215,8 @@ function GlobalStoreContextProvider(props) {
                     path: store.path,
                     parents: [],
                     otherDrive: store.otherDrive,
-                    groups: {}
+                    groups: {},
+                    analyze: []
                 });
             }
             case GlobalStoreActionType.OPEN_AC_SEARCH: {
@@ -223,7 +234,8 @@ function GlobalStoreContextProvider(props) {
                     path: store.path,
                     parents: [],
                     otherDrive: store.otherDrive,
-                    groups: {}
+                    groups: {},
+                    analyze: []
                 });
             }
             case GlobalStoreActionType.CLOSE_MODAL: {
@@ -240,7 +252,8 @@ function GlobalStoreContextProvider(props) {
                     path: store.path,
                     parents: store.parents,
                     otherDrive: store.otherDrive,
-                    groups: store.groups
+                    groups: store.groups,
+                    analyze: []
                 });
             }
             
@@ -258,7 +271,8 @@ function GlobalStoreContextProvider(props) {
                     openAnalyze: false,
                     path: [],
                     parents: [],
-                    otherDrive: store.otherDrive
+                    otherDrive: store.otherDrive,
+                    analyze: []
                 });
             }
             case GlobalStoreActionType.OPEN_ANALYZE: {
@@ -275,7 +289,26 @@ function GlobalStoreContextProvider(props) {
                     openAnalyze: true,
                     path: [],
                     parents: [],
-                    otherDrive: store.otherDrive
+                    otherDrive: store.otherDrive,
+                    analyze: []
+                });
+            }
+            case GlobalStoreActionType.OPEN_ANALYZE_VIEW: {
+                return setStore({
+                    allItems: store.allItems,
+                    currentSnapshot: store.currentSnapshot,
+                    queryBuilder: false,
+                    takeSnapshotModal: false,
+                    updateSharingModal: false,
+                    accessModal: false,
+                    search: false,
+                    openDrive: null,
+                    openAccess: false,
+                    openAnalyze: true,
+                    path: [],
+                    parents: [],
+                    otherDrive: store.otherDrive,
+                    analyze: payload
                 });
             }
             default:
@@ -288,9 +321,12 @@ function GlobalStoreContextProvider(props) {
         console.log(`Analyzing deviant file sharing permissions for snapshot '${snapshotId}' with a threshold value of ${threshold}.`);
         const response = await api.analyzeDeviantPermissions({ threshold: threshold }, snapshotId);
         if (response.status === 200) {
-            // TODO: do something with analysis
             const analysis = response.data.analysis;
-            console.log(analysis);
+            console.log(analysis)
+            storeReducer({
+                type:GlobalStoreActionType.OPEN_ANALYZE_VIEW,
+                payload: analysis
+            });
         }
     }
 
@@ -299,9 +335,11 @@ function GlobalStoreContextProvider(props) {
         console.log(`Analyzing file-folder differences for snapshot '${snapshotId}'.`);
         const response = await api.analyzeFileFolderDifferences(snapshotId);
         if (response.status === 200) {
-            // TODO: do something with analysis
             const analysis = response.data.analysis;
-            console.log(analysis);
+            storeReducer({
+                type:GlobalStoreActionType.OPEN_ANALYZE_VIEW,
+                payload: analysis
+            });
         }
     }
     
@@ -310,9 +348,11 @@ function GlobalStoreContextProvider(props) {
         console.log(`Analyzing file sharing differences between snapshots '${snapshot1Id}' and '${snapshot2Id}'`);
         const response = await api.analyzeSnapshots(snapshot1Id, snapshot2Id);
         if (response.status === 200) {
-            // TODO: do something with analysis
             const analysis = response.data.analysis;
-            console.log(analysis);
+            storeReducer({
+                type:GlobalStoreActionType.OPEN_ANALYZE_VIEW,
+                payload: analysis
+            });
         }
     }
 
@@ -333,7 +373,6 @@ function GlobalStoreContextProvider(props) {
                 type:GlobalStoreActionType.CLOSE_TAKE_SNAPSHOT_MODAL
             });
             store.getDrive(snapshot.snapshotId, driveID, "My Drive");
-
         }
     };
 

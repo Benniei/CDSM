@@ -253,7 +253,7 @@ async function analyzeSnapshots(req, res) {
             const snapshot2ExclusivePermissions = fileDifferences[1];
             // If there are any differences in the file's permissions between the two snapshots, add these differences to the sharing differences object
             if (snapshot1ExclusivePermissions.length > 0 || snapshot2ExclusivePermissions.length > 0) {
-                permissionDifferences[file.fileId] = [snapshot1ExclusivePermissions, snapshot2ExclusivePermissions];
+                permissionDifferences[file.path.name + file.name] = [snapshot1ExclusivePermissions, snapshot2ExclusivePermissions];
                 console.log(`Found file sharing differences for file (${file.fileId}).`);
             }
         }

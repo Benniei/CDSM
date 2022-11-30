@@ -30,22 +30,23 @@ function AnalyzeMainView() {
         setView("Normal")
     }
 
-    function openDeviant(event) {
-        if(+deviant >= 0.51 && +deviant <= 1)
+    async function openDeviant(event) {
+        if(+deviant >= 0.51 && +deviant <= 1){
+            await store.analyzeDeviantPermissions(snapshot, deviant);
             setView("Deviant");
-            store.analyzeDeviantPermissions(snapshot, deviant);
+        }
     }
      
-    function openSharingChanges(event) {
+    async function openSharingChanges(event) {   
+        await store.analyzeFileFolderDifferences(snapshot);
         setView("SharingChanges");
-        store.analyzeFileFolderDifferences(snapshot);
     }
 
-    function openSharingDifferences(event) {
+    async function openSharingDifferences(event) {
         if(snapshot1 !== snapshot2){
-            setView("SharingDifferences")
-            store.analyzeSnapshots(snapshot1, snapshot2);
+            await store.analyzeSnapshots(snapshot1, snapshot2);
             setDiffError(false)
+            setView("SharingDifferences")
         }
         else
             setDiffError(true)
@@ -156,6 +157,7 @@ function AnalyzeMainView() {
                             <strong>
                                 Sharing Differences displays information about the differences between two snapshots. This includes sharing new 
                                 files and sharing changes for files that exist in both snapshots. It excludes information about deleted files.
+                                File Snapshot B is compared to File Snapshot A.
                             </strong>
                         </Typography>
                         <Stack direction="row" mt={2}>
@@ -164,7 +166,7 @@ function AnalyzeMainView() {
                                 id="select-snapshot"
                                 select
                                 display="inline"
-                                label="File Snapshot"
+                                label="File Snapshot A"
                                 value={snapshot1}
                                 onChange={(event) => {setSnapshot1(event.target.value); setDiffError(false);}}
                                 sx={{width:"43%", mr:3}}
@@ -180,7 +182,7 @@ function AnalyzeMainView() {
                                 id="select-snapshot"
                                 select
                                 display="inline"
-                                label="File Snapshot"
+                                label="File Snapshot B"
                                 value={snapshot2}
                                 onChange={(event) => {setSnapshot2(event.target.value); setDiffError(false);}}
                                 sx={{width:"43%"}}
