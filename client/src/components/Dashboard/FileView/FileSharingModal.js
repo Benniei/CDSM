@@ -50,6 +50,16 @@ function FileSharingUser(props) {
             </Typography>
         </Box>
     }
+    else if (user.type === "anyone") {
+        userItem = <Box>
+            <Typography variant="h6">
+                <strong>File Link</strong>
+            </Typography>
+            <Typography variant="h7">
+                <strong>{user.type}</strong>
+            </Typography>
+            </Box>
+    }
 
     return (
         <Box 
@@ -191,6 +201,8 @@ function FileSharingModal(props) {
                     owners.push(permission.email)
                 }
                 for(let key in fileInfo){
+                    if(selected.length > 1 && fileInfo[key].id === "anyoneWithLink")
+                        continue;
                     let obj = fileInfo[key]
                     let permission = {
                         role: obj.role,

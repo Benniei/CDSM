@@ -158,6 +158,9 @@ function FileTable(props){
                 // Gather all the file's permissions as an array
                 let data = [[],[]]
                 for(let key in file.permissionsRaw){
+                    if(key === "anyoneWithLink"){
+                        continue
+                    }
                     data[0].push(file.permissionsRaw[key])
                 }
                 if(parent)
