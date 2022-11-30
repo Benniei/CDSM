@@ -1,55 +1,6 @@
 // Local imports
 const File = require('../models/file-model');
-
-/**
- * Analyzes sharing permissions of all files in a FileSnapshot
- * @param {string} snapshotId - Id of the FileSnapshot being analyzed
- * @param {number} threshold - Threshold value set by the user for deviant permission analysis
- */
-async function sharingAnalysis(snapshotId, threshold) {
-    try {
-        // Retrieve all non-root-folder folder files in the snapshot
-        let folderList = await File.find({ snapshotId: snapshotId, children: { $ne: null } });
-        // Perform sharing analysis on each of the folders
-        await Promise.all(folderList.map(async (folder) => {
-            // Retrieve children of folder
-            let children = await File.find({ snapshotId: snapshotId, parent: folder.fileId });
-            // Perform file-folder difference analysis on non-root folders
-            if (!folder.root) {
-                for (const file of children) {
-                    await fileFolderDifferencesAnalysis(snapshotId, file, folder);
-                }
-            }
-            // Perform deviant permission analysis on all folders
-            await deviantPermissionAnalysis(snapshotId, folder, threshold);
-        }));
-        console.log(`Sharing Analysis completed for FileSnapshot '${snapshotId}'.`); 
-    } catch (error) {
-        throw new Error(`Failed to analyze FileSnapshot '${snapshotId}'. ${error}`);
-    }
-}
-
-/**
- * Identifies file and folder exclusive permissions
- * @param {string} snapshotId - Id of the FileSnapshot the files belong to
- * @param {Object} file - The file being analyzed
- * @param {Object} folder - The parent of the file being analyzed
- */
-async function fileFolderDifferencesAnalysis(snapshotId, file, folder) {
-    // Identify sharing permission differences between the file and folder
-    const fileDifferences = compareFiles(file, folder);
-    const fileExclusivePermissions = fileDifferences[0];
-    const folderExclusivePermissions = fileDifferences[1];
-    // Update fileFolderDifferences property of file
-    if (fileExclusivePermissions.length > 0 || folderExclusivePermissions.length > 0) {
-        try {
-            const updatedFile = await File.findOneAndUpdate({ snapshotId: snapshotId, fileId: file.fileId }, { $set:{ fileFolderDifferences: { 'fileExclusivePermissions': fileExclusivePermissions, 'folderExclusivePermissions': folderExclusivePermissions } } });
-            console.log(`Added fileFolderDifferences for File '${updatedFile.fileId}'.`);
-        } catch (error) {
-            throw new Error(`Failed to update fileFolderDifferences for file '${file.id}'. ${error}`);
-        }  
-    }
-}
+const User = require('../models/user-model');
 
 /**
  * Compare the sharing permissions of two files
@@ -92,15 +43,82 @@ function compareFiles(file1, file2) {
 }
 
 /**
- * Identifies sharing permissions that deviate from those found in the majority
- * @param {string} snapshotId - Id of the FileSnapshot the folder belongs to
- * @param {Object} folder - The folder whose content is being analyzed
- * @param {number} threshold - Threshold value that determines what percentage of files count as a majority
+ * Identifies differences in file sharing permissions given a file and its parent
+ * @param {Object} file - The file whose file sharing permissions are being analyzed
+ * @param {Object} folder - The parent folder whose file sharing permissions are being analyzed
+ * @returns {Object} differences - Object containing the file's path (by name) and each file's exclusive permissions
  */
-async function deviantPermissionAnalysis(snapshotId, folder, threshold) {
+function identifyFileFolderDifferences(file, folder) {
+    // Identify differences in sharing permissions between the file and folder
+    const fileDifferences = compareFiles(file, folder);
+    const fileExclusivePermissions = fileDifferences[0];
+    const folderExclusivePermissions = fileDifferences[1];
+    // Return results of fileFolderDifferences analysis for the file
+    return { path: file.path.name + file.name, fileFolderDifferences: { fileExclusivePermissions: fileExclusivePermissions, folderExclusivePermissions: folderExclusivePermissions } };
+}
+
+// Retrieves a list of file-folder differences for all files in the user's drives
+async function analyzeFileFolderDifferences(req, res) {
+    const  { snapshotId } = req.params;
     try {
-        // Retrieve children of the folder
-        let children = await File.find({ snapshotId: snapshotId, parent: folder.fileId });
+        // Check if the requesting user is in the database
+        const user = await User.findById(req.userId);
+        if (!user) {
+            throw new Error('Unable to find user in the database.');
+        }
+        // Check if the requesting user has access to the provided FileSnapshot
+        if (!user.filesnapshot.includes(snapshotId)) {
+            throw new Error('User does not have access to requested file snapshot.');
+        }
+        // Retrieve all non-root-folder folder files in the snapshot
+        let folders = await File.find({ snapshotId: snapshotId, children: { $ne: null } });
+        // Perform sharing analysis on each of the folders
+        let analysis = await Promise.all(folders.map(async function (folder) {
+            // Retrieve children of folder
+            let children = await File.find({ snapshotId: snapshotId, parent: folder.fileId });
+            // Perform file-folder difference analysis on non-root folders
+            if (!folder.root) {
+                // Array containing file-folder differences of each file in the folder
+                const folderAnalysis = [];
+                // For-loop to identify file-folder differences of each file in the folder
+                for (const file of children) {
+                    // Identify differences in the sharing permissions between the file and folder
+                    const fileAnalysis = identifyFileFolderDifferences(file, folder);
+                    // If there are file-folder differences, add them to the folder analysis array
+                    if (fileAnalysis.fileFolderDifferences.fileExclusivePermissions.length > 0 || fileAnalysis.fileFolderDifferences.folderExclusivePermissions.length > 0) {
+                        folderAnalysis.push(fileAnalysis);
+                        console.log(`File-folder differences found for file '${file.fileId}'.`);
+                    }
+                }
+                // Return null if the folder does not have any file-folder differences
+                if (folderAnalysis.length === 0) {
+                    return null
+                }
+                return folderAnalysis;
+            }
+        }));
+        // Filter out folder analysis arrays that are null
+        analysis = analysis.filter((folderAnalysis) => folderAnalysis);
+        // Concatenate all folder analysis arrays
+        analysis = [].concat(...analysis);
+        console.log(`File-folder differences analysis completed for FileSnapshot '${snapshotId}'.`);
+        res.status(200).json({ success: true, analysis: analysis });
+    } catch (error) {
+        console.error(`Failed to analyze File-folder differences for FileSnasphot '${snapshotId}'. ${error}`);
+        res.status(400).json({ success: false, error: error });
+    }
+}
+
+/**
+ * Identifies file sharing permissions that deviate from those found in the majority of files given a folder and a deviance threshold
+ * @param {Object} folder - The folder whose children files are going to be analyzed 
+ * @param {number} threshold - Integer value >= 0.51 that determines which file sharing permissions are part of the majority group based on their number of appearance
+ * @returns {Object[]} differences - Object containing the deviant permissions of each file in the folder
+ */
+async function identifyDeviantPermissions(folder, threshold) {
+    try {
+        // Retrieve all children of the folder
+        let children = await File.find({ snapshotId: folder.snapshotId, parent: folder.fileId });
         // Map of file permission string arrays
         const filePermissionMap = new Map();
         // Map of all permissions string arrays found throughout the folder's files
@@ -119,48 +137,88 @@ async function deviantPermissionAnalysis(snapshotId, folder, threshold) {
             // Concatenate all permission strings into a single string
             const combinedString = permissions.join(', ');
             // Increment appearance of permission array in overall permission map
-            let object = overallPermissionMap.get(combinedString);
-            if (object) {
-                overallPermissionMap.set(combinedString, { ...object, count: object.count+1 });
+            let permissionSet = overallPermissionMap.get(combinedString);
+            if (permissionSet) {
+                overallPermissionMap.set(combinedString, { ...permissionSet, count: permissionSet.count+1 });
             } else {
                 overallPermissionMap.set(combinedString, { permissions: permissions, count: 1 });
             }
         }
         // Determine which permissions belong to the file 'majority' dictated by the user's threshold value
-        let majorityPermissions = Object.values(Object.fromEntries(overallPermissionMap)).find(value => value.count / children.length >= threshold);
+        let majorityPermissionSet = Object.values(Object.fromEntries(overallPermissionMap)).find(value => value.count / children.length >= threshold);
         // Identify which of the files' permissions deviate from those found in the majority of files
-        if (majorityPermissions) {
+        if (majorityPermissionSet) {
+            // Array containing the deviant permissions of each file in the folder
+            let analysis = [];
+            // For-loop to identify deviant permissions of each file in the folder
             for (const file of children) {
-                // Continue loop if the file doesn't have any permissions
+                // Continue the loop if the file does not have any permissions
                 if (Object.keys(file.permissions).length === 0) {
                     continue;
                 }
-                // Permissions exclusive to file
-                const fileExclusivePermissions = (filePermissionMap.get(file.fileId)).filter((permission) => !(majorityPermissions.permissions).includes(permission));
-                // Permissions exclusive to majority
-                const majorityExclusivePermissions = (majorityPermissions.permissions).filter((permission) => !(filePermissionMap.get(file.fileId)).includes(permission));
-                // Update deviantPermissions property of file
+                // Permissions exclusive to the file
+                const fileExclusivePermissions = (filePermissionMap.get(file.fileId)).filter((permission) => !(majorityPermissionSet.permissions).includes(permission));
+                // Permissions exclusive to the majority permission set
+                const majorityExclusivePermissions = (majorityPermissionSet.permissions).filter((permission) => !(filePermissionMap.get(file.fileId)).includes(permission));
+                // If the file's permission deviate from that of the majority permission set, add its deviation to the folder analysis array
                 if (fileExclusivePermissions.length > 0 || majorityExclusivePermissions.length > 0) {
-                    const updatedFile = await File.findOneAndUpdate({ snapshotId: snapshotId, fileId: file.fileId }, { $set:{ deviantPermissions: { 'fileExclusivePermissions': fileExclusivePermissions, 'majorityExclusivePermissions': majorityExclusivePermissions } } });
-                    console.log(`Added deviantPermissions for File '${updatedFile.fileId}'.`);
+                    analysis.push({ path: file.path.name + file.name, fileMajorityDifferences: { fileExclusivePermissions: fileExclusivePermissions, majorityExclusivePermissions: majorityExclusivePermissions } });
+                    console.log(`Deviant permissions found for file '${file.fileId}'.`);
                 }
             }
+            // Return null if there are no deviant permissions for any files in the folder
+            if (analysis.length === 0) {
+                return null;
+            }
+            return analysis;
         }
+        return null;
     } catch (error) {
         throw new Error(`Failed to analyze deviant permissions for folder '${folder.fileId}'. ${error}`);
-    }   
+    }
+}
+
+// Retrieve a list of deviant permissions for all files in the user's drive
+async function analyzeDeviantPermissions(req, res) {
+    // Retrieve FileSnapshotId and deviance threshold from request
+    const { snapshotId } = req.params;
+    const threshold = req.body.threshold;
+    try {
+        // Check if the requesting user is in the database
+        const user = await User.findById(req.userId);
+        if (!user) {
+            throw new Error('Unable to find user in the database.');
+        }
+        // Check if the requesting user has access to the provided FileSnapshot
+        if (!user.filesnapshot.includes(snapshotId)) {
+            throw new Error('User does not have access to requested file snapshot.');
+        }
+        // Retrieve all non-root-folder folder files in the snapshot
+        let folders = await File.find({ snapshotId: snapshotId, children: { $ne: null } });
+        // Perform sharing analysis on each of the folders
+        let analysis = await Promise.all(folders.map(async (folder) => await identifyDeviantPermissions(folder, threshold)));
+        // Filter out folder analysis arrays that are null
+        analysis = analysis.filter((folderAnalysis) => folderAnalysis);
+        // Concatenate all folder analysis arrays
+        analysis = [].concat(...analysis);
+        console.log(`Deviant permission analysis completed for FileSnapshot '${snapshotId}' with threshold value ${threshold}.`);
+        res.status(200).json({ success: true, analysis: analysis });
+    } catch (error) {
+        console.error(`Failed to analyze deviant permissions for FileSnapshot '${snapshotId}'. ${error}`);
+        res.status(400).json({ success: false, error: error });
+    }
 }
 
 /**
  * Creates a map-like object of all files associated with a given file snapshot
- * @param {Object[]} fileList - Array of all files associated with the given snapshot
+ * @param {Object[]} files - List of all files associated with the given snapshot
  * @returns {Object} map - Map of all files present in the user's drive at the time the snapshot was taken
  */
-function createFileMap(fileList) {
+ function createFileMap(files) {
     // Map object storing all files in the snapshot
     const map = new Map();
     // Insert the files into the map
-    for (const file of fileList) {
+    for (const file of files) {
         map.set(file.fileId, file);
     }
     // Return the map of files
@@ -168,7 +226,7 @@ function createFileMap(fileList) {
 }
 
 // Identifies file sharing differences between two FileSnapshots
-async function snapshotAnalysis(req, res) {
+async function analyzeSnapshots(req, res) {
     // Retrieve snapshot Ids from request
     const { snapshot1, snapshot2 } = req.params;
     try {
@@ -186,6 +244,7 @@ async function snapshotAnalysis(req, res) {
             // If the file is not in the first snapshot, label it as a new file in the second snapshot
             if (!snapshot1Map.has(file.fileId)) {
                 newFiles.push(file);
+                console.log(`Found new file '${file.fileId}' in FileSnapshot '${snapshot2}'.`);
                 continue;
             }
             // If the file is found exists in both snapshots, compare file sharing permissions
@@ -195,19 +254,21 @@ async function snapshotAnalysis(req, res) {
             // If there are any differences in the file's permissions between the two snapshots, add these differences to the sharing differences object
             if (snapshot1ExclusivePermissions.length > 0 || snapshot2ExclusivePermissions.length > 0) {
                 permissionDifferences[file.fileId] = [snapshot1ExclusivePermissions, snapshot2ExclusivePermissions];
-                console.log(`Found snapshot sharing differences for file (${file.fileId})`);
+                console.log(`Found file sharing differences for file (${file.fileId}).`);
             }
         }
+        console.log(`Snapshot analysis completed for FileSnapshots '${snapshot1}' and '${snapshot2}'.`)
         // Return the file sharing differences between the two snapshots as an object
         const sharingDifferences = { 'newFiles': newFiles, 'permissionDifferences': permissionDifferences };
-        res.status(200).json({ success: true, differences: sharingDifferences });
+        res.status(200).json({ success: true, analysis: sharingDifferences });
     } catch(error) {
-        console.error(`Failed to analyze snapshots: ${error}`);
+        console.error(`Failed to analyze sharing differences for snapshots '${snapshot1}' and '${snapshot2}'. ${error}`);
         res.status(400).json({ success: false, error: error });
     }
 }
 
 module.exports = {
-    sharingAnalysis,
-    snapshotAnalysis
+    analyzeDeviantPermissions,
+    analyzeFileFolderDifferences,
+    analyzeSnapshots
 };

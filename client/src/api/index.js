@@ -15,6 +15,24 @@ export const getLoggedIn = () => api.get('/loggedIn').then(response => {
 });
 
 // Snapshot related requests
+export const analyzeDeviantPermissions = (payload, snapshotId) => api.post(`/snapshot/${snapshotId}/deviantPermissions`, payload).then(response => {
+   return response;
+}).catch(error => {
+   return error.response;
+});
+
+export const analyzeFileFolderDifferences = (snapshotId) => api.post(`/snapshot/${snapshotId}/fileFolderDifferences`).then(response => {
+   return response;
+}).catch(error => {
+   return error.response;
+});
+
+export const analyzeSnapshots = (snapshot1Id, snapshot2Id) => api.post(`/snapshots/${snapshot1Id}/${snapshot2Id}/analyze`).then(response => {
+   return response;
+}).catch(error => {
+   return error.response;
+});
+
 export const getSnapshot = (payload) => api.post('/snapshot', payload).then(response => {
    return response;
 }).catch(error => {
@@ -22,12 +40,6 @@ export const getSnapshot = (payload) => api.post('/snapshot', payload).then(resp
 });
 
 export const takeSnapshot = (payload) => api.post('/snapshot/create', payload).then(response => {
-   return response;
-}).catch(error => {
-   return error.response;
-});
-
-export const analyzeSnapshots = (payload, snapshot1Id, snapshot2Id) => api.post(`/snapshots/${snapshot1Id}/${snapshot2Id}/analyze`, payload).then(response => {
    return response;
 }).catch(error => {
    return error.response;
@@ -67,6 +79,8 @@ export const updateACR = (payload) => api.post('/acr', payload).then(response =>
 });
  
 const apis = {
+   analyzeDeviantPermissions,
+   analyzeFileFolderDifferences,
    analyzeSnapshots,
    buildQuery,
    doQuery,
