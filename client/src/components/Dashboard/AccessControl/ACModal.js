@@ -5,6 +5,7 @@ import AuthContext from '../../../auth/index.js';
 import NameBar from '../NameBar'
 
 // Imports from MUI
+import Autocomplete from '@mui/material/Autocomplete';
 import Switch from '@mui/material/Switch';
 import CloseIcon from '@mui/icons-material/Close';
 import FormGroup from '@mui/material/FormGroup';
@@ -35,6 +36,7 @@ const style = {
 function ACModal() {
     const {store} = useContext(GlobalStoreContext);
     const {auth} = useContext(AuthContext);
+    const [query, setQuery] = useState("");
     const [allowWrite, setAllowWrite] = useState("");
     const [allowWriters, setAllowWriters] = useState([]);
     const [allowRead, setAllowRead] = useState("");
@@ -44,24 +46,32 @@ function ACModal() {
     const [denyWrite, setDenyWrite] = useState("");
     const [denyWriters, setDenyWriters] = useState([]);
     const [flag, setFlag] = useState(false);
+    
+    let searchHistory = [];
 
     useEffect(() => {
         let acr = auth.user.access_control_req;
+        if(auth.user) {
+            searchHistory = auth.user.searchHistory;
+        }
+        
         if(acr && acr !== ' ') {
+            setQuery(acr.query);
             setAllowWriters(acr.AW);
             setAllowReaders(acr.AR);
             setDenyReaders(acr.DR);
             setDenyWriters(acr.DW);
             setFlag(acr.Grp);
         }
-    }, [auth.user.access_control_req])
-    
+    }, [auth.user])
+
     function handleOpenBuilder(){
         store.openAccessControlSearch();
     }
 
     function handleSave() {
         let access_control_req = {
+            query: query,
             AW: allowWriters,
             AR: allowReaders,
             DW: denyWriters,
@@ -74,6 +84,7 @@ function ACModal() {
     function closeModal() { 
         console.log("Close Access Control Modal");
         store.closeModal();
+        setQuery("");
         setAllowWrite("");
         setAllowWriters([]);
         setAllowRead("");
@@ -171,31 +182,41 @@ function ACModal() {
                     /> */}
 
                     {/* Search Bar */}
-                    <TextField   
-                        id="search"
-                        label="Search Query"
-                        name="search"
-                        autoComplete="Search"
-                        size="large"
-                        sx={{backgroundColor:"#FFFFFF", width:'85%', mt:3}}
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <TuneOutlinedIcon 
-                                        sx={{
-                                            ':hover': {
-                                                bgcolor: 'grey.300',
-                                                color: 'black'
-                                            },
-                                            color: 'black',
-                                            p:1,
-                                            borderRadius: '50%'
-                                        }}
-                                        onClick={event =>  handleOpenBuilder()}/>
-                                </InputAdornment>
-                            )
-                        }}
-                    />
+                    <Stack 
+                        direction = "row"
+                        alignItems = "center"
+                        justifyContent = "center"
+                        sx={{mb:2, width:'100%'}}
+                    >
+                        <Autocomplete
+                            disablePortal
+                            popupIcon={""}
+                            freeSolo={true}
+                            options={searchHistory}
+                            sx={{backgroundColor:"#FFFFFF", width:'100%', mt:1}}
+                            renderInput={(params) => 
+                                <TextField {...params} label="Search" />
+                            }
+                            value={query}
+                            inputValue={query}
+                            onInputChange={(event) => {
+                                setQuery(event.target.value);
+                            }}/>     
+                            <InputAdornment position="end">
+                                <TuneOutlinedIcon 
+                                    sx={{
+                                        ':hover': {
+                                            bgcolor: 'grey.300',
+                                            color: 'black'
+                                        },
+                                        color: 'black',
+                                        p:1,
+                                        borderRadius: '50%'
+                                    }}
+                                    onClick={event =>  handleOpenBuilder()}/>
+                            </InputAdornment>
+                        <Box sx={{flexGrow:1}} />
+                    </Stack>
                     <FormGroup>
                         <FormControlLabel 
                             control={
