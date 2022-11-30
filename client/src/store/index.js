@@ -372,7 +372,7 @@ function GlobalStoreContextProvider(props) {
             storeReducer({
                 type:GlobalStoreActionType.CLOSE_TAKE_SNAPSHOT_MODAL
             });
-            store.getDrive(snapshot.snapshotId, driveID, "My Drive");
+            store.getDrive(snapshot.snapshotId, driveID, "MyDrive");
         }
     };
 
