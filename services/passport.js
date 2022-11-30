@@ -41,8 +41,7 @@ async function(accessToken, refreshToken, profile, done) {
                 cloudProvider: profile.provider,
                 displayName: profile.displayName,
                 email: profile.emails[0].value,
-                refreshToken: refreshToken,
-                threshold: 0.8
+                refreshToken: refreshToken
             });
             await User.create(newUser);
             user = await User.findOne({ cloudProvider: profile.provider, profileId: profile.id }, '-profileId -refreshToken -__v');
@@ -79,8 +78,7 @@ async function(accessToken, refreshToken, profile, done) {
                 cloudProvider: profile.provider,
                 displayName: profile.displayName,
                 email: profile.emails[0].value,
-                refreshToken: refreshToken,
-                threshold: 0.8
+                refreshToken: refreshToken
             });
             await User.create(newUser);
             user = await User.findOne({ cloudProvider: profile.provider, profileId: profile.id }, '-profileId -refreshToken -__v');

@@ -13,7 +13,7 @@ const User = require('../models/user-model');
 async function createFileSnapshot(req, res) {
     try {
         // Retrieve the user's profile
-        const user = await User.findById(req.userId, { cloudProvider: 1, filesnapshot: 1, refreshToken: 1, threshold: 1 });
+        const user = await User.findById(req.userId, { cloudProvider: 1, filesnapshot: 1, refreshToken: 1 });
         if (!user) {
             throw new Error('Could not find User in database.');
         }
