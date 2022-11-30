@@ -72,7 +72,7 @@ export const doQuery = (payload) => api.post('/doQuery', payload).then(response 
 });
 
 // User related requests
-export const updateACR = (payload) => api.post('/acr', payload).then(response => {
+export const checkACR = (payload) => api.post('/checkACR', payload).then(response => {
    return response;
 }).catch(error => {
    return error.response;
@@ -95,7 +95,7 @@ const apis = {
    getLoggedIn,
    getSnapshot,
    takeSnapshot,
-   updateACR,
+   checkACR,
    addGroup
 };
 

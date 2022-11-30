@@ -502,7 +502,7 @@ function GlobalStoreContextProvider(props) {
     };
 
     store.updateACR = async function(access_control_req) {
-        const response = await api.updateACR(access_control_req);
+        const response = await api.checkACR(access_control_req);
         if (response.status === 200) {
             let acr = response.data.acr;
             auth.updateACR(acr);
