@@ -23,7 +23,7 @@ router.get('/auth/google/callback', passport.authenticate('google', { failureRed
 });
 
 // Authenticate user with Microsoft
-router.get('/auth/microsoft', passport.authenticate('microsoft', { accessType: 'offline', prompt: 'select_account', scope: ['user.read', 'offline_access'] } ));
+router.get('/auth/microsoft', passport.authenticate('microsoft', { accessType: 'offline', prompt: 'select_account', scope: ['user.read', 'Files.read', 'offline_access'] } ));
 // Redirect based on Microsoft authentication response
 router.get('/auth/microsoft/callback', passport.authenticate('microsoft', { failureRedirect: process.env.CLIENT_BASE_URL }), function(req, res) {
     console.log("Successfully authenticated with microsoft.");

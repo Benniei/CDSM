@@ -2,6 +2,7 @@
 const Analyze = require('./analyze-controller');
 const File = require('../models/file-model');
 const FileSnapshot = require('../models/filesnapshot-model');
+const User = require('../models/user-model');
 
 // Import modules
 const onedrive = require("onedrive-api");
@@ -11,21 +12,19 @@ const axios = require('axios');
 // Create a snapshot of the user's current drive
 createFileSnapshot = async function(req, res) {
     try {
-        let user = req.user;
+        const user = await User.findById(req.userId);
         // Retrieve access token from Microsoft using refresh token
         const accessToken = await getAccessToken(user.refreshToken);
         //oauth2Client.setCredentials({ access_token: accessToken, refresh_token: user.refreshToken });
         // Initialize Google Drive API
         await onedrive.items
-        .customEndpoint({
+        .createFolder({
             accessToken: accessToken,
-            url: "me/drives",
+            rootItemId: "root",
+            name: "Folder",
         })
         .then((r) => {
-            //console.log(r);
-        })
-          .catch((e) => {
-            //console.log(e);
+            console.log(r);
         });
         /*const driveAPI = google.drive({ version: 'v3', auth: oauth2Client });
         // Retrieve the name and Ids of all of the user's drives
@@ -77,7 +76,7 @@ createFileSnapshot = async function(req, res) {
         res.status(200).json({ success: true/*, fileSnapshot: newSnapshot*/ }); 
     } catch(error) {
         console.error('Failed to create File Snapshot: ' + error);
-        res.status(400).json({ success: false, error: error });   
+        // res.status(400).json({ success: false, error: error });   
     }
 };
 
@@ -323,7 +322,7 @@ getPath = function(file, map) {
  getAccessToken = async function(refreshToken) {
     const body =  {
         client_id: `${process.env.ONEDRIVE_CLIENT_ID}`, 
-        scope: `user.read offline_access`,
+        scope: ['user.read', 'Files.read', 'offline_access'],
         refresh_token: `${refreshToken}`,
         grant_type: `refresh_token`,
         client_secret: `${process.env.ONEDRIVE_CLIENT_SECRET}`
@@ -341,7 +340,7 @@ getPath = function(file, map) {
         const response = await axios.post(endpoint, body, options);
         return response.data.access_token;
     } catch (error) {
-        console.log(error)
+        // console.log(error)
         return error;
     }
 };

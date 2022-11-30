@@ -27,6 +27,7 @@ async function createFileSnapshot(req, res) {
             case 'google':
                 // Initialize instance of the Google Drive API service
                 const driveAPI = await GoogleDriveController.GD_initializeAPI(user.refreshToken);
+                console.log(driveAPI);
                 driveIds = await GoogleDriveController.GD_getDrives(driveAPI);
                 fileMap = await GoogleDriveController.GD_getFileMap(driveAPI, driveIds);
                 break;
