@@ -283,6 +283,39 @@ function GlobalStoreContextProvider(props) {
         }
     };
 
+    // Identifies deviant permissions of all files in a given FileSnapshot
+    store.analyzeDeviantPermissions = async function(snapshotId, threshold) {
+        console.log(`Analyzing deviant file sharing permissions for snapshot '${snapshotId}' with a threshold value of ${threshold}.`);
+        const response = await api.analyzeDeviantPermissions({ threshold: threshold }, snapshotId);
+        if (response.status === 200) {
+            // TODO: do something with analysis
+            const analysis = response.data.analysis;
+            console.log(analysis);
+        }
+    }
+
+    // Identifies file-folder differences of all files in a given FileSnapshot
+    store.analyzeFileFolderDifferences = async function(snapshotId) {
+        console.log(`Analyzing file-folder differences for snapshot '${snapshotId}'.`);
+        const response = await api.analyzeFileFolderDifferences(snapshotId);
+        if (response.status === 200) {
+            // TODO: do something with analysis
+            const analysis = response.data.analysis;
+            console.log(analysis);
+        }
+    }
+    
+    // Identifies file sharing permission changes between two FileSnapshots
+    store.analyzeSnapshots = async function(snapshot1Id, snapshot2Id) {
+        console.log(`Analyzing file sharing differences between snapshots '${snapshot1Id}' and '${snapshot2Id}'`);
+        const response = await api.analyzeSnapshots(snapshot1Id, snapshot2Id);
+        if (response.status === 200) {
+            // TODO: do something with analysis
+            const analysis = response.data.analysis;
+            console.log(analysis);
+        }
+    }
+
     /**
      * The user clicks on the Take Snapshot button.
      * This creates a snapshot that will be sent to 
@@ -396,17 +429,6 @@ function GlobalStoreContextProvider(props) {
             });
         }
     };
-
-    store.analyzeSnapshots = async function(snapshot1Id, snapshot2Id) {
-        console.log(`Analyzing file sharing differences between snapshots '${snapshot1Id}' and '${snapshot2Id}'`);
-        const response = await api.analyzeSnapshots(auth.user, snapshot1Id, snapshot2Id);
-        if (response.status === 200) {
-            // TODO: do something with analysis
-            const differences = response.data.differences;
-            console.log(differences.newFiles);
-            console.log(differences.permissionDifferences);
-        }
-    }
 
     store.buildQuery = async function(query) {
         console.log(`Building query: ${query}`);
