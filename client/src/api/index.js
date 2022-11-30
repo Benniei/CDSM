@@ -65,6 +65,12 @@ export const updateACR = (payload) => api.post('/acr', payload).then(response =>
 }).catch(error => {
    return error.response;
 });
+
+export const addGroup = (payload) => api.post('/addGroup', payload).then(response => {
+   return response;
+}).catch(error => {
+   return error.response;
+});
  
 const apis = {
    analyzeSnapshots,
@@ -75,7 +81,8 @@ const apis = {
    getLoggedIn,
    getSnapshot,
    takeSnapshot,
-   updateACR
+   updateACR,
+   addGroup
 };
 
 export default apis;

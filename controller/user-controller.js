@@ -1,6 +1,7 @@
 // Local imports
 const File = require('../models/file-model');
 const User = require('../models/user-model');
+const GroupSnapshot = require('../models/groupsnapshot-model')
 
 buildQuery = async function(req, res) {
     const query = req.body.query;
@@ -10,9 +11,10 @@ buildQuery = async function(req, res) {
             throw new Error('Could not find User in database.');
         }
         if (user.searchHistory) {
+            user.searchHistory = user.searchHistory.filter(item => item !== query);
             user.searchHistory.unshift(query);
-            if(user.searchHistory.length > 5) 
-                user.searchHistory = user.searchHistory.slice(0, 5);
+            if(user.searchHistory.length > 10) 
+                user.searchHistory = user.searchHistory.slice(0, 10);
         } else {
             user.searchHistory = [query];
         } 
@@ -160,6 +162,35 @@ updateACR = async (req, res) => {
     }
 }
 
+addGroup = async(req, res) => {
+    try{
+        const {name, domain, emails} = req.body
+        const userID = req.userId
+
+        // Add New Group to Database
+        let body = req.body
+        body.user = userID
+        
+        const group = new GroupSnapshot(body);
+        group.save()
+
+        // Add as Unique Group to user's list of groups
+        let user = await User.findById(req.userId, { email: 1 , groupsnapshot: 1});
+        if(user.groupsnapshot.length === 0){
+            user.groupsnapshot = [name]
+        }
+        else if(user.groupsnapshot.indexOf(name) == -1){
+            user.groupsnapshot.push(name)
+        }
+        user.save()
+
+        res.status(200).json({ success: true, group: group });
+    } catch(error) {
+        console.error('Failed to add Group Snapshot: ' + error);
+        res.status(400).json({ success: false, error: error });
+    }
+}
+
 listSnapshots = async (req, res) => {
     try {
         const snapshots = await User.findById(req.userId, { _id: 0, filesnapshot: 1, groupsnapshot: 1 });
@@ -177,5 +208,6 @@ module.exports = {
     updateACR,
     listSnapshots,
     buildQuery,
-    doQuery
+    doQuery,
+    addGroup
 };

@@ -17,7 +17,7 @@ const UserSchema = new Schema(
         access_control_req: { type: Object, required: false },                                  // Access control requirements assigned by the user
         searchHistory: { type: [String], required: false },                                     // History of search queries made by the user
         filesnapshot: { type: [String], required: false },
-        groupsnapshot: { type: Schema.Types.ObjectId, ref:'GroupSnapshot', required: false }
+        groupsnapshot: { type: [String], required: false }
     },
     { timeStamps: true }                                                                        // Timestamps for when document was created and last updated
 );

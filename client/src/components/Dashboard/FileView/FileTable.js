@@ -148,13 +148,11 @@ function FileTable(props){
         if (store.allItems) {
             let i = 0;
             // Enter Data into the File Table
-            console.log(store.parents)
             for (let file of store.allItems) {
                 //console.log(file.name)
                 // Intersection between the file and its parent's permissions
                 // Step 1 Find out if File has Corresponding Parent
                 let parent = store.parents && store.parents.find(o => (o.fileId === file.parent)? o: null)
-                console.log(file, parent)
                 // Gather all the file's permissions as an array
                 let data = [[],[]]
                 for(let key in file.permissionsRaw){

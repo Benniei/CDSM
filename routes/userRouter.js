@@ -10,6 +10,7 @@ const router = express.Router();
 
 // User Routes
 router.post('/acr', auth.verify, UserController.updateACR);
+router.post('/addGroup', auth.verify, UserController.addGroup);
 router.post('/buildQuery', auth.verify, UserController.buildQuery);
 router.post('/doQuery', auth.verify, UserController.doQuery);
 router.get('/snapshot/list', auth.verify, UserController.listSnapshots);
