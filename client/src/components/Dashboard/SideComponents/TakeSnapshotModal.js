@@ -118,25 +118,6 @@ function GroupSnapshot(props) {
             <Stack
                 direction="row"
                 mt={1}>
-                <Typography 
-                    display="flex"
-                    variant="h6"
-                    sx={{ml: 2, width: '25%', mt: 1.7, pr:2.5}}
-                    justifyContent="flex-end">
-                    <strong>Group Name:</strong>
-                </Typography>
-                <TextField
-                    id="GroupName"
-                    label="Group Name"
-                    value={groupName}
-                    sx={{width: '70%',}}
-                    overflow='auto'
-                    onChange= {(event) => {setGroupName(event.target.value)}}
-                />
-            </Stack>
-            <Stack
-                direction="row"
-                mt={1}>
 
                 <Typography 
                     display="flex"

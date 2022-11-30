@@ -146,6 +146,12 @@ async function getSnapshot(req, res) {
         if (!snapshot) {
             throw new Error('Unable to find FileSnapshot in database.');
         }
+
+        // Get all the closes group snapshots
+        const user = await User.findById(req.userId);
+        const groups = user.groupsnapshot ? user.groupsnapshot : [];
+
+        console.log(groups)
         res.status(200).json({ success: true, snapshot: snapshot });
     } catch(error) {
         console.error(`Failed to retrieve FileSnapshot: ${error}`);

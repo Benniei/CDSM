@@ -6,9 +6,8 @@ const Schema = mongoose.Schema;
 const GroupSnapshotSchema = new Schema(
     {         // Unique ID of the screenshot
         user: { type: String, required: true },                   // User that created the screenshot
-        emails: { type: [String], required: true},            // list of groups mentioned (replace with [Group]?)
-        name: { type: String, required: true},
-        domain: { type: String, required: true}            // any additional metadata saved
+        emails: { type: [String], required: true},            // list of emails in the group 
+        domain: { type: String, required: true}            // domain of the group
     },
     { timeStamps: true }                                        // Timestamps for when screenshot was created and last updated
 );
