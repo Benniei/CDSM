@@ -297,6 +297,7 @@ async function GD_getFileMap(driveAPI, driveIds) {
                 }
             }
             // Replace the file's permission array with an object
+            let type = [];
             if (file.permissions) {
                 const permissionObjects = GD_createPermissionObject(file.permissions);
                 overrides['permissions'] = permissionObjects.permissions;
@@ -307,6 +308,7 @@ async function GD_getFileMap(driveAPI, driveIds) {
                 const sharable = [];
                 // For-loop to add each user to the appropriate access array
                 for (const permission of file.permissions) {
+                    console.log(permission)
                     switch (permission.role) {
                         case 'owner':
                             sharable.push(permission.emailAddress);
@@ -315,12 +317,34 @@ async function GD_getFileMap(driveAPI, driveIds) {
                         case 'reader':
                         case 'commenter':
                             readable.push(permission.emailAddress);
+                    }   
+                    switch (permission.type) {
+                        case 'user':
+                            if (file.ownedByMe) {
+                                break;
+                            }
+                            type.push('individual');
+                            break;
+                        case 'group':
+                            // no specific instruction how to deal with group
+                            type.push('individual');
+                            break;
+                        case 'domain':
+                            type.push('domain');
+                            break;
+                        case 'anyone':
+                            type.push('anyone');
+                            break;
                     }
                 }
                 overrides['readable'] = readable;
                 overrides['writable'] = writable;
                 overrides['sharable'] = sharable;
             }
+            if (type.length === 0) {
+                type.push('none')
+            }
+            overrides['sharing'] = type
             // If the file already has an entry in the map (because it's the parent folder of some file in the map), update the entry with the file's other fields (parents, permissions, etc.)
             if (map.get(file.id)) { 
                 map.set(file.id, { ...map.get(file.id), ...file, ...overrides });

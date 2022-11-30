@@ -69,6 +69,7 @@ async function createFileSnapshot(req, res) {
                 readable: file.readable,
                 writable: file.writable,
                 sharable: file.sharable,
+                sharing: file.sharing,
             });
             await File.create(newFile);
             console.log(`Added File '${newFile.fileId}' to database.`);
