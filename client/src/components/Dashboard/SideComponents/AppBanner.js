@@ -69,7 +69,6 @@ function AppBanner() {
                     }
                     onKeyPress={(event) => {
                         if (event.key === 'Enter'){
-                            console.log(event.target.value);
                             store.buildQuery(event.target.value);
                         }
                     }}/>     

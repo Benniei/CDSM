@@ -19,11 +19,10 @@ const FileSchema = new Schema(
         permissions: { type: Object, required: false },                                                 // List of the file's permissions as strings taken from cloud provider
         permissionsRaw: { type: Object, required: false },                                              // List of the file's permissions as objects form taken from cloud provider
         lastModifiedTime: { type: String, required: false },                                            // Timestamp of when the file was last modified
-        deviantPermissions: { type: Object, required: false, default: () => { return null; } },         // Permissions that deviate from those found in other files in the same folder
-        fileFolderDifferences: { type: Object, required: false, default: () => { return null; } },      // Permissions that are different from those of the parent folder
-        readable: {type: [String], required: false},                                                    // list of email addresses with readable permission
-        writable: {type: [String], required: false},                                                    // list of email addresses with writable permission
-        sharable: {type: [String], required: false},                                                    // list of email addresses with sharable permission
+        readable: {type: [String], required: false },                                                   // list of email addresses with readable permission
+        writable: {type: [String], required: false },                                                   // list of email addresses with writable permission
+        sharable: {type: [String], required: false },                                                   // list of email addresses with sharable permission
+        sharing: {type: [String], required: false, default: () => { return null; } },                   // type of grantee of sharing (user, group, domain, anyone)
     }, { minimize: false }                                                                              // Allow empty objects to be valid field values
 );
 

@@ -147,25 +147,23 @@ function FileTable(props){
         let directPerms = [];
         if (store.allItems) {
             let i = 0;
-            // Get Unique Parent ids (Used Primarily for Search when there are multiple files)
-            // let allParents=[]
-            // store.allItems.map((file) => allParents.indexOf(file.parent) === -1? allParents.push(file.parent): null)
-            
             // Enter Data into the File Table
             for (let file of store.allItems) {
                 //console.log(file.name)
                 // Intersection between the file and its parent's permissions
                 // Step 1 Find out if File has Corresponding Parent
-                let parent = store.parents && store.parents.find(o => (o.folderid === file.parent)? o: null)
-
+                let parent = store.parents && store.parents.find(o => (o.fileId === file.parent)? o: null)
                 // Gather all the file's permissions as an array
                 let data = [[],[]]
                 for(let key in file.permissionsRaw){
+                    if(key === "anyoneWithLink"){
+                        continue
+                    }
                     data[0].push(file.permissionsRaw[key])
                 }
                 if(parent)
-                    for(let key in parent.permissions){
-                        data[1].push(parent.permissions[key])
+                    for(let key in parent.permissionsRaw){
+                        data[1].push(parent.permissionsRaw[key])
                     }
                 // console.log(data)
                 // If there is parent, there can be inheritied and direct permissions

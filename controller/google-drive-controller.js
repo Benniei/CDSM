@@ -163,7 +163,6 @@ async function GD_getFiles(driveAPI) {
         throw new Error(`Failed to retrieve file data. ${error}`);
     }
     // Return the file data retrieved from the Google Drive API
-    console.log(files);
     return files;
 }
 
@@ -298,30 +297,54 @@ async function GD_getFileMap(driveAPI, driveIds) {
                 }
             }
             // Replace the file's permission array with an object
+            let type = [];
             if (file.permissions) {
                 const permissionObjects = GD_createPermissionObject(file.permissions);
-
-                let readable = [];
-                let writable = [];
-                let sharable = [];
-                Object.values(permissionObjects.permissionsRaw).forEach(function (item) {
-                    console.log(item);
-                    switch(item.role) {
+                overrides['permissions'] = permissionObjects.permissions;
+                overrides['permissionsRaw'] = permissionObjects.permissionsRaw;
+                // Lists of users who have permission to read, write, and share the file
+                const readable = [];
+                const writable = [];
+                const sharable = [];
+                // For-loop to add each user to the appropriate access array
+                for (const permission of file.permissions) {
+                    console.log(permission)
+                    switch (permission.role) {
                         case 'owner':
-                            sharable.push(item.emailAddress);
+                            sharable.push(permission.emailAddress);
                         case 'writer':
-                            writable.push(item.emailAddress);
+                            writable.push(permission.emailAddress);
                         case 'reader':
                         case 'commenter':
-                            readable.push(item.emailAddress);
+                            readable.push(permission.emailAddress);
+                    }   
+                    switch (permission.type) {
+                        case 'user':
+                            if (file.ownedByMe) {
+                                break;
+                            }
+                            type.push('individual');
+                            break;
+                        case 'group':
+                            // no specific instruction how to deal with group
+                            type.push('individual');
+                            break;
+                        case 'domain':
+                            type.push('domain');
+                            break;
+                        case 'anyone':
+                            type.push('anyone');
+                            break;
                     }
-                })
+                }
                 overrides['readable'] = readable;
                 overrides['writable'] = writable;
                 overrides['sharable'] = sharable;
-                overrides['permissions'] = permissionObjects.permissions;
-                overrides['permissionsRaw'] = permissionObjects.permissionsRaw;
             }
+            if (type.length === 0) {
+                type.push('none')
+            }
+            overrides['sharing'] = type
             // If the file already has an entry in the map (because it's the parent folder of some file in the map), update the entry with the file's other fields (parents, permissions, etc.)
             if (map.get(file.id)) { 
                 map.set(file.id, { ...map.get(file.id), ...file, ...overrides });

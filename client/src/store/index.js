@@ -13,6 +13,7 @@ export const GlobalStoreActionType = {
     SHOW_SEARCH: "SHOW_SEARCH",
     OPEN_QUERY_BUILDER: "OPEN_QUERY_BUILDER",
     OPEN_TAKE_SNAPSHOT_MODAL: "OPEN_TAKE_SNAPSHOT_MODAL",
+    CLOSE_TAKE_SNAPSHOT_MODAL: "CLOSE_TAKE_SNAPSHOT_MODAL",
     OPEN_UPDATE_SHARING: "OPEN_UPDATE_SHARING",
     OPEN_AC_MODAL: "OPEN_AC_MODAL",
     CLOSE_MODAL: "CLOSE_MODAL",
@@ -38,7 +39,8 @@ function GlobalStoreContextProvider(props) {
         openAnalyze: false,
         path: [],
         parents: [],
-        otherDrive: []
+        otherDrive: [],
+        groups: {}
     });
 
     const storeReducer = (action) => {
@@ -58,7 +60,8 @@ function GlobalStoreContextProvider(props) {
                     openAnalyze: store.openAnalyze,
                     path: payload.path,
                     parents: payload.parents,
-                    otherDrive: store.otherDrive
+                    otherDrive: store.otherDrive,
+                    groups: {}
                 });
             }
             case GlobalStoreActionType.GET_DRIVE: {
@@ -75,7 +78,8 @@ function GlobalStoreContextProvider(props) {
                     openAnalyze: false,
                     path: [],
                     parents: payload.parents,
-                    otherDrive: store.otherDrive
+                    otherDrive: store.otherDrive,
+                    groups: {}
                 });
             }
             case GlobalStoreActionType.SET_DRIVES: {
@@ -92,7 +96,8 @@ function GlobalStoreContextProvider(props) {
                     openAnalyze: false,
                     path: [],
                     parents: payload.parents,
-                    otherDrive: payload.otherDrive
+                    otherDrive: payload.otherDrive,
+                    groups: {}
                 });
             }
             case GlobalStoreActionType.SHOW_SEARCH: {
@@ -108,8 +113,9 @@ function GlobalStoreContextProvider(props) {
                     openAccess: false,
                     openAnalyze: false,
                     path: null,
-                    parents: [],
-                    otherDrive: store.otherDrive
+                    parents: payload.parents,
+                    otherDrive: store.otherDrive,
+                    groups: store.groups
                 });
             }
             case GlobalStoreActionType.OPEN_QUERY_BUILDER: {
@@ -126,7 +132,8 @@ function GlobalStoreContextProvider(props) {
                     openAnalyze: store.openAnalyze,
                     path: store.path,
                     parents: store.parents,
-                    otherDrive: store.otherDrive
+                    otherDrive: store.otherDrive,
+                    groups: store.groups
                 });
             }
             case GlobalStoreActionType.OPEN_TAKE_SNAPSHOT_MODAL: {
@@ -143,7 +150,26 @@ function GlobalStoreContextProvider(props) {
                     openAnalyze: store.openAnalyze,
                     path: store.path,
                     parents: store.parents,
-                    otherDrive: store.otherDrive
+                    otherDrive: store.otherDrive,
+                    groups: store.groups
+                });
+            }
+            case GlobalStoreActionType.CLOSE_TAKE_SNAPSHOT_MODAL: {
+                return setStore({
+                    allItems: store.allItems,
+                    currentSnapshot: store.currentSnapshot,
+                    queryBuilder: false,
+                    takeSnapshotModal: false,
+                    updateSharingModal: false,
+                    accessModal: false,
+                    search: false,
+                    openDrive: store.openDrive,
+                    openAccess: store.openAccess,
+                    openAnalyze: store.openAnalyze,
+                    path: store.path,
+                    parents: store.parents,
+                    otherDrive: store.otherDrive,
+                    groups: store.groups
                 });
             }
             case GlobalStoreActionType.OPEN_UPDATE_SHARING: {
@@ -160,7 +186,8 @@ function GlobalStoreContextProvider(props) {
                     openAnalyze: store.openAnalyze,
                     path: store.path,
                     parents: store.parents,
-                    otherDrive: store.otherDrive
+                    otherDrive: store.otherDrive,
+                    groups: store.groups
                 });
             }
             case GlobalStoreActionType.OPEN_AC_MODAL: {
@@ -177,7 +204,8 @@ function GlobalStoreContextProvider(props) {
                     openAnalyze: store.openAnalyze,
                     path: store.path,
                     parents: [],
-                    otherDrive: store.otherDrive
+                    otherDrive: store.otherDrive,
+                    groups: {}
                 });
             }
             case GlobalStoreActionType.OPEN_AC_SEARCH: {
@@ -194,7 +222,8 @@ function GlobalStoreContextProvider(props) {
                     openAnalyze: store.openAnalyze,
                     path: store.path,
                     parents: [],
-                    otherDrive: store.otherDrive
+                    otherDrive: store.otherDrive,
+                    groups: {}
                 });
             }
             case GlobalStoreActionType.CLOSE_MODAL: {
@@ -210,7 +239,8 @@ function GlobalStoreContextProvider(props) {
                     openAnalyze: store.openAnalyze,
                     path: store.path,
                     parents: store.parents,
-                    otherDrive: store.otherDrive
+                    otherDrive: store.otherDrive,
+                    groups: store.groups
                 });
             }
             
@@ -253,6 +283,39 @@ function GlobalStoreContextProvider(props) {
         }
     };
 
+    // Identifies deviant permissions of all files in a given FileSnapshot
+    store.analyzeDeviantPermissions = async function(snapshotId, threshold) {
+        console.log(`Analyzing deviant file sharing permissions for snapshot '${snapshotId}' with a threshold value of ${threshold}.`);
+        const response = await api.analyzeDeviantPermissions({ threshold: threshold }, snapshotId);
+        if (response.status === 200) {
+            // TODO: do something with analysis
+            const analysis = response.data.analysis;
+            console.log(analysis);
+        }
+    }
+
+    // Identifies file-folder differences of all files in a given FileSnapshot
+    store.analyzeFileFolderDifferences = async function(snapshotId) {
+        console.log(`Analyzing file-folder differences for snapshot '${snapshotId}'.`);
+        const response = await api.analyzeFileFolderDifferences(snapshotId);
+        if (response.status === 200) {
+            // TODO: do something with analysis
+            const analysis = response.data.analysis;
+            console.log(analysis);
+        }
+    }
+    
+    // Identifies file sharing permission changes between two FileSnapshots
+    store.analyzeSnapshots = async function(snapshot1Id, snapshot2Id) {
+        console.log(`Analyzing file sharing differences between snapshots '${snapshot1Id}' and '${snapshot2Id}'`);
+        const response = await api.analyzeSnapshots(snapshot1Id, snapshot2Id);
+        if (response.status === 200) {
+            // TODO: do something with analysis
+            const analysis = response.data.analysis;
+            console.log(analysis);
+        }
+    }
+
     /**
      * The user clicks on the Take Snapshot button.
      * This creates a snapshot that will be sent to 
@@ -266,6 +329,9 @@ function GlobalStoreContextProvider(props) {
             let driveIds = snapshot.driveIds;
             let driveID = Object.keys(driveIds).find((key) => driveIds[key] === "MyDrive");
             auth.takeSnapshot(snapshot.snapshotId);
+            storeReducer({
+                type:GlobalStoreActionType.CLOSE_TAKE_SNAPSHOT_MODAL
+            });
             store.getDrive(snapshot.snapshotId, driveID, "My Drive");
 
         }
@@ -338,7 +404,7 @@ function GlobalStoreContextProvider(props) {
                 folder: response.data.folder,
                 id: snapshotId,
                 path: path,
-                parents: [{folderid: folderId, permissions: response.data.perms}]
+                parents: [{fileId: folderId, permissionsRaw: response.data.perms}]
             };
             console.log(snapshot);
             storeReducer({
@@ -364,17 +430,6 @@ function GlobalStoreContextProvider(props) {
         }
     };
 
-    store.analyzeSnapshots = async function(snapshot1Id, snapshot2Id) {
-        console.log(`Analyzing file sharing differences between snapshots '${snapshot1Id}' and '${snapshot2Id}'`);
-        const response = await api.analyzeSnapshots(auth.user, snapshot1Id, snapshot2Id);
-        if (response.status === 200) {
-            // TODO: do something with analysis
-            const differences = response.data.differences;
-            console.log(differences.newFiles);
-            console.log(differences.permissionDifferences);
-        }
-    }
-
     store.buildQuery = async function(query) {
         console.log(`Building query: ${query}`);
         const response = await api.buildQuery({ query: query, snapshotid: store.currentSnapshot });
@@ -393,11 +448,17 @@ function GlobalStoreContextProvider(props) {
                 folder: response.data.files,
                 snapshotid: response.data.snapshot_id
             };
-            console.log(snapshot.folder);
-            storeReducer({
-                type:GlobalStoreActionType.SHOW_SEARCH,
-                payload: snapshot
-            });
+            // Get Unique Parent ids (Used Primarily for Search when there are multiple files)
+            let allParents=[]
+            snapshot.folder.map((file) => allParents.indexOf(file.parent) === -1? allParents.push(file.parent): null)
+            const response2 = await api.getFiles({fileIds: allParents}, store.currentSnapshot);
+            if(response.status === 200) {
+                snapshot.parents = response2.data.files
+                storeReducer({
+                    type:GlobalStoreActionType.SHOW_SEARCH,
+                    payload: snapshot
+                });
+            }
         }
     };
 
@@ -409,6 +470,18 @@ function GlobalStoreContextProvider(props) {
             store.closeModal();
         }
     };
+
+    store.updateGroups = async function(name, domain, emails) {
+        let payload = {
+            name: name,
+            domain: domain,
+            emails: emails
+        }
+        const response = await api.addGroup(payload)
+        if(response.status === 200) {
+            console.log(response.data)
+        }
+    }
 
     /**!SECTION Functions for managing the view/state of the application */
     store.openQueryBuilder = async function () {

@@ -13,11 +13,10 @@ const UserSchema = new Schema(
         refreshToken: { type: String, required: false },                                        // Refresh token provided by cloud provider
         displayName: { type: String, required: true },                                          // First and last name taken from cloud provider
         email: { type: String, required: true },                                                // Email taken from cloud provider
-        threshold: { type: Number, required: true },                                            // Threshold value for deviant check
         access_control_req: { type: Object, required: false },                                  // Access control requirements assigned by the user
         searchHistory: { type: [String], required: false },                                     // History of search queries made by the user
         filesnapshot: { type: [String], required: false },
-        groupsnapshot: { type: Schema.Types.ObjectId, ref:'GroupSnapshot', required: false }
+        groupsnapshot: { type: [String], required: false }
     },
     { timeStamps: true }                                                                        // Timestamps for when document was created and last updated
 );

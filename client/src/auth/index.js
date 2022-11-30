@@ -140,9 +140,10 @@ function AuthContextProvider(props) {
     auth.doSearch = async function(query) {
         let user = auth.user;
         if (user.searchHistory) {
+            user.searchHistory = user.searchHistory.filter(item=> item !== query);
             user.searchHistory.unshift(query);
-            if(user.searchHistory.length > 5) 
-                user.searchHistory = user.searchHistory.slice(0, 5);
+            if(user.searchHistory.length > 10) 
+                user.searchHistory = user.searchHistory.slice(0, 10);
         } else {
             user.searchHistory = [query];
         } 

@@ -1,13 +1,11 @@
-// Being changed to a wrapper.
-const GoogleDriveController = require('../controller/google-drive-controller');
-const MicrosoftDriveController = require('../controller/onedrive-controller');
 // Import modules
 const moment = require('moment');
 
 // Local imports
-const AnalysisController = require('../controller/analyze-controller');
 const File = require('../models/file-model');
 const FileSnapshot = require('../models/filesnapshot-model');
+const GoogleDriveController = require('../controller/google-drive-controller');
+const MicrosoftDriveController = require('../controller/onedrive-controller');
 const User = require('../models/user-model');
 
 
@@ -15,7 +13,7 @@ const User = require('../models/user-model');
 async function createFileSnapshot(req, res) {
     try {
         // Retrieve the user's profile
-        const user = await User.findById(req.userId, { name: 1, cloudProvider: 1, filesnapshot: 1, 
+        const user = await User.findById(req.userId, { cloudProvider: 1, filesnapshot: 1, 
                 refreshToken: 1, threshold: 1, profileId: 1 });
         if (!user) {
             throw new Error('Could not find User in database.');
@@ -46,7 +44,6 @@ async function createFileSnapshot(req, res) {
             driveIds: driveIds
         });
         await FileSnapshot.create(newSnapshot);
-        console.log(`Added FileSnapshot '${newSnapshot.snapshotId}' to database.`);
         // Add the FileSnapshot as the user's most recent FileSnapshot
         if (user.filesnapshot) {
             user.filesnapshot.unshift(newSnapshot.snapshotId);
@@ -75,12 +72,12 @@ async function createFileSnapshot(req, res) {
                 readable: file.readable,
                 writable: file.writable,
                 sharable: file.sharable,
+                sharing: file.sharing,
             });
             await File.create(newFile);
             console.log(`Added File '${newFile.fileId}' to database.`);
         }));
-        // Perform sharing analysis on the newly created snapshot
-        AnalysisController.sharingAnalysis(newSnapshot.snapshotId, user.threshold);
+        console.log(`Added FileSnapshot '${newSnapshot.snapshotId}' to database.`);
         // Send the newly created FileSnapshot's id and owner to the client
         res.status(200).json({ success: true, fileSnapshot: newSnapshot });
     } catch(error) {

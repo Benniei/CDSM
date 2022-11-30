@@ -31,17 +31,20 @@ function AnalyzeMainView() {
     }
 
     function openDeviant(event) {
-        if(+deviant >= .51 && +deviant <= 1)
-            setView("Deviant")
+        if(+deviant >= 0.51 && +deviant <= 1)
+            setView("Deviant");
+            store.analyzeDeviantPermissions(snapshot, deviant);
     }
      
     function openSharingChanges(event) {
-        setView("SharingChanges")
+        setView("SharingChanges");
+        store.analyzeFileFolderDifferences(snapshot);
     }
 
     function openSharingDifferences(event) {
         if(snapshot1 !== snapshot2){
             setView("SharingDifferences")
+            store.analyzeSnapshots(snapshot1, snapshot2);
             setDiffError(false)
         }
         else

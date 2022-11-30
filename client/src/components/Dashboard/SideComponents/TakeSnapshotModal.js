@@ -14,9 +14,6 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import LinearProgress from '@mui/material/LinearProgress';
 
-
-const SnapshotType=["File Snapshot", "Group Snapshot"]
-
 const style = {
     position: 'absolute',
     top: '50%',
@@ -83,16 +80,44 @@ function FileSnapshot() {
     )
 }
 
-function GroupSnapshot() {
+function GroupSnapshot(props) {
+    const {close} = props
+    const {store} = useContext(GlobalStoreContext);
     const [groupName, setGroupName] = useState("")
     const [groupEmail, setGroupEmail] = useState("")
     const [file, setFile] = useState({})
+
+    async function parseFile() {
+        if(Object.keys(file).length === 0){
+            close();
+        }
+        const text = await file.text();
+        // Parsing File for all Emails
+        let emails = []
+        const regex = /(?<=mailto:)[^"]*/gm;
+        
+        let m;
+        while ((m = regex.exec(text)) !== null) {
+            // This is necessary to avoid infinite loops with zero-width matches
+            if (m.index === regex.lastIndex) {
+                regex.lastIndex++;
+            }
+            
+            // The result can be accessed through the `m`-variable.
+            m.forEach((match, groupIndex) => {
+                emails.push(match)
+            });
+        }
+        
+        store.updateGroups(groupName, groupEmail, emails);
+        close();
+    }
+
     return(
         <Box sx={{width: '100%'}}>
             <Stack
                 direction="row"
                 mt={1}>
-
                 <Typography 
                     display="flex"
                     variant="h6"
@@ -118,11 +143,11 @@ function GroupSnapshot() {
                     variant="h6"
                     sx={{ml: 2, width: '25%', mt: 1.7, pr:2.5}}
                     justifyContent="flex-end">
-                    <strong>Group Email:</strong>
+                    <strong>Group Domain:</strong>
                 </Typography>
                 <TextField
                     id="GroupEmail"
-                    label="Group Email"
+                    label="Group Domain"
                     value={groupEmail}
                     sx={{width: '70%',}}
                     overflow='auto'
@@ -141,8 +166,8 @@ function GroupSnapshot() {
                             sx={{color:'black'}}
                             component='label'> 
                             <strong> Upload File </strong> 
-                            <input type="file" hidden
-                                onChange={(event) => setFile(event.target.files[0])}/>
+                            <input type="file" hidden accept=".html"
+                                onChange={(event) => {setFile(event.target.files.item(0)); }}/>
                         </Typography>
                     </center>
                     
@@ -157,7 +182,7 @@ function GroupSnapshot() {
             <Box 
                 className="black-button" 
                 sx={{width:'100px', ml: '80%', mt:3}}
-                onClick={event => console.log("Confirm Group Snapshot")}>
+                onClick={parseFile}>
                 <center>
                     <Typography 
                         sx={{color:'black'}}
@@ -174,6 +199,11 @@ function GroupSnapshot() {
 function TakeSnapshotModal() {
     const {store} = useContext(GlobalStoreContext);
     const [snapshotType, setSnapshotType] = useState("File Snapshot")
+    const {auth} = useContext(AuthContext);
+
+    let SnapshotType = ["File Snapshot"]
+    if (auth.user && auth.user.cloudProvider === "google")
+        SnapshotType = ["File Snapshot", "Group Snapshot"]
 
     let flag = false;
     if(store.takeSnapshotModal)
@@ -236,7 +266,7 @@ function TakeSnapshotModal() {
                         </MenuItem>
                     ))}
                 </TextField>
-                {(snapshotType === SnapshotType[0])? <FileSnapshot/> : <GroupSnapshot/>}
+                {(snapshotType === SnapshotType[0])? <FileSnapshot/> : <GroupSnapshot close={closeModal}/>}
 
             </Box>
         </Modal>
