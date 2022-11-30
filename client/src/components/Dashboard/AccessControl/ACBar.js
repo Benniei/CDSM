@@ -39,18 +39,33 @@ function ACBar() {
 
             {/* View Information or Update Sharing */}
             <Box sx={{flexGrow:.85}}/>
-            <Box 
-                className="black-button" 
-                sx={{width:'150px'}}
-                onClick={event => store.openCreateAccessControl() }>
-                <center>
-                    <Typography 
-                        display="inline" 
-                        sx={{color:'black'}}> 
-                        <strong> Edit Access Control Policy </strong> 
-                    </Typography>
-                </center>
-            </Box>
+            {auth.user.access_control_req && auth.user.access_control_req !== ' ' ? 
+                <Box 
+                    className="black-button" 
+                    sx={{width:'150px'}}
+                    onClick={event => store.openCreateAccessControl() }>
+                    <center>
+                        <Typography 
+                            display="inline" 
+                            sx={{color:'black'}}> 
+                            <strong> Edit Access Control Policy </strong> 
+                        </Typography>
+                    </center>
+                </Box>
+                :
+                <Box 
+                    className="black-button" 
+                    sx={{width:'150px'}}
+                    onClick={event => store.openCreateAccessControl() }>
+                    <center>
+                        <Typography 
+                            display="inline" 
+                            sx={{color:'black'}}> 
+                            <strong> Create Access Control Policy </strong> 
+                        </Typography>
+                    </center>
+                </Box>
+            }
         </Toolbar>
     );
 }

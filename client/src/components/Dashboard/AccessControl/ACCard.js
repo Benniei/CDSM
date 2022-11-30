@@ -40,7 +40,7 @@ function ACCard() {
     const {store} = useContext(GlobalStoreContext);
     const {auth} = useContext(AuthContext);
     let data = {
-        query: auth.user.access_control_req.query,
+        query: auth.user.access_control_req.query ,
         grp: auth.user.access_control_req.Grp,
         allowWrite: auth.user.access_control_req.AW,
         allowRead: auth.user.access_control_req.AR,
@@ -48,6 +48,7 @@ function ACCard() {
         denyWrite: auth.user.access_control_req.DW
     }
     
+    console.log(data)
     return (
         <Box className="access-control-card" sx={{width: '87%'}} ml={3} mt={2}>
             <Typography variant="h4" ml={2} mb={1.5}>

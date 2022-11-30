@@ -91,7 +91,7 @@ function SharingDifferenceView(props) {
                         })
                     }
                 </Stack>
-                <Stack direction="column" sx={{width:'50%', ml:-5}}>
+                <Stack direction="column" sx={{width:'50%', ml: -3}}>
                         <Typography variant="h6" ml={2.1} sx={{fontSize:30}}>
                             <strong>Permission Differences</strong>
                         </Typography>

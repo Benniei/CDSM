@@ -67,6 +67,7 @@ function DeviantCard(props) {
 function DeviantView(props) {
     const {store} = useContext(GlobalStoreContext);
     const{mainView, snapshot} = props
+    console.log(store.analyze)
     return(
         <Box>
             <Stack direction="row" spacing={2}>
@@ -74,7 +75,6 @@ function DeviantView(props) {
                 <Typography variant="h3"><strong>Deviant Sharing Analysis</strong></Typography>
             </Stack>
             <Typography variant="h5" ml={3} mt={.5}><strong>Snapshot: </strong> {snapshot.substring(snapshot.indexOf('-')+1)}</Typography>
-            <DeviantCard />
             {store.analyze.map((item) => {
                 return(<DeviantCard 
                     path={item.path} 
