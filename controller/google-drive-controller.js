@@ -300,6 +300,25 @@ async function GD_getFileMap(driveAPI, driveIds) {
             // Replace the file's permission array with an object
             if (file.permissions) {
                 const permissionObjects = GD_createPermissionObject(file.permissions);
+
+                let readable = [];
+                let writable = [];
+                let sharable = [];
+                Object.values(permissionObjects.permissionsRaw).forEach(function (item) {
+                    console.log(item);
+                    switch(item.role) {
+                        case 'owner':
+                            sharable.push(item.emailAddress);
+                        case 'writer':
+                            writable.push(item.emailAddress);
+                        case 'reader':
+                        case 'commenter':
+                            readable.push(item.emailAddress);
+                    }
+                })
+                overrides['readable'] = readable;
+                overrides['writable'] = writable;
+                overrides['sharable'] = sharable;
                 overrides['permissions'] = permissionObjects.permissions;
                 overrides['permissionsRaw'] = permissionObjects.permissionsRaw;
             }
