@@ -163,7 +163,6 @@ async function GD_getFiles(driveAPI) {
         throw new Error(`Failed to retrieve file data. ${error}`);
     }
     // Return the file data retrieved from the Google Drive API
-    console.log(files);
     return files;
 }
 
@@ -300,10 +299,12 @@ async function GD_getFileMap(driveAPI, driveIds) {
             // Replace the file's permission array with an object
             if (file.permissions) {
                 const permissionObjects = GD_createPermissionObject(file.permissions);
-
-                let readable = [];
-                let writable = [];
-                let sharable = [];
+                overrides['permissions'] = permissionObjects.permissions;
+                overrides['permissionsRaw'] = permissionObjects.permissionsRaw;
+                // Lists of users who have permission to read, write, and share the file
+                const readable = [];
+                const writable = [];
+                const sharable = [];
                 // For-loop to add each user to the appropriate access array
                 for (const permission of file.permissions) {
                     switch (permission.role) {
@@ -314,14 +315,11 @@ async function GD_getFileMap(driveAPI, driveIds) {
                         case 'reader':
                         case 'commenter':
                             readable.push(permission.emailAddress);
-                        }
+                    }
                 }
-
                 overrides['readable'] = readable;
                 overrides['writable'] = writable;
                 overrides['sharable'] = sharable;
-                overrides['permissions'] = permissionObjects.permissions;
-                overrides['permissionsRaw'] = permissionObjects.permissionsRaw;
             }
             // If the file already has an entry in the map (because it's the parent folder of some file in the map), update the entry with the file's other fields (parents, permissions, etc.)
             if (map.get(file.id)) { 
