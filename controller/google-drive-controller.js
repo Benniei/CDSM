@@ -304,18 +304,19 @@ async function GD_getFileMap(driveAPI, driveIds) {
                 let readable = [];
                 let writable = [];
                 let sharable = [];
-                Object.values(permissionObjects.permissionsRaw).forEach(function (item) {
-                    console.log(item);
-                    switch(item.role) {
+                // For-loop to add each user to the appropriate access array
+                for (const permission of file.permissions) {
+                    switch (permission.role) {
                         case 'owner':
-                            sharable.push(item.emailAddress);
+                            sharable.push(permission.emailAddress);
                         case 'writer':
-                            writable.push(item.emailAddress);
+                            writable.push(permission.emailAddress);
                         case 'reader':
                         case 'commenter':
-                            readable.push(item.emailAddress);
-                    }
-                })
+                            readable.push(permission.emailAddress);
+                        }
+                }
+
                 overrides['readable'] = readable;
                 overrides['writable'] = writable;
                 overrides['sharable'] = sharable;
