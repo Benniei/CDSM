@@ -109,7 +109,7 @@ function GlobalStoreContextProvider(props) {
                     openAccess: false,
                     openAnalyze: false,
                     path: null,
-                    parents: [],
+                    parents: payload.parents,
                     otherDrive: store.otherDrive
                 });
             }
@@ -359,7 +359,7 @@ function GlobalStoreContextProvider(props) {
                 folder: response.data.folder,
                 id: snapshotId,
                 path: path,
-                parents: [{folderid: folderId, permissions: response.data.perms}]
+                parents: [{fileId: folderId, permissionsRaw: response.data.perms}]
             };
             console.log(snapshot);
             storeReducer({
@@ -414,11 +414,17 @@ function GlobalStoreContextProvider(props) {
                 folder: response.data.files,
                 snapshotid: response.data.snapshot_id
             };
-            console.log(snapshot.folder);
-            storeReducer({
-                type:GlobalStoreActionType.SHOW_SEARCH,
-                payload: snapshot
-            });
+            // Get Unique Parent ids (Used Primarily for Search when there are multiple files)
+            let allParents=[]
+            snapshot.folder.map((file) => allParents.indexOf(file.parent) === -1? allParents.push(file.parent): null)
+            const response2 = await api.getFiles({fileIds: allParents}, store.currentSnapshot);
+            if(response.status === 200) {
+                snapshot.parents = response2.data.files
+                storeReducer({
+                    type:GlobalStoreActionType.SHOW_SEARCH,
+                    payload: snapshot
+                });
+            }
         }
     };
 
