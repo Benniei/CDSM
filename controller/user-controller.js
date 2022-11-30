@@ -28,7 +28,7 @@ buildQuery = async function(req, res) {
 
 // do query
 doQuery = async function (req, res) {
-    function objectify(op) {
+    function objectify(op, email) {
         let op_statement = op;
         let toInvert = false;;
         if (op_statement.charAt(0) === '-') {
@@ -56,7 +56,16 @@ doQuery = async function (req, res) {
             regexValue = { $regex: '^\/'+value };
             query['path'] = toInvert ? { $ne: regexValue } : regexValue;
         } else {
-            query[field] = toInvert ? { $ne: value } : value;
+            if (value === 'me') {
+                first = {}
+                second = {}
+                first[field] = toInvert ? { $ne: value } : value
+                second[field] = toInvert ? { $ne: email } : email
+            
+                query["$or"] = [ first, second ]
+            } else {
+                query[field] = toInvert ? { $ne: value } : value;
+            }
         }
         return query;
     }
@@ -112,7 +121,7 @@ doQuery = async function (req, res) {
                     opStack.push(next)
                     break;
                 default:
-                    valueStack.push(objectify(next))
+                    valueStack.push(objectify(next, email))
                     break;
             }
         }

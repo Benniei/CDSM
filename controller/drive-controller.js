@@ -13,7 +13,8 @@ const User = require('../models/user-model');
 async function createFileSnapshot(req, res) {
     try {
         // Retrieve the user's profile
-        const user = await User.findById(req.userId, { cloudProvider: 1, filesnapshot: 1, refreshToken: 1 });
+        const user = await User.findById(req.userId, { cloudProvider: 1, filesnapshot: 1, 
+                refreshToken: 1, threshold: 1, profileId: 1 });
         if (!user) {
             throw new Error('Could not find User in database.');
         }
@@ -29,7 +30,9 @@ async function createFileSnapshot(req, res) {
                 fileMap = await GoogleDriveController.GD_getFileMap(driveAPI, driveIds);
                 break;
             case 'microsoft':
-                MicrosoftDriveController.createFileSnapshot(req, res);
+                const accessToken = await MicrosoftDriveController.OD_accessToken(user.refreshToken);
+                driveIds = await MicrosoftDriveController.OD_getDrives(accessToken);
+                fileMap = await MicrosoftDriveController.OD_getFileMap(accessToken, driveIds, user.profileId);
                 break;
             default:
                 throw new Error('Could not find listed cloud provider.');
