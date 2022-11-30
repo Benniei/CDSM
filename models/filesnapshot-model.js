@@ -10,6 +10,7 @@ const FileSnapshotSchema = new Schema(
         driveIds: { type: Object, required: false },                                    // File Ids of each drive's root folder
         metadata: {type: [String], required: false, default: () => { return null; } }   // Any additional metadata
     },
+    {timestamps:true}
 );
 
 module.exports = mongoose.model('FileSnapshot', FileSnapshotSchema);

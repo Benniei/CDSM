@@ -17,6 +17,10 @@ import ArticleIcon from '@mui/icons-material/Article';
 import FolderIcon from '@mui/icons-material/Folder';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+import Popper from '@mui/material/Popper';
+import Fade from '@mui/material/Fade';
+import Paper from '@mui/material/Paper';
+import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 function createData(name, type, owner, lastModified, id, index, inheritedperms, directperms) {
     return {
@@ -112,22 +116,75 @@ function FileTableHead(props) {
 }
 
 function PermissionsTab (props){
+    const {store} = useContext(GlobalStoreContext);
     const {permissions} = props
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [open, setOpen] = useState(false)
+    const [placement, setPlacement] = useState()
+    const [group, setGroup] = useState([])
+
+    const handleClick = (newPlacement) => (event) => {
+        setAnchorEl(event.currentTarget);
+        setOpen((prev) => placement !== newPlacement || !prev);
+        setPlacement(newPlacement);
+        setGroup(store.groups[newPlacement])
+      };
+
     return (
-        <Stack
-            direction="row"
-            sx={{maxWidth:600, overflowX: 'auto'}}>
-                {permissions.map((item) => (
-                    <Box 
-                        key={item.id}
-                        className="grey-button"
-                        ml={.25}
-                        mr={.25}
-                    >
-                        <Typography sx={{ml:.2}} variant="h7">{item.emailAddress || item.domain}</Typography>
-                    </Box>
-                ))}
-        </Stack>
+        <Box>
+            <Popper open={open} anchorEl={anchorEl} placement={'left'} transition
+                sx={{overflowY: "auto", maxHeight: 600, boxShadow: 1}}>
+                {({ TransitionProps }) => (
+                <Fade {...TransitionProps} timeout={350}
+                onClose={handleClick}>
+                    <Paper>
+                        {
+                            group.map((item) => {
+                                return(
+                                    <Typography ml={1} key={"filetable" + item} sx={{fontsize: 20}} mt={.2}>
+                                        {item}
+                                    </Typography> 
+                                )
+                            })
+                        }
+                    </Paper>
+                </Fade>
+                )}
+            </Popper>
+            <Stack
+                direction="row"
+                sx={{maxWidth:600, overflowX: 'auto'}}>
+                    {permissions.map((item) => {
+                        let result;
+                        if(store.groups[item.emailAddress || item.domain]){
+                            result = <Box 
+                                key={item.id}
+                                className="grey-button"
+                                ml={.25}
+                                mr={.25}
+                                onClick={handleClick(item.emailAddress || item.domain)}
+                            >
+                                <Typography sx={{ml:.2, color:'#39acac'}} variant="h7">{item.emailAddress || item.domain}</Typography>
+                            </Box>
+                        }
+
+                        else{
+                            result = <Box 
+                            key={item.id}
+                            className="grey-button"
+                            ml={.25}
+                            mr={.25}
+                        >
+                            <Typography sx={{ml:.2}} variant="h7">{item.emailAddress || item.domain}</Typography>
+                        </Box>
+                        }
+                        return(
+                            result
+                        )
+                        })}
+            </Stack>
+            
+        </Box>
     );
 }
 

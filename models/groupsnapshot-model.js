@@ -9,7 +9,7 @@ const GroupSnapshotSchema = new Schema(
         emails: { type: [String], required: true},            // list of emails in the group 
         domain: { type: String, required: true}            // domain of the group
     },
-    { timeStamps: true }                                        // Timestamps for when screenshot was created and last updated
+    { timestamps: true }                                        // Timestamps for when screenshot was created and last updated
 );
 
 module.exports = mongoose.model('GroupSnapshot', GroupSnapshotSchema);
