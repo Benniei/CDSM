@@ -1,13 +1,11 @@
-// Being changed to a wrapper.
-const GoogleDriveController = require('../controller/google-drive-controller');
-const MicrosoftDriveController = require('../controller/onedrive-controller');
 // Import modules
 const moment = require('moment');
 
 // Local imports
-const AnalysisController = require('../controller/analyze-controller');
 const File = require('../models/file-model');
 const FileSnapshot = require('../models/filesnapshot-model');
+const GoogleDriveController = require('../controller/google-drive-controller');
+const MicrosoftDriveController = require('../controller/onedrive-controller');
 const User = require('../models/user-model');
 
 
@@ -27,7 +25,6 @@ async function createFileSnapshot(req, res) {
             case 'google':
                 // Initialize instance of the Google Drive API service
                 const driveAPI = await GoogleDriveController.GD_initializeAPI(user.refreshToken);
-                console.log(driveAPI);
                 driveIds = await GoogleDriveController.GD_getDrives(driveAPI);
                 fileMap = await GoogleDriveController.GD_getFileMap(driveAPI, driveIds);
                 break;
@@ -44,7 +41,6 @@ async function createFileSnapshot(req, res) {
             driveIds: driveIds
         });
         await FileSnapshot.create(newSnapshot);
-        console.log(`Added FileSnapshot '${newSnapshot.snapshotId}' to database.`);
         // Add the FileSnapshot as the user's most recent FileSnapshot
         if (user.filesnapshot) {
             user.filesnapshot.unshift(newSnapshot.snapshotId);
@@ -77,8 +73,7 @@ async function createFileSnapshot(req, res) {
             await File.create(newFile);
             console.log(`Added File '${newFile.fileId}' to database.`);
         }));
-        // Perform sharing analysis on the newly created snapshot
-        AnalysisController.sharingAnalysis(newSnapshot.snapshotId, user.threshold);
+        console.log(`Added FileSnapshot '${newSnapshot.snapshotId}' to database.`);
         // Send the newly created FileSnapshot's id and owner to the client
         res.status(200).json({ success: true, fileSnapshot: newSnapshot });
     } catch(error) {
