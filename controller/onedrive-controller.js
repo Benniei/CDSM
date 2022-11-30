@@ -48,7 +48,6 @@ const axios = require('axios');
 OD_getDrives = async function(accessToken) {
     // Object to store fileIds of all drives' root folder
     let driveIds = {};
-    let drives = [{ id: 'SharedWithMe',  name: 'SharedWithMe' }];
     // Retrieve root folder of user's 'My Drive' collection
     // Retrieve access token from Microsoft using refresh token
     const options = {
@@ -57,13 +56,19 @@ OD_getDrives = async function(accessToken) {
             authorization: `Bearer ${accessToken}`
         }
     };
-    const endpoint = "https://graph.microsoft.com/v1.0/me/drives";
+    endpoint = "https://graph.microsoft.com/v1.0/me/drives";
 
     try {
-        const response = await axios.get(endpoint, options);
-        drives = [...drives, ...response.data.value]
+        response = await axios.get(endpoint, options);
+        drives = response.data.value
+        driveIds['SharedWithMe'] = 'SharedWithMe';
         for (const drive of drives) {
-            driveIds[drive.id] = drive.name;
+            endpoint = `https://graph.microsoft.com/v1.0/me/drives/${drive.id}/root`;
+            response = await axios.get(endpoint, options);
+            driveIds[response.data.id] = drive.name;
+            if (drive.name === 'OneDrive') {
+                driveIds[response.data.id] = 'MyDrive';
+            }
         }
     } catch (error) {
         console.log(`Error in OD_getDrives:\n ${error}`);
@@ -135,7 +140,7 @@ OD_getFiles = async function(accessToken) {
                             file.permissions = [...file.permissions, ...response.data.value];
                         }
                         // Update next page token
-                        pageToken = response.data.nextPageToken;
+                        pageToken = response.data["@odata.nextLink"];
                     } while (pageToken);
                     console.log(`Retrieved permission data of ${file.permissions.length} permissions for file '${file.id}'.`);
                 } catch(error) {
@@ -167,23 +172,35 @@ OD_getFiles = async function(accessToken) {
  * @returns {Object} permissions - Objects containing all of the file's permissions as strings and objects
  */
 OD_createPermissionObject = function(permissionList) {
-    console.log(permissionList);
     // Object to store the permissions of a file
     const permissions = {};
     const permissionsRaw = {};
     // Insert the permissions into permission object as '(type, emailAddress/domain, role)' values
     for (const permission of permissionList) {
-        if (permission.grantedTo) {
-            let type = permission.grantedTo.user ? 'user' : 'group';
-            let id = type === 'user' ? permission.grantedTo.user.id : permission.grantedTo.group.id;
-            permissions[permission.id] = `(${type}, ${id}, ${permission.roles})`;
+        let email = '';
+        let type;
+        let domain = '';
+        let role = permission.roles[0];
+        let displayName;
+        if (permission.grantedTo || permission.grantedToIdentities) {
+            email = permission.grantedTo ? permission.grantedTo.user.email : 
+                    permission.grantedToIdentities ? permission.grantedToIdentities[0].user.email : '';
+            type = 'user';
+            displayName = email;
+            permissions[permission.id] = `(user, ${email}, ${permission.roles})`;
         } else if (permission.link) {
+            domain = permission.link.webUrl;
+            type = "domain";
+            displayName = domain;
             permissions[permission.id] = `(domain, ${permission.link.webUrl}, ${permission.roles})`;
         } else {
+            type = "anyone";
+            displayName = '';
             permissions[permission.id] = `(anyone, ${permission.roles})`;
         }
         // Remove unnecessary data from Google Drive API permission objects
-        permissionsRaw[permission.id] = { id: permission.id, type: permission.type, emailAddress: permission.emailAddress, domain: permission.domain, role: permission.role, displayName: permission.displayName };
+        permissionsRaw[permission.id] = { id: permission.id, type: type, emailAddress: email, 
+            domain: domain, role: role, displayName: displayName };
     }
     return { permissions: permissions, permissionsRaw: permissionsRaw };
 };
@@ -248,6 +265,7 @@ OD_getPath = function(file, map) {
         const map = new Map();
         // Insert the files into the map
         for (const file of files) {
+            console.log(file);
             // Object containing file field overrides
             let overrides = {};
             // If the file has a parent folder, list it as a child of the parent folder
@@ -284,7 +302,7 @@ OD_getPath = function(file, map) {
             // Update the file's 'driveId' field if the file is part of the user's 'My Drive' or 'Shared with me' file collections
             if (!file.driveId && !file.root) {
                 // File is part of the 'My Drive' file collection
-                if (file.owner && file.createdBy.user.id == profileId) {
+                if (file.owner && file.owner.user.id == profileId) {
                     // Find driveId for 'My Drive' file collection
                     overrides['driveId'] = Object.keys(driveIds).find(key => driveIds[key] === 'OneDrive');
                 } else if (file.createdBy && file.createdBy.user.id == profileId) {
@@ -343,6 +361,11 @@ OD_getPath = function(file, map) {
         }
         // Update each entry in the map with the file's path
         for (const file of files) {
+            if (file.parentReference) {
+                file.parent = file.parentReference.id;
+                file.driveId = file.parentReference.driveId;
+                file.parentReference = null;
+            }
             OD_getPath(map.get(file.id), map);
         }
         // Return the map of the user's files

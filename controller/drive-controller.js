@@ -127,7 +127,7 @@ async function getFolder(req, res) {
         // Retrieve the folder being requested
         const folder = await File.find({ snapshotId: snapshotId, fileId: folderId });
         // Retrieve file content of the requested folder
-        const fileList = await File.find({ snapshotId: snapshotId, parent: folderId });
+        let fileList = await File.find({ snapshotId: snapshotId, parent: folderId});
         // Return the files retrieved as well as the parent folder's file permissions
         let folders = { success: true, folder: fileList, perms: folder[0].permissionsRaw }
         res.status(200).json(folders);
