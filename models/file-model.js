@@ -26,7 +26,7 @@ const FileSchema = new Schema(
         sharable: {type: [String], required: false},                                                    // list of email addresses with sharable permission
         from: {type: [String], required: false},                                                        // list of email addresses that have shared this file
         to: {type: [String], required: false},                                                          // list of email addresses that were the target of sharing (shared to these people)
-        sharingType: {type: String, required: true, default: () => { return null; } },                  // type of grantee of sharing (user, group, domain, anyone)
+        sharingType: {type: String, required: false, default: () => { return null; } },                  // type of grantee of sharing (user, group, domain, anyone)
         sharingEmail: {type: [String], required: false},                                                // if type is user, list of users that this file has been shared to
         sharingDomain: {type: String, required: false}                                                  // if type is domain, name of domain
     }, { minimize: false }                                                                              // Allow empty objects to be valid field values

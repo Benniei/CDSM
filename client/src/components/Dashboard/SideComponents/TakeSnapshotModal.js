@@ -14,9 +14,6 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import LinearProgress from '@mui/material/LinearProgress';
 
-
-const SnapshotType=["File Snapshot", "Group Snapshot"]
-
 const style = {
     position: 'absolute',
     top: '50%',
@@ -174,6 +171,11 @@ function GroupSnapshot() {
 function TakeSnapshotModal() {
     const {store} = useContext(GlobalStoreContext);
     const [snapshotType, setSnapshotType] = useState("File Snapshot")
+    const {auth} = useContext(AuthContext);
+
+    let SnapshotType = ["File Snapshot"]
+    if (auth.user && auth.user.cloudProvider === "google")
+        SnapshotType = ["File Snapshot", "Group Snapshot"]
 
     let flag = false;
     if(store.takeSnapshotModal)

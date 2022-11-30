@@ -13,6 +13,7 @@ export const GlobalStoreActionType = {
     SHOW_SEARCH: "SHOW_SEARCH",
     OPEN_QUERY_BUILDER: "OPEN_QUERY_BUILDER",
     OPEN_TAKE_SNAPSHOT_MODAL: "OPEN_TAKE_SNAPSHOT_MODAL",
+    CLOSE_TAKE_SNAPSHOT_MODAL: "CLOSE_TAKE_SNAPSHOT_MODAL",
     OPEN_UPDATE_SHARING: "OPEN_UPDATE_SHARING",
     OPEN_AC_MODAL: "OPEN_AC_MODAL",
     CLOSE_MODAL: "CLOSE_MODAL",
@@ -146,6 +147,23 @@ function GlobalStoreContextProvider(props) {
                     otherDrive: store.otherDrive
                 });
             }
+            case GlobalStoreActionType.CLOSE_TAKE_SNAPSHOT_MODAL: {
+                return setStore({
+                    allItems: store.allItems,
+                    currentSnapshot: store.currentSnapshot,
+                    queryBuilder: false,
+                    takeSnapshotModal: false,
+                    updateSharingModal: false,
+                    accessModal: false,
+                    search: false,
+                    openDrive: store.openDrive,
+                    openAccess: store.openAccess,
+                    openAnalyze: store.openAnalyze,
+                    path: store.path,
+                    parents: store.parents,
+                    otherDrive: store.otherDrive
+                });
+            }
             case GlobalStoreActionType.OPEN_UPDATE_SHARING: {
                 return setStore({
                     allItems: store.allItems,
@@ -266,6 +284,9 @@ function GlobalStoreContextProvider(props) {
             let driveIds = snapshot.driveIds;
             let driveID = Object.keys(driveIds).find((key) => driveIds[key] === "MyDrive");
             auth.takeSnapshot(snapshot.snapshotId);
+            storeReducer({
+                type:GlobalStoreActionType.CLOSE_TAKE_SNAPSHOT_MODAL
+            });
             store.getDrive(snapshot.snapshotId, driveID, "My Drive");
 
         }
