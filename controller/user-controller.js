@@ -26,115 +26,117 @@ buildQuery = async function(req, res) {
     }
 };
 
-// do query
-doQuery = async function (req, res) {
-    function objectify(op, email) {
-        let op_statement = op;
-        let toInvert = false;;
-        if (op_statement.charAt(0) === '-') {
-            toInvert = true;
-            op_statement = op_statement.substring(1);
-        }
-        
-        field = op_statement.substring(0, op_statement.indexOf(':'));
-        value = op_statement.substring(op_statement.indexOf(':')+1);
-        if (value.charAt(0) === '"' && value.charAt(value.length-1) === '"') {
-            value = value.slice(1, -1);
-        }
-        query = {};
+// Helper Query Functions
+function objectify(op, email) {
+    let op_statement = op;
+    let toInvert = false;;
+    if (op_statement.charAt(0) === '-') {
+        toInvert = true;
+        op_statement = op_statement.substring(1);
+    }
     
-        if (field === 'name') {
-            regexValue = { $regex: value };
-            query['name'] = toInvert ? { $ne: regexValue } : regexValue;
-        } else if (field === 'inFolder') {
-            regexValue = { $regex: '\/'+value+'\/$' };
-            query['path'] = toInvert ? { $ne: regexValue } : regexValue;
-        } else if (field === 'folder') {
-            regexValue = { $regex: '\/'+value };
-            query['path'] = toInvert ? { $ne: regexValue } : regexValue;
-        } else if (field === 'drive') {
-            regexValue = { $regex: '^\/'+value };
-            query['path'] = toInvert ? { $ne: regexValue } : regexValue;
+    field = op_statement.substring(0, op_statement.indexOf(':'));
+    value = op_statement.substring(op_statement.indexOf(':')+1);
+    if (value.charAt(0) === '"' && value.charAt(value.length-1) === '"') {
+        value = value.slice(1, -1);
+    }
+    query = {};
+
+    if (field === 'name') {
+        regexValue = { $regex: value };
+        query['name'] = toInvert ? { $ne: regexValue } : regexValue;
+    } else if (field === 'inFolder') {
+        regexValue = { $regex: '\/'+value+'\/$' };
+        query['path'] = toInvert ? { $ne: regexValue } : regexValue;
+    } else if (field === 'folder') {
+        regexValue = { $regex: '\/'+value };
+        query['path'] = toInvert ? { $ne: regexValue } : regexValue;
+    } else if (field === 'drive') {
+        regexValue = { $regex: '^\/'+value };
+        query['path'] = toInvert ? { $ne: regexValue } : regexValue;
+    } else {
+        if (value === 'me') {
+            first = {}
+            second = {}
+            first[field] = toInvert ? { $ne: value } : value
+            second[field] = toInvert ? { $ne: email } : email
+        
+            query["$or"] = [ first, second ]
         } else {
-            if (value === 'me') {
-                first = {}
-                second = {}
-                first[field] = toInvert ? { $ne: value } : value
-                second[field] = toInvert ? { $ne: email } : email
-            
-                query["$or"] = [ first, second ]
-            } else {
-                query[field] = toInvert ? { $ne: value } : value;
-            }
+            query[field] = toInvert ? { $ne: value } : value;
         }
-        return query;
+    }
+    return query;
+}
+
+function combine(bool, b, a) {
+    combined = {};
+    ab = [a, b];
+    combined["$"+bool] = ab;
+    return combined;
+}
+
+function parseQuery(query, email) {
+    /*
+    Regex explanation:
+    ( and | or |\(|\))  : match " and " or " or " or "(" or ")"
+     (?=                : lookahead, match if its followed by
+      (?:               : these
+       [^"]*"           : any number of not ", and then "
+       [^"]*"           : same, make sure there two "
+      )*                : any even amount of "
+      [^"]*             : and then only non quotes
+      $                 : until the end
+     )                  : end of lookahead
+    */
+    regex = /( and | or |\(|\))(?=(?:[^"]*"[^"]*")*[^"]*$)/
+    parseable = query.split(regex);
+    parseable = parseable.filter(x => x.length>0);
+    parseable = parseable.map(x => x.trim());
+    
+    opStack = [];
+    valueStack = [];
+
+    while (parseable.length) {
+        next = parseable.shift();
+        //console.log('Next: '+next)
+        //console.log(opStack)
+        //console.log(valueStack)
+        switch(next) {
+            case '(':
+                opStack.push(next)
+                break;
+            case ')':
+                while (opStack.length && opStack.slice(-1)[0]  !== '(') {
+                    valueStack.push(combine(opStack.pop(), valueStack.pop(), valueStack.pop()))
+                }
+                opStack.pop()
+                break;
+            case 'and':
+            case 'or':
+                while (opStack.length && opStack.slice(-1)[0]  !== '(') {
+                    valueStack.push(combine(opStack.pop(), valueStack.pop(), valueStack.pop()))
+                }
+                opStack.push(next)
+                break;
+            default:
+                valueStack.push(objectify(next, email))
+                break;
+        }
+    }
+    while (opStack.length) {
+        valueStack.push(combine(opStack.pop(), valueStack.pop(), valueStack.pop()))
+    }
+    query = valueStack.pop()
+    if (query && Object.keys(query)[0] == '') {
+        query['name'] = { '$regex': query[''] }
     }
     
-    function combine(bool, b, a) {
-        combined = {};
-        ab = [a, b];
-        combined["$"+bool] = ab;
-        return combined;
-    }
-    
-    function parseQuery(query, email) {
-        /*
-        Regex explanation:
-        ( and | or |\(|\))  : match " and " or " or " or "(" or ")"
-         (?=                : lookahead, match if its followed by
-          (?:               : these
-           [^"]*"           : any number of not ", and then "
-           [^"]*"           : same, make sure there two "
-          )*                : any even amount of "
-          [^"]*             : and then only non quotes
-          $                 : until the end
-         )                  : end of lookahead
-        */
-        regex = /( and | or |\(|\))(?=(?:[^"]*"[^"]*")*[^"]*$)/
-        parseable = query.split(regex);
-        parseable = parseable.filter(x => x.length>0);
-        parseable = parseable.map(x => x.trim());
-        
-        opStack = [];
-        valueStack = [];
-    
-        while (parseable.length) {
-            next = parseable.shift();
-            //console.log('Next: '+next)
-            //console.log(opStack)
-            //console.log(valueStack)
-            switch(next) {
-                case '(':
-                    opStack.push(next)
-                    break;
-                case ')':
-                    while (opStack.length && opStack.slice(-1)[0]  !== '(') {
-                        valueStack.push(combine(opStack.pop(), valueStack.pop(), valueStack.pop()))
-                    }
-                    opStack.pop()
-                    break;
-                case 'and':
-                case 'or':
-                    while (opStack.length && opStack.slice(-1)[0]  !== '(') {
-                        valueStack.push(combine(opStack.pop(), valueStack.pop(), valueStack.pop()))
-                    }
-                    opStack.push(next)
-                    break;
-                default:
-                    valueStack.push(objectify(next, email))
-                    break;
-            }
-        }
-        while (opStack.length) {
-            valueStack.push(combine(opStack.pop(), valueStack.pop(), valueStack.pop()))
-        }
-        query = valueStack.pop()
-        if (Object.keys(query)[0] == '') {
-            query['name'] = { '$regex': query[''] }
-        }
-        return query
-    }
-    
+    return query
+}
+
+// do query
+doQuery = async function (req, res) {   
     // const {query, snapshot_id} = req.params;
     let {query, snapshotid} = req.body;
     console.log(req.body)
@@ -145,7 +147,10 @@ doQuery = async function (req, res) {
         let email = user.email
 
         builtQuery = parseQuery(query, email)
-        builtQuery['snapshotId'] = snapshot_id
+        if (builtQuery)
+            builtQuery['snapshotId'] = snapshot_id;
+        else 
+            builtQuery = { snapshotId: snapshot_id };
         console.log('Input Query, Output Query')
         console.log(query, builtQuery);
         files = await File.find( builtQuery );
@@ -158,13 +163,95 @@ doQuery = async function (req, res) {
 }
 
 // User Functions
-updateACR = async (req, res) => {
+checkACR = async (req, res) => {
     try {
-        const acr = await User.findOneAndUpdate({ _id: req.userId }, { $set:{ access_control_req: req.body }}, { fields: 'access_control_req', returnDocument: 'after' });
-        if (!acr) {
+        let {acr, snapshot_id} = req.body;
+        const user = await User.findOneAndUpdate({ _id: req.userId }, { $set:{ access_control_req: acr }},
+            { fields: 'email access_control_req', returnDocument: 'after' });
+        if (!user) {
             throw new Error('Could not find User in database.');
         }
-        res.status(200).json({ success: true, acr: acr.access_control_req });
+        let email = user.email;
+        const {query, AW, AR, DW, DR, Grp } = acr;
+
+        // Perform search query
+        builtQuery = parseQuery(query, email);
+        if (builtQuery)
+            builtQuery['snapshotId'] = snapshot_id;
+        else 
+            builtQuery = { snapshotId: snapshot_id };
+        console.log(builtQuery);
+        files = await File.find( builtQuery );
+
+        // Check each permission for each file 
+        let violations = []
+        for(const file of files) {
+            let violation = {}
+            let violated_AW;
+            let violated_AR;
+            let violated_DW;
+            let violated_DR;
+            if(Grp) {
+                violated_AW = [...file.writable.filter(u => {
+                    if(u.includes('@')) {
+                        return !AW.includes(u);
+                    } else { 
+                        return AW.filter((v) => !v.includes(u)).length > 0;
+                    }}),
+                    ...file.readable.filter(u => {
+                        if(u.includes('@')) {
+                            return !AW.includes(u);
+                        } else { 
+                            return AW.filter((v) => !v.includes(u)).length > 0;
+                }})];
+                violated_AR = file.readable.filter(u => {
+                    if(u.includes('@')) {
+                        return !AR.includes(u);
+                    } else { 
+                        return AR.filter((v) => !v.includes(u)).length > 0;
+                }});
+                violated_DW = [...DW.filter(u => {
+                    if(u.includes('@')) {
+                        return file.writable.includes(u);
+                    } else { 
+                        return file.writable.find((v) => v.includes(u)).length > 0;
+                }}),
+                    ...DW.filter(u => {
+                        if(u.includes('@')) {
+                            return file.readable.includes(u);
+                        } else { 
+                            return file.readable.find((v) => v.includes(u)).length > 0;
+                }})];
+                violated_DR = DR.filter(u => {
+                    if(u.includes('@')) {
+                        return file.readable.includes(u);
+                    } else { 
+                        return file.readable.find((v) => v.includes(u)).length > 0;
+                }});
+            } else { // Everything is treated as an email.
+                
+                violated_AW = [...file.writable.filter(u => !AW.includes(u)),
+                    ...file.readable.filter(u => !AW.includes(u))];
+                violated_AR = file.readable.filter(u => !AR.includes(u));
+                violated_DW = [...DW.filter(u => file.writable.includes(u)),
+                    ...DW.filter(u => file.readable.includes(u))];
+                violated_DR = DR.filter(u => file.readable.includes(u));
+            }
+            if (violated_AW.length > 0)
+                violation["AW"] = violated_AW;
+            if (violated_AR.length > 0)
+                violation["AR"] = violated_AR;
+            if (violated_DW.length > 0)
+                violation["DW"] = violated_DW;
+            if (violated_DR.length > 0)
+                violation["DR"] = violated_DR;
+            if(Object.keys(violation).length > 0) {
+                violation["path"] = file.path;
+                violations.push(violation);
+            }
+                
+        }
+        res.status(200).json({ success: true, acr: acr, violations: violations });
     } catch(error) {
         console.error('Failed to update ACR: ' + error);
         res.status(400).json({ success: false, error: error });   
@@ -214,7 +301,7 @@ listSnapshots = async (req, res) => {
 }
 
 module.exports = {
-    updateACR,
+    checkACR,
     listSnapshots,
     buildQuery,
     doQuery,

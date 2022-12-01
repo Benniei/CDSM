@@ -9,7 +9,7 @@ const UserController = require('../controller/user-controller');
 const router = express.Router();
 
 // User Routes
-router.post('/acr', auth.verify, UserController.updateACR);
+router.post('/checkACR', auth.verify, UserController.checkACR);
 router.post('/addGroup', auth.verify, UserController.addGroup);
 router.post('/buildQuery', auth.verify, UserController.buildQuery);
 router.post('/doQuery', auth.verify, UserController.doQuery);
