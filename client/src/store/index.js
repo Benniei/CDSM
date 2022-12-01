@@ -229,6 +229,26 @@ function GlobalStoreContextProvider(props) {
                     sharingResult: []
                 });
             }
+            case GlobalStoreActionType.UPDATE_SHARING: {
+                return setStore({
+                    allItems: store.allItems,
+                    currentSnapshot: store.currentSnapshot,
+                    queryBuilder: false,
+                    takeSnapshotModal: false,
+                    updateSharingModal: true,
+                    accessModal: false,
+                    search: false,
+                    openDrive: store.openDrive,
+                    openAccess: store.openAccess,
+                    openAnalyze: store.openAnalyze,
+                    path: store.path,
+                    parents: store.parents,
+                    otherDrive: store.otherDrive,
+                    groups: store.groups,
+                    analyze: [],
+                    sharingResult: payload
+                });
+            }
             case GlobalStoreActionType.OPEN_AC_SEARCH: {
                 return setStore({
                     allItems: store.allItems,
@@ -528,15 +548,25 @@ function GlobalStoreContextProvider(props) {
         }
     };
 
-    store.updateGroups = async function(name, domain, emails) {
+    store.updateGroups = async function(domain, emails) {
         let payload = {
-            name: name,
             domain: domain,
             emails: emails
         }
         const response = await api.addGroup(payload)
         if(response.status === 200) {
             console.log(response.data)
+        }
+    }
+
+    store.updateSharing = async function(payload){
+        const response = await api.updateSharing(payload);
+        if(response.status === 200) {
+            console.log(response.data)
+            // storeReducer({
+            //     type: GlobalStoreActionType.UPDATE_SHARING,
+            //     payload: response.data.confirm // in the for of [success], [fail]
+            // });
         }
     }
 

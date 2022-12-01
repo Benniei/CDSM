@@ -83,7 +83,6 @@ function FileSnapshot() {
 function GroupSnapshot(props) {
     const {close} = props
     const {store} = useContext(GlobalStoreContext);
-    const [groupName, setGroupName] = useState("")
     const [groupEmail, setGroupEmail] = useState("")
     const [file, setFile] = useState({})
 
@@ -109,7 +108,7 @@ function GroupSnapshot(props) {
             });
         }
         
-        store.updateGroups(groupName, groupEmail, emails);
+        store.updateGroups(groupEmail, emails);
         close();
     }
 

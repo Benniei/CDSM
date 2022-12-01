@@ -1,6 +1,7 @@
 // Local imports
 const File = require('../models/file-model');
 const User = require('../models/user-model');
+const FileSnapshot = require('../models/filesnapshot-model')
 const GroupSnapshot = require('../models/groupsnapshot-model')
 
 buildQuery = async function(req, res) {
@@ -173,7 +174,7 @@ checkACR = async (req, res) => {
     try {
         let {acr, snapshot_id} = req.body;
         const user = await User.findOneAndUpdate({ _id: req.userId }, { $set:{ access_control_req: acr }},
-            { fields: 'email access_control_req', returnDocument: 'after' });
+            { fields: 'email access_control_req groupsnapshot', returnDocument: 'after' });
         if (!user) {
             throw new Error('Could not find User in database.');
         }
@@ -186,8 +187,31 @@ checkACR = async (req, res) => {
             builtQuery['snapshotId'] = snapshot_id;
         else 
             builtQuery = { snapshotId: snapshot_id };
-        console.log(builtQuery);
         files = await File.find( builtQuery );
+
+        const snapshot = await FileSnapshot.findOne({ snapshotId: snapshot_id });
+        if (!snapshot) {
+            throw new Error('Unable to find FileSnapshot in database.');
+        }
+
+        const groups = user.groupsnapshot ? user.groupsnapshot : [];
+        let validGroup = {}
+        var snapshotTime = snapshot.createdAt
+        if (Grp) {
+            for (let value of groups) {
+                const group = await GroupSnapshot.aggregate([
+                    // Match the User's ID and the name of the group
+                    {$match: {domain: value, user: req.userId}},
+                    // Project a diff field that's the absolute difference along with the original doc.
+                    {$project: {diff: {$abs: {$subtract: [snapshotTime, '$createdAt']}}, doc: '$$ROOT'}},
+                    // Order the docs by diff
+                    {$sort: {diff: 1}},
+                    // Take the first one
+                    {$limit: 1}
+                ])
+                validGroup[value] = group[0].doc.emails
+            }
+        }
 
         // Check each permission for each file 
         let violations = []
@@ -199,40 +223,49 @@ checkACR = async (req, res) => {
             let violated_DR;
             if(Grp) {
                 violated_AW = [...file.writable.filter(u => {
-                    if(u.includes('@')) {
-                        return !AW.includes(u);
+                    if(Object.keys(validGroup).includes(u)) {
+                        return AW.filter((v) => v.includes(u)).length > 0;
                     } else { 
-                        return AW.filter((v) => !v.includes(u)).length > 0;
+                        return !AW.includes(u);
                     }}),
                     ...file.readable.filter(u => {
-                        if(u.includes('@')) {
-                            return !AW.includes(u);
+                        if(Object.keys(validGroup).includes(u)) {
+                            return AW.filter((v) => v.includes(u)).length > 0;
                         } else { 
-                            return AW.filter((v) => !v.includes(u)).length > 0;
+                            return !AW.includes(u);
                 }})];
                 violated_AR = file.readable.filter(u => {
-                    if(u.includes('@')) {
-                        return !AR.includes(u);
-                    } else { 
+                    if(Object.keys(validGroup).includes(u)) {
                         return AR.filter((v) => !v.includes(u)).length > 0;
+                    } else { 
+                        return !AR.includes(u);
                 }});
                 violated_DW = [...DW.filter(u => {
-                    if(u.includes('@')) {
-                        return file.writable.includes(u);
+                    if(Object.keys(validGroup).includes(u)) {
+                        return file.writable.filter((v) => {
+                            if(v) v.includes(u);
+                            else false;
+                        }).length > 0;
                     } else { 
-                        return file.writable.find((v) => v.includes(u)).length > 0;
+                        return file.writable.includes(u);
                 }}),
                     ...DW.filter(u => {
-                        if(u.includes('@')) {
-                            return file.readable.includes(u);
+                        if(Object.keys(validGroup).includes(u)) {
+                            return file.readable.filter((v) => {
+                                if(v) v.includes(u);
+                                else false;
+                            }).length > 0;
                         } else { 
-                            return file.readable.find((v) => v.includes(u)).length > 0;
+                            return file.readable.includes(u);
                 }})];
                 violated_DR = DR.filter(u => {
-                    if(u.includes('@')) {
-                        return file.readable.includes(u);
+                    if(Object.keys(validGroup).includes(u)) {
+                        return file.readable.filter((v) => {
+                            if(v) v.includes(u);
+                            else false;
+                        }).length > 0;
                     } else { 
-                        return file.readable.find((v) => v.includes(u)).length > 0;
+                        return file.readable.includes(u);
                 }});
             } else { // Everything is treated as an email.
                 
