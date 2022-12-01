@@ -28,21 +28,18 @@ function AccessControlView(){
             {/* Snapshot Bar on top to choose Snapshot + Create New Access Control Policy */}
             <ACBar />
             {/* Access Control Policy Card */}
-            {auth.user.access_control_req && auth.user.access_control_req !== ' ' ? <ACCard /> : <Typography variant="h4" ml={10}><ErrorOutlineIcon sx={{fontSize: 33, color: 'red'}}/> <strong>Please Create an Access Control Requirement Policy </strong></Typography> }
+            <ACCard />
             
             {/* Violations found in AC Policy */}
-            {auth.user.access_control_req && auth.user.access_control_req !== ' ' ?  
-                <Box>
-                    <Typography variant='h4' mb={2} mt={3}>
-                        <strong>Violations</strong>
-                    </Typography>
-                    {
-                        violations.map(violation =>
-                            <ACViolations violation={violation}/> )
-                    }
-                    
-                </Box>
-            : "" }
+            <Box>
+                <Typography variant='h4' mb={2} mt={3}>
+                    <strong>Violations</strong>
+                </Typography>
+                {
+                    violations.map(violation =>
+                        <ACViolations violation={violation}/> )
+                }
+            </Box>
 
             {/* AC Modal */}
             <ACModal />
