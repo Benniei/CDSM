@@ -376,8 +376,57 @@ async function GD_getFileMap(driveAPI, driveIds) {
     }
 }
 
+async function GD_shareFiles(driveAPI, permReqs) {
+    permissionIds = [];
+    for (let file of permReqs) {
+        const {fileId, perms} = file;
+        for (const permission of perms) {
+            try {
+                let result;
+                switch(permission.function) {
+                    case 'create':
+                        delete permission.function;
+                        result = await service.permissions.create({
+                            resource: permission,
+                            fileId: fileId,
+                            fields: 'id',
+                        });
+                        break;
+                    case 'update':
+                        let id = permission.id;
+                        delete permission.id;
+                        delete permission.function;
+                        result = await service.permissions.create({
+                            resource: permission,
+                            permissionId: id,
+                            fileId: fileId,
+                            fields: 'id',
+                        });
+                        break;
+                    case 'delete':
+                        result = await service.permissions.delete({
+                            permissionId: permission.id,
+                            fileId: fileId,
+                        });
+                        break;
+                    default:
+                        throw new Error('Invalid function type given')
+                }
+                
+              permissionIds.push(result.data.id);
+              console.log(`Inserted permission id: ${result.data.id}`);
+            } catch (err) {
+              // TODO(developer): Handle failed permissions
+              console.error(err);
+            }
+          }
+    }
+    return permissionIds;
+}
+
 module.exports = {
     GD_getDrives,
     GD_getFileMap,
-    GD_initializeAPI
+    GD_initializeAPI,
+    GD_shareFiles
 };

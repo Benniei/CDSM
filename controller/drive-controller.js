@@ -202,11 +202,47 @@ async function deleteFiles(req, res) {
     res.send('All files deleted');
 }
 
+async function shareFiles(req, res) {
+    const { permReqs } = req.body;
+
+    try {
+        // Retrieve the user's profile
+        const user = await User.findById(req.userId, { cloudProvider: 1, filesnapshot: 1, 
+            refreshToken: 1, threshold: 1, profileId: 1 });
+        if (!user) {
+        throw new Error('Could not find User in database.');
+        }
+
+        let permIds;
+
+        switch (user.cloudProvider) {
+        case 'google':
+            // Initialize instance of the Google Drive API service
+            const driveAPI = await GoogleDriveController.GD_initializeAPI(user.refreshToken);
+            permIds = await GoogleDriveController.GD_shareFiles(driveAPI, permReqs);
+            break;
+        case 'microsoft':
+            const accessToken = await MicrosoftDriveController.OD_accessToken(user.refreshToken);
+            break;
+        default:
+            throw new Error('Could not find listed cloud provider.');
+        }
+        res.status(200).json({ success: true, permIds: permIds});
+    } catch (err) {
+        res.status(400).json({ success: false, error: error });
+    }
+    
+
+    
+
+}
+
 module.exports = {
     createFileSnapshot,
     getFiles,
     getFolder,
     getSnapshot,
     updateSharing,
-    deleteFiles
+    deleteFiles,
+    shareFiles
 };

@@ -477,7 +477,7 @@ function FileSharingModal(props) {
                     <Box 
                     className="black-button" 
                     sx={{width:'100px', ml: '83%', mt:3}}
-                    onClick={event => {store.updateSharing(changes)}}>
+                    onClick={event => {console.log(changes)}}>
                     <center>
                         <Typography 
                             sx={{color:'black'}}> 

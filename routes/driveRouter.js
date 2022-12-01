@@ -31,7 +31,7 @@ router.post('/snapshot/:snapshotId/:folderId', auth.verify, DriveController.getF
 router.post('/snapshots/:snapshot1/:snapshot2/analyze', auth.verify, AnalysisController.analyzeSnapshots);
 
 // Perform update sharing permissions on a single or multiple files
-router.post('/updateSharing', auth.verify, DriveController.updateSharing)
+router.post('/shareFiles', auth.verify, DriveController.shareFiles)
 
 // Delete all files stored in the database
 router.get('/deleteFiles', DriveController.deleteFiles);
