@@ -5,6 +5,7 @@ import ACModal from './ACModal'
 import ACViolations from './ACViolations'
 import {useContext} from 'react';
 import AuthContext from '../../../auth/index.js';
+import GlobalStoreContext from '../../../store/index.js';
 
 // Imports from MUI
 import Box from '@mui/material/Box'
@@ -13,6 +14,9 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
 function AccessControlView(){
     const {auth} = useContext(AuthContext);
+    const {store} = useContext(GlobalStoreContext);
+
+    let violations = store.violations;
     
     return (
         <Box sx={{flexGrow: 1}}>
@@ -32,7 +36,11 @@ function AccessControlView(){
                     <Typography variant='h4' mb={2} mt={3}>
                         <strong>Violations</strong>
                     </Typography>
-                    <ACViolations />
+                    {
+                        violations.map(violation =>
+                            <ACViolations violation={violation}/> )
+                    }
+                    
                 </Box>
             : "" }
 
