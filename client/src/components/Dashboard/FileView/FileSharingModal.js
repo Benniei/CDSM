@@ -314,7 +314,17 @@ function FileSharingModal(props) {
             setMixedUsers(mixedResult)
         }
     }, [store.updateSharingModal]);
-    // Sanatize the user and split them into unique and mixed users
+
+    function updateShare() {
+        let filePerms = []; 
+        for(let file of selected){
+            let fileID = store.allItems[file.index].fileId
+            let fileInfo = store.allItems[file.index].permissionsRaw;
+            filePerms.push({fileId: fileID, permissions: fileInfo})
+        }
+        let payload = {files: filePerms, changes: changes}
+        store.updateSharing(payload)
+    }
 
     function closeModal() { 
         console.log("Close File Sharing Modal");
@@ -477,7 +487,7 @@ function FileSharingModal(props) {
                     <Box 
                     className="black-button" 
                     sx={{width:'100px', ml: '83%', mt:3}}
-                    onClick={event => {console.log(changes)}}>
+                    onClick={updateShare}>
                     <center>
                         <Typography 
                             sx={{color:'black'}}> 
