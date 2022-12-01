@@ -377,50 +377,56 @@ async function GD_getFileMap(driveAPI, driveIds) {
 }
 
 async function GD_shareFiles(driveAPI, permReqs) {
+    const {files, changes} = permReqs;
+    console.log(files);
+    console.log(changes);
     permissionIds = [];
-    for (let file of permReqs) {
-        const {fileId, perms} = file;
-        for (const permission of perms) {
-            try {
-                let result;
-                switch(permission.function) {
-                    case 'create':
-                        delete permission.function;
-                        result = await service.permissions.create({
-                            resource: permission,
-                            fileId: fileId,
-                            fields: 'id',
-                        });
-                        break;
-                    case 'update':
-                        let id = permission.id;
-                        delete permission.id;
-                        delete permission.function;
-                        result = await service.permissions.create({
-                            resource: permission,
-                            permissionId: id,
-                            fileId: fileId,
-                            fields: 'id',
-                        });
-                        break;
-                    case 'delete':
-                        result = await service.permissions.delete({
-                            permissionId: permission.id,
-                            fileId: fileId,
-                        });
-                        break;
-                    default:
-                        throw new Error('Invalid function type given')
-                }
-                
-              permissionIds.push(result.data.id);
-              console.log(`Inserted permission id: ${result.data.id}`);
-            } catch (err) {
-              // TODO(developer): Handle failed permissions
-              console.error(err);
+    for (const permission of changes) {
+        try {
+            let id = permission.id;
+            let role = permission.role;
+            let result;
+
+            let fileId = id === 'new' ? files[0].fileId : files.filter(file => Object.keys(file.permissions).includes(id))[0].fileId;
+
+            if(id === 'new') {
+                delete permission.id;
+                delete permission.name;
+                delete permission.tag;
+                permission.emailAddress = permission.email;
+                delete permission.email;
+                result = await driveAPI.permissions.create({
+                    resource: permission,
+                    fileId: fileId,
+                    fields: 'id',
+                });
+            } else if (role === 'Remove Access') {
+                result = await driveAPI.permissions.delete({
+                    permissionId: permission.id,
+                    fileId: fileId,
+                });
+            } else {
+                delete permission.tag;
+                delete permission.id;
+                delete permission.name;
+                permission.emailAddress = permission.email;
+                delete permission.email;
+                result = await driveAPI.permissions.create({
+                    resource: permission,
+                    permissionId: id,
+                    fileId: fileId,
+                    fields: 'id',
+                });
             }
-          }
+
+            permissionIds.push(result.data.id);
+            console.log(`Inserted permission id: ${result.data.id}`);
+        } catch (err) {
+            // TODO(developer): Handle failed permissions
+            console.error(err);
+        }
     }
+    
     return permissionIds;
 }
 

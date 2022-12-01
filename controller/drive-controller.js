@@ -203,7 +203,7 @@ async function deleteFiles(req, res) {
 }
 
 async function shareFiles(req, res) {
-    const { permReqs } = req.body;
+    const permReqs = req.body;
 
     try {
         // Retrieve the user's profile
@@ -228,7 +228,8 @@ async function shareFiles(req, res) {
             throw new Error('Could not find listed cloud provider.');
         }
         res.status(200).json({ success: true, permIds: permIds});
-    } catch (err) {
+    } catch (error) {
+        console.log(error);
         res.status(400).json({ success: false, error: error });
     }
     
