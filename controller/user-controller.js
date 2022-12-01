@@ -97,6 +97,12 @@ function parseQuery(query, email) {
     opStack = [];
     valueStack = [];
 
+    precedence = {
+        '(': 3,
+        'and': 2,
+        'or': 1
+    }
+
     while (parseable.length) {
         next = parseable.shift();
         //console.log('Next: '+next)
@@ -114,7 +120,7 @@ function parseQuery(query, email) {
                 break;
             case 'and':
             case 'or':
-                while (opStack.length && opStack.slice(-1)[0]  !== '(') {
+                while (opStack.length && (precedence[opStack.slice(-1)[0]] >= precedence[next])) {
                     valueStack.push(combine(opStack.pop(), valueStack.pop(), valueStack.pop()))
                 }
                 opStack.push(next)
