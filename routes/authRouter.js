@@ -11,7 +11,7 @@ const User = require('../models/user-model');
 const router = express.Router();
 
 // Authenticate user with Google
-router.get('/auth/google', passport.authenticate('google', { accessType: 'offline', prompt: 'select_account', scope: ['profile', 'email', 'https://www.googleapis.com/auth/drive'] } ));
+router.get('/auth/google', passport.authenticate('google', { accessType: 'offline', prompt: 'consent', scope: ['profile', 'email', 'https://www.googleapis.com/auth/drive'] } ));
 // Redirect based on Google authentication response
 router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: process.env.CLIENT_BASE_URL }), function(req, res) {
     // Upon successful authentication, redirect to dashboard
@@ -23,7 +23,7 @@ router.get('/auth/google/callback', passport.authenticate('google', { failureRed
 });
 
 // Authenticate user with Microsoft
-router.get('/auth/microsoft', passport.authenticate('microsoft', { accessType: 'offline', prompt: 'select_account', scope: ['user.read', 'Files.read', 'offline_access'] } ));
+router.get('/auth/microsoft', passport.authenticate('microsoft', { accessType: 'offline', prompt: 'consent', scope: ['user.read', 'Files.read', 'offline_access'] } ));
 // Redirect based on Microsoft authentication response
 router.get('/auth/microsoft/callback', passport.authenticate('microsoft', { failureRedirect: process.env.CLIENT_BASE_URL }), function(req, res) {
     console.log("Successfully authenticated with microsoft.");
