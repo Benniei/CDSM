@@ -252,7 +252,7 @@ function FileSharingModal(props) {
                 }
                 data.push(setdata);
             }
-            console.log(owners)
+            
             // Get all the Users who have consistent roles over all files
             uniqueResult = data.reduce((a, b) => a.filter(c => b.some(item => item.id === c.id)));
 
