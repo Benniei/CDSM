@@ -23,6 +23,8 @@ const FileSchema = new Schema(
         writable: {type: [String], required: false },                                                   // list of email addresses with writable permission
         sharable: {type: [String], required: false },                                                   // list of email addresses with sharable permission
         sharing: {type: [String], required: false, default: () => { return null; } },                   // type of grantee of sharing (user, group, domain, anyone)
+        from: {type: [String], required: false, default: () => { return null; } },
+        to: {type: [String], required: false, default: () => { return null; } },
     }, { minimize: false }                                                                              // Allow empty objects to be valid field values
 );
 

@@ -18,7 +18,7 @@ const UserSchema = new Schema(
         filesnapshot: { type: [String], required: false },
         groupsnapshot: { type: [String], required: false }
     },
-    { timeStamps: true }                                                                        // Timestamps for when document was created and last updated
+    { timestamps: true }                                                                        // Timestamps for when document was created and last updated
 );
 
 module.exports = mongoose.model('User', UserSchema);

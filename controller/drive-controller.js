@@ -4,6 +4,7 @@ const moment = require('moment');
 // Local imports
 const File = require('../models/file-model');
 const FileSnapshot = require('../models/filesnapshot-model');
+const GroupSnapshot = require('../models/groupsnapshot-model')
 const GoogleDriveController = require('../controller/google-drive-controller');
 const MicrosoftDriveController = require('../controller/onedrive-controller');
 const User = require('../models/user-model');
@@ -73,6 +74,8 @@ async function createFileSnapshot(req, res) {
                 writable: file.writable,
                 sharable: file.sharable,
                 sharing: file.sharing,
+                from: file.from,
+                to: file.to,
             });
             await File.create(newFile);
             console.log(`Added File '${newFile.fileId}' to database.`);
@@ -150,9 +153,22 @@ async function getSnapshot(req, res) {
         // Get all the closes group snapshots
         const user = await User.findById(req.userId);
         const groups = user.groupsnapshot ? user.groupsnapshot : [];
-
-        console.log(groups)
-        res.status(200).json({ success: true, snapshot: snapshot });
+        let validGroup = {}
+        var snapshotTime = snapshot.createdAt
+        for (let value of groups) {
+            const group = await GroupSnapshot.aggregate([
+                // Match the User's ID and the name of the group
+                {$match: {domain: value, user: req.userId}},
+                // Project a diff field that's the absolute difference along with the original doc.
+                {$project: {diff: {$abs: {$subtract: [snapshotTime, '$createdAt']}}, doc: '$$ROOT'}},
+                // Order the docs by diff
+                {$sort: {diff: 1}},
+                // Take the first one
+                {$limit: 1}
+            ])
+            validGroup[value] = group[0].doc.emails
+        }
+        res.status(200).json({ success: true, snapshot: snapshot, groups: validGroup});
     } catch(error) {
         console.error(`Failed to retrieve FileSnapshot: ${error}`);
         res.status(400).json({ success: false, error: error });

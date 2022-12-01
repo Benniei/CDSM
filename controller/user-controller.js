@@ -273,10 +273,10 @@ addGroup = async(req, res) => {
         // Add as Unique Group to user's list of groups
         let user = await User.findById(req.userId, { email: 1 , groupsnapshot: 1});
         if(user.groupsnapshot.length === 0){
-            user.groupsnapshot = [name]
+            user.groupsnapshot = [domain]
         }
-        else if(user.groupsnapshot.indexOf(name) == -1){
-            user.groupsnapshot.push(name)
+        else if(user.groupsnapshot.indexOf(domain) === -1){
+            user.groupsnapshot.push(domain)
         }
         user.save()
 
