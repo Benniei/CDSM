@@ -153,9 +153,10 @@ function PermissionsTab (props){
             <Stack
                 direction="row"
                 sx={{maxWidth:600, overflowX: 'auto'}}>
-                    {permissions.map((item) => {
+                    {permissions?.map((item) => {
                         let result;
-                        if(store.groups[item.emailAddress || item.domain]){
+                        console.log(item)
+                        if(store.groups? store.groups[item.emailAddress || item.domain]: false){
                             result = <Box 
                                 key={item.id}
                                 className="grey-button"
@@ -198,6 +199,7 @@ function FileTable(props){
 
     useEffect(() => {
         setRows([])
+        setSelected([])
         let rowPrototype = [];
         let inheritiedPerms = [];
         let directPerms = [];
