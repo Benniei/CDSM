@@ -63,7 +63,7 @@ function ACModal() {
             setDenyWriters(acr.DW);
             setFlag(acr.Grp);
         }
-    }, [auth.user])
+    }, [auth.user.access_control_req])
 
     function handleOpenBuilder(){
         store.openAccessControlSearch();
@@ -200,6 +200,7 @@ function ACModal() {
                             value={query}
                             inputValue={query}
                             onInputChange={(event) => {
+                                console.log(event.target.value);
                                 setQuery(event.target.value);
                             }}/>     
                             <InputAdornment position="end">
