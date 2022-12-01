@@ -187,6 +187,9 @@ checkACR = async (req, res) => {
         let email = user.email;
         let {query, AW, AR, DW, DR, Grp } = acr;
 
+        if(AW.length === 0 && AR.length === 0 && DW.length === 0 && DR.length === 0)
+            return res.status(200).json({ success: true, acr: acr, violations: [] });
+
         query = query? query: ""
         // Perform search query
         builtQuery = parseQuery(query, email);
