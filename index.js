@@ -41,6 +41,10 @@ app.use('/', require('./routes/authRouter'));
 app.use('/', require('./routes/driveRouter'));
 app.use('/', require('./routes/userRouter'));
 
+app.get("/tester", function (req, res) {
+  res.send("Hello World");
+})
+
 // Hosts Static Websites
 app.use(express.static(path.resolve(__dirname, "./client/build")));
 app.get("*", function (request, response) {
