@@ -21,28 +21,28 @@ function ACViolations(props) {
         AW =    (<Stack direction="row" spacing={1} ml={4} mt={.5}>
                     <ErrorOutlineIcon style={{color: 'red', fontSize:25}}/>
                     <Typography sx={{fontSize:19}}>
-                        <strong>Allowed Writers: {violation.AW}</strong>
+                        <strong>Allowed Writers: {violation.AW.join(", ")}</strong>
                     </Typography>
                 </Stack>);
     if (violation && violation.AR) 
         AR =    (<Stack direction="row" spacing={1} ml={4} mt={.5}>
                     <ErrorOutlineIcon style={{color: 'red', fontSize:25}}/>
                     <Typography sx={{fontSize:19}}>
-                        <strong>Allowed Readers: {violation.AR}</strong>
+                        <strong>Allowed Readers: {violation.AR.join(", ")}</strong>
                     </Typography>
                 </Stack>);
     if (violation && violation.DW) 
         DW =    (<Stack direction="row" spacing={1} ml={4} mt={.5}>
                     <ErrorOutlineIcon style={{color: 'red', fontSize:25}}/>
                     <Typography sx={{fontSize:19}}>
-                        <strong>Denied Writers: {violation.DW}</strong>
+                        <strong>Denied Writers: {violation.DW.join(", ")}</strong>
                     </Typography>
                 </Stack>);
     if (violation && violation.DR) 
         DR =    (<Stack direction="row" spacing={1} ml={4} mt={.5}>
                     <ErrorOutlineIcon style={{color: 'red', fontSize:25}}/>
                     <Typography sx={{fontSize:19}}>
-                        <strong>Denied Readers: {violation.DR}</strong>
+                        <strong>Denied Readers: {violation.DR.join(", ")}</strong>
                     </Typography>
                 </Stack>);
 
@@ -58,10 +58,10 @@ function ACViolations(props) {
                 <strong>Access Control Requirement Conflicts: </strong>
             </Typography>
             <Stack direction="column" spacing={1}>
-            { AW }
-            { AR }
-            { DW }
-            { DR }                 
+                <Box> { AW }</Box>
+                <Box> { AR }</Box>
+                <Box> { DW }</Box>
+                <Box> { DR }</Box>           
             </Stack>
         </Box>
     )
