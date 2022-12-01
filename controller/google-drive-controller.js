@@ -321,7 +321,7 @@ async function GD_getFileMap(driveAPI, driveIds) {
                     }   
                     switch (permission.type) {
                         case 'user':
-                            if (file.ownedByMe) {
+                            if (permission.role === 'owner') {
                                 break;
                             }
                             type.push('individual');
