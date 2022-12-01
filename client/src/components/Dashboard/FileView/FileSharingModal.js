@@ -31,7 +31,7 @@ const style = {
 
 function FileSharingUser(props) {
     const {store} = useContext(GlobalStoreContext);
-    const {user, selectValues, users, setUsers} = props
+    const {user, selectValues, users, setUsers, changePermission} = props
     const [anchorEl, setAnchorEl] = useState(null);
     const [open, setOpen] = useState(false)
     const [placement, setPlacement] = useState()
@@ -55,7 +55,7 @@ function FileSharingUser(props) {
             </Typography>
         </Box>
     }
-    else if (user.type === "group") {
+    else if (user.type === "group" && store.groups[user.email]) {
         userItem = <Box onClick={handleClick(user.email)}>
             <Typography variant="h6">
                 <strong>{user.email}</strong>
@@ -75,12 +75,23 @@ function FileSharingUser(props) {
             </Typography>
             </Box>
     }
+    else {
+        userItem = <Box>
+            <Typography variant="h6">
+                <strong>{user.email}</strong>
+            </Typography>
+            <Typography variant="h7">
+                <strong>{user.type}</strong>
+            </Typography>
+        </Box>
+    }
 
     return (
         <Box 
             className="fileFolderModal"
             display="flex"
             mt={1.5}
+            key={"FileSharingUser" + user.email}
             >
             <Popper open={open} anchorEl={anchorEl} placement={'left'} transition
                 sx={{overflowY: "auto", maxHeight: 600, boxShadow: 1}}
@@ -92,7 +103,7 @@ function FileSharingUser(props) {
                         {
                             group.map((item) => {
                                 return(
-                                    <Typography ml={1} key={"filetable" + item} sx={{fontsize: 20}} mt={.2}>
+                                    <Typography ml={1} key={"filetable2" + item} sx={{fontsize: 20}} mt={.2}>
                                         {item}
                                     </Typography> 
                                 )
@@ -128,13 +139,13 @@ function FileSharingUser(props) {
                         disabled={true}
                     >
                         {selectValues.map((item, index) => (
-                            <MenuItem key={item + index} value={item}>
+                            <MenuItem key={"filesharing3" + item + index} value={item}>
                                 {item}
                             </MenuItem>
                         ))}
                     </TextField>
                 :
-                user.id === "special"?
+                user.tag === "special"?
                 <TextField
                     display="flex"
                     id={"roles"}
@@ -162,6 +173,7 @@ function FileSharingUser(props) {
                     onChange={(event) => {
                         setUsers(users.map((item) => {
                             if (item.email === user.email) {
+                                changePermission({...item, role: event.target.value})
                                 return {...item, role: event.target.value}
                             }
                             return item
@@ -208,9 +220,12 @@ function FileSharingModal(props) {
     const [data, setData] = useState("");
     const [uniqueUsers, setUniqueUsers] = useState([]); // Follow a schema of {Email, role, type, name}
     const [mixedUsers, setMixedUsers] = useState([]); // Follow a schema of {Email, role, type}
+    const [newRole, setNewRole] = useState("user")
+    const [changes, setChanges] = useState([]);
 
     const uniqueSelections = ["Reader", "Commenter", "Writer", "Remove Access"]
     const mixedSelections = ["Mixed Values", "Reader", "Commenter", "Writer", "Remove Access"]
+    const userRoles = ["user", "group"]
     let flag = store.updateSharingModal;
     useEffect(() => {
         
@@ -230,7 +245,7 @@ function FileSharingModal(props) {
                         role: "owner",
                         type: "user",
                         email: store.allItems[file.index].owner,
-                        id: store.allItems[file.index].fileID
+                        id: store.allItems[file.index].fileID,
                     }
                     setdata.push(permission)
                     owners.push(permission.email)
@@ -244,7 +259,7 @@ function FileSharingModal(props) {
                         type: obj.type,
                         email: obj.emailAddress || obj.domain,
                         name: obj.displayName,
-                        id: obj.emailAddress+obj.role
+                        id: obj.id
                     }
                     if (permission.role === "owner")
                         owners.push(permission.email)
@@ -277,7 +292,8 @@ function FileSharingModal(props) {
                                 email: perm.email,
                                 type: perm.type,
                                 role: "Mixed Values",
-                                id: "special"
+                                tag: "special",
+                                id: perm.id
                             });
                         else
                             mixedResult.push({
@@ -285,13 +301,14 @@ function FileSharingModal(props) {
                                 email: perm.email,
                                 type: perm.type,
                                 role: "Mixed Values",
-                                id: "notspecial"
+                                tag: "notspecial",
+                                id: perm.id
                             });
                     }
                 }
             }
             // Move all "owner" special values to the top
-            mixedResult.sort(function(x,y) { return (x.id==="special"?-1 : y.id ==="special" ? 1: 0)});
+            mixedResult.sort(function(x,y) { return (x.tag==="special"?-1 : y.tag ==="special" ? 1: 0)});
 
             setUniqueUsers(uniqueResult)
             setMixedUsers(mixedResult)
@@ -303,11 +320,33 @@ function FileSharingModal(props) {
         console.log("Close File Sharing Modal");
         setUniqueUsers([]);
         setMixedUsers([]);
+        setChanges([]);
         store.closeModal();
+    }
+
+    function changePermission(payload) {
+        console.log(payload)
+        if(payload.id === "new"){
+            let temp = changes.filter(item=> item.id !== "new" || item.email !== payload.email );
+            temp.push(payload)
+            setChanges([...changes, payload])
+            console.log(temp)
+        }
+        else{
+            let temp = changes.filter(item=> item.id !== payload.id);
+            temp.push(payload)
+            setChanges([...changes, payload])
+            console.log(temp)
+        }
     }
     
     function newUser(data) {
-        setUniqueUsers([...uniqueUsers, {email: data, role: "writer", type: "new"}])
+        if(uniqueUsers.some(e => e.email === data) || mixedUsers.some(e=>e.email === data)){
+            return
+        }
+        let newUser = {role: "writer", type: newRole, email: data, id: "new"}
+        setUniqueUsers([...uniqueUsers, newUser])
+        changePermission(newUser)
     }
     
     return (
@@ -371,13 +410,14 @@ function FileSharingModal(props) {
                             {/* Right Column -- Show all Shared Users */}
                             <Stack
                                 sx={{width: '70%'}}>
+                                <Box display="flex">
                                     <TextField
                                         id={"user"}
-                                        label={"Add User or Group"}
+                                        label={"Add User"}
                                         fullWidth
                                         overflow='auto' 
                                         value={data}
-                                        sx={{width: '90%', ml:3, mb:1}}
+                                        sx={{width: '80%', ml:3, mb:1}}
                                         onChange= {(event) => {setData(event.target.value)}}
                                         onKeyPress={(event) => {
                                             if (event.key === 'Enter'){
@@ -385,6 +425,24 @@ function FileSharingModal(props) {
                                                 setData("");
                                             }
                                         }}/>
+                                    <TextField
+                                        id={"newRoles"}
+                                        select
+                                        label={"Role"}
+                                        value={newRole}
+                                        sx={{width:'20%', ml:3, mb:1}}
+                                        justifycontent="flex-end"
+                                        onChange={(event) => {
+                                            setNewRole(event.target.value)
+                                        }}
+                                    >
+                                        {userRoles.map((item, index) => (
+                                            <MenuItem key={index + item} value={item}>
+                                                {item}
+                                            </MenuItem>
+                                        ))}
+                                    </TextField>
+                                </Box>
                                 {/* TODO: Compute selected users */}
                                 { 
                                     uniqueUsers.map((item) => {
@@ -393,7 +451,8 @@ function FileSharingModal(props) {
                                                 user={item}
                                                 selectValues={uniqueSelections} 
                                                 users={uniqueUsers}
-                                                setUsers={setUniqueUsers} />
+                                                setUsers={setUniqueUsers} 
+                                                changePermission={changePermission}/>
                                         )
                                     })
                                 }
@@ -404,7 +463,8 @@ function FileSharingModal(props) {
                                                 user={item}
                                                 selectValues={mixedSelections} 
                                                 users={mixedUsers}
-                                                setUsers={setMixedUsers} />
+                                                setUsers={setMixedUsers} 
+                                                changePermission={changePermission}/>
                                         )
                                     })
                                 }
@@ -417,7 +477,7 @@ function FileSharingModal(props) {
                     <Box 
                     className="black-button" 
                     sx={{width:'100px', ml: '83%', mt:3}}
-                    onClick={event => {store.updateSharing([])}}>
+                    onClick={event => {store.updateSharing(changes)}}>
                     <center>
                         <Typography 
                             sx={{color:'black'}}> 

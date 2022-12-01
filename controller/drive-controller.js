@@ -177,7 +177,7 @@ async function getSnapshot(req, res) {
 
 async function updateSharing(req, res) {
     try{
-        
+        console.log(req.body)
     }catch(error){
         res.status(400).json({ success: false, error: error });
     }
