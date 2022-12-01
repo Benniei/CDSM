@@ -229,12 +229,12 @@ checkACR = async (req, res) => {
         for(const file of files) {
             let violation = {}
                 
-            let violated_AW = [...new Set([...file.writable.filter(u => AW.includes(u)),
-                    ...file.readable.filter(u => AW.includes(u))])];
-            let violated_AR = file.readable.filter(u => AR.includes(u));
-            let violated_DR = [...new Set([...DR.filter(u => !file.writable.includes(u)),
-                    ...DR.filter(u => !file.readable.includes(u))])];
-            let violated_DW = DW.filter(u => !file.writable.includes(u));
+            let violated_AW = [...new Set([...file.writable.filter(u => !AW.includes(u)),
+                    ...file.readable.filter(u => !AW.includes(u))])];
+            let violated_AR = file.readable.filter(u => !AR.includes(u));
+            let violated_DR = [...new Set([...DR.filter(u => file.writable.includes(u)),
+                    ...DR.filter(u => file.readable.includes(u))])];
+            let violated_DW = DW.filter(u => file.writable.includes(u));
 
             if (violated_AW.length > 0)
                 violation["AW"] = violated_AW;
