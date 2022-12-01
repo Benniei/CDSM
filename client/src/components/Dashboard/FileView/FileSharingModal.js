@@ -42,7 +42,7 @@ function FileSharingUser(props) {
         setOpen((prev) => placement !== newPlacement || !prev);
         setPlacement(newPlacement);
         setGroup(store.groups[newPlacement])
-      };
+    };
 
     let userItem;
     if (user.type === "user" || user.type === "domain") {

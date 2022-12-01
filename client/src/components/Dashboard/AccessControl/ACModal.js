@@ -170,17 +170,6 @@ function ACModal() {
                         variant="h5"
                     >Edit Access Control Policy</Typography>
 
-                    {/* Access Control Policy Name */}
-                    {/* <TextField   
-                        id="name"
-                        label="Access Control Name"
-                        name="name"
-                        autoComplete="Access Control Name"
-                        size="large"
-                        onChange={(event) => setName(event.value.target)}
-                        sx={{backgroundColor:"#FFFFFF", width:'85%', mt:3}}
-                    /> */}
-
                     {/* Search Bar */}
                     <Stack 
                         direction = "row"

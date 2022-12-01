@@ -29,17 +29,14 @@ const style = {
     overflowY: 'scroll'
 };
 
-const operators = ["Drive", "Owner", "Creator", "From", "To", "Name", "inFolder", "Folder", "Path", "Sharing"]
+const operators = ["drive", "owner", "creator", "from", "to", "name", "infolder", "folder", "path", "sharing"]
 
 function QueryBuilderModal() {
     const {store} = useContext(GlobalStoreContext);
     const [opCount, setOpCount] = useState(0);
     const [queryOp, setqueryOp] = useState([]);
-    const [readText, setReadText] = useState("");
     const [readableUser, setReadableUser] = useState([]);
-    const [writeText, setWriteText] = useState("");
     const [writableUser, setWritableUser] = useState([]);
-    const [shareText, setShareText] = useState("");
     const [sharableUser, setSharableUser] = useState([]);
     
     let flag = false;
@@ -62,7 +59,13 @@ function QueryBuilderModal() {
             query += 'sharable:' + sharableUser[op] + ' and '
         }
         query = query.substring(0, query.lastIndexOf(' and '));
+        console.log(query)
         store.buildQuery(query);
+        setqueryOp([]);
+        setReadableUser([]);
+        setWritableUser([]);
+        setSharableUser([]);
+        flag=false;
     }
 
     function closeModal() { 
@@ -70,11 +73,8 @@ function QueryBuilderModal() {
         store.closeModal();
         setOpCount(0);
         setqueryOp([]);
-        setReadText("");
         setReadableUser([]);
-        setWriteText("");
         setWritableUser([]);
-        setShareText("");
         setSharableUser([]);
         flag=false;
     }
@@ -96,7 +96,7 @@ function QueryBuilderModal() {
     }
 
     function addRead(name){
-        console.log("Add " + readText + " in Reader query")
+        console.log("Add " + name + " in Reader query")
         setReadableUser([...readableUser, name])
         setOpCount(opCount+1)
         console.log(queryOp)
@@ -109,7 +109,7 @@ function QueryBuilderModal() {
     }
 
     function addWrite(name){
-        console.log("Add " + writeText + " in Writer query")
+        console.log("Add " + name + " in Writer query")
         setWritableUser([...writableUser, name])
         setOpCount(opCount+1)
     }
@@ -121,7 +121,7 @@ function QueryBuilderModal() {
     }
 
     function addShare(name){
-        console.log("Add " + shareText + " in Shared query")
+        console.log("Add " + name + " in Shared query")
         setSharableUser([...sharableUser, name])
         setOpCount(opCount+1)
     }
@@ -228,7 +228,7 @@ function QueryBuilderModal() {
                                     }}
                                 >
                                     {operators.map((item, value) => (
-                                        <MenuItem key={value} value={item}>
+                                        <MenuItem key={"operator " + item + value} value={item}>
                                             {item}
                                         </MenuItem>
                                     ))}

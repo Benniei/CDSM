@@ -13,7 +13,7 @@ function RouteBar(){
     const {store} = useContext(GlobalStoreContext);
 
     let path = [];
-    if(store.path.length > 0)
+    if(store.path?.length > 0)
         path = store.path
     
     return (

@@ -155,7 +155,6 @@ function PermissionsTab (props){
                 sx={{maxWidth:600, overflowX: 'auto'}}>
                     {permissions?.map((item) => {
                         let result;
-                        console.log(item)
                         if(store.groups? store.groups[item.emailAddress || item.domain]: false){
                             result = <Box 
                                 key={item.id}

@@ -34,12 +34,13 @@ function NameBar(props){
                 {values.map((item) => (
                     <Box 
                         className="grey-button"
+                        key={"NB" + item}
                         display="flex"
                         ml={.25}
                         mr={.25}
                     >
                         <Typography display='inline' sx={{ml:1}}>{item}</Typography>
-                        <CloseIcon sx={{width:'28%', ml:.2, mt:-.2,
+                        <CloseIcon sx={{mt:-.2,
                             ':hover': {
                                 bgcolor: 'grey.300',
                                 color: 'black'

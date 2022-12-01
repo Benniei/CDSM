@@ -144,7 +144,7 @@ function GlobalStoreContextProvider(props) {
                     takeSnapshotModal: false,
                     updateSharingModal: false,
                     accessModal: false,
-                    search: false,
+                    search: store.search,
                     openDrive: store.openDrive,
                     openAccess: store.openAccess,
                     openAnalyze: store.openAnalyze,
@@ -659,9 +659,14 @@ function GlobalStoreContextProvider(props) {
 
     store.openAccessView = async function () { 
         console.log("Open Access Control Policy View");
-        storeReducer({
-            type: GlobalStoreActionType.OPEN_ACCESS
-        });
+        const response = await api.checkACR({snapshot_id: store.currentSnapshot});
+        if (response.status === 200) {
+            console.log(response.data.violations);
+            storeReducer({
+                type:GlobalStoreActionType.SET_VIOLATIONS,
+                payload: response.data.violations
+            });
+        }
     };
 
     store.openAnalyzeView = async function () {
