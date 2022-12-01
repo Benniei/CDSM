@@ -181,7 +181,7 @@ function FileSharingUser(props) {
                     }}
                 >
                     {selectValues.map((item, index) => (
-                        <MenuItem key={index} value={item}>
+                        <MenuItem key={"Filesharinguser5" + index} value={item}>
                             {item}
                         </MenuItem>
                     ))}
