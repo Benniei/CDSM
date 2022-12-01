@@ -559,6 +559,17 @@ function GlobalStoreContextProvider(props) {
         }
     }
 
+    store.updateSharing = async function(payload){
+        const response = await api.updateSharing(payload);
+        if(response.status === 200) {
+            console.log(response.data)
+            // storeReducer({
+            //     type: GlobalStoreActionType.UPDATE_SHARING,
+            //     payload: response.data.confirm // in the for of [success], [fail]
+            // });
+        }
+    }
+
     /**!SECTION Functions for managing the view/state of the application */
     store.openQueryBuilder = async function () {
         console.log("Open Query Builder");

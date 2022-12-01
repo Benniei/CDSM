@@ -83,6 +83,12 @@ export const addGroup = (payload) => api.post('/addGroup', payload).then(respons
 }).catch(error => {
    return error.response;
 });
+
+export const updateSharing = (payload) => api.post('/updateSharing', payload).then(response => {
+   return response;
+}).catch(error => {
+   return error.response;
+});
  
 const apis = {
    analyzeDeviantPermissions,
@@ -96,7 +102,8 @@ const apis = {
    getSnapshot,
    takeSnapshot,
    checkACR,
-   addGroup
+   addGroup,
+   updateSharing
 };
 
 export default apis;

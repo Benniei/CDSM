@@ -333,6 +333,9 @@ function FileSharingModal(props) {
                 {selected.length === 0?
                 <Typography variant="h4"> <strong> No Files Selected </strong> </Typography>
                 :
+                (store.sharingResult.length > 0)?
+                <Box></Box>
+                :
                 <Box>
                     {/* Title */}
                     <Stack 
@@ -414,7 +417,7 @@ function FileSharingModal(props) {
                     <Box 
                     className="black-button" 
                     sx={{width:'100px', ml: '83%', mt:3}}
-                    onClick={event => {store.takeSnapshot()}}>
+                    onClick={event => {store.updateSharing([])}}>
                     <center>
                         <Typography 
                             sx={{color:'black'}}> 
