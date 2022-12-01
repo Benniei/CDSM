@@ -78,8 +78,8 @@ function DeviantView(props) {
             {store.analyze.map((item) => {
                 return(<DeviantCard 
                     path={item.path} 
-                    fileExclusive={item.fileFolderDifferences.fileExclusivePermissions}
-                    majorityExclusive={item.fileFolderDifferences.folderExclusivePermissions}/>)
+                    fileExclusive={item.fileMajorityDifferences.fileExclusivePermissions}
+                    majorityExclusive={item.fileMajorityDifferences.majorityExclusivePermissions}/>)
             })}
         </Box>
     )
