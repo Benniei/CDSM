@@ -21,7 +21,8 @@ export const GlobalStoreActionType = {
     OPEN_ACCESS: "OPEN_ACCESS",
     OPEN_ANALYZE: "OPEN_ANALYZE",
     SET_DRIVES: "SET_DRIVES",
-    OPEN_ANALYZE_VIEW: "OPEN_ANALYZE_VIEW"
+    OPEN_ANALYZE_VIEW: "OPEN_ANALYZE_VIEW",
+    UPDATE_SHARING: "UPDATE_SHARING"
 };
 
 function GlobalStoreContextProvider(props) {
@@ -42,7 +43,8 @@ function GlobalStoreContextProvider(props) {
         parents: [],
         otherDrive: [],
         groups: {},
-        analyze: []
+        analyze: [],
+        sharingResult: []
     });
 
     const storeReducer = (action) => {
@@ -64,7 +66,8 @@ function GlobalStoreContextProvider(props) {
                     parents: payload.parents,
                     otherDrive: store.otherDrive,
                     groups: {},
-                    analyze: []
+                    analyze: [],
+                    sharingResult: []
                 });
             }
             case GlobalStoreActionType.GET_DRIVE: {
@@ -83,7 +86,8 @@ function GlobalStoreContextProvider(props) {
                     parents: payload.parents,
                     otherDrive: store.otherDrive,
                     groups: store.groups,
-                    analyze: []
+                    analyze: [],
+                    sharingResult: []
                 });
             }
             case GlobalStoreActionType.SET_DRIVES: {
@@ -102,7 +106,8 @@ function GlobalStoreContextProvider(props) {
                     parents: payload.parents,
                     otherDrive: payload.otherDrive,
                     groups: payload.groups,
-                    analyze: []
+                    analyze: [],
+                    sharingResult: []
                 });
             }
             case GlobalStoreActionType.SHOW_SEARCH: {
@@ -121,7 +126,8 @@ function GlobalStoreContextProvider(props) {
                     parents: payload.parents,
                     otherDrive: store.otherDrive,
                     groups: store.groups,
-                    analyze: []
+                    analyze: [],
+                    sharingResult: []
                 });
             }
             case GlobalStoreActionType.OPEN_QUERY_BUILDER: {
@@ -140,7 +146,8 @@ function GlobalStoreContextProvider(props) {
                     parents: store.parents,
                     otherDrive: store.otherDrive,
                     groups: store.groups,
-                    analyze: []
+                    analyze: [],
+                    sharingResult: []
                 });
             }
             case GlobalStoreActionType.OPEN_TAKE_SNAPSHOT_MODAL: {
@@ -159,7 +166,8 @@ function GlobalStoreContextProvider(props) {
                     parents: store.parents,
                     otherDrive: store.otherDrive,
                     groups: store.groups,
-                    analyze: []
+                    analyze: [],
+                    sharingResult: []
                 });
             }
             case GlobalStoreActionType.CLOSE_TAKE_SNAPSHOT_MODAL: {
@@ -197,7 +205,8 @@ function GlobalStoreContextProvider(props) {
                     parents: store.parents,
                     otherDrive: store.otherDrive,
                     groups: store.groups,
-                    analyze: []
+                    analyze: [],
+                    sharingResult: []
                 });
             }
             case GlobalStoreActionType.OPEN_AC_MODAL: {
@@ -216,7 +225,8 @@ function GlobalStoreContextProvider(props) {
                     parents: [],
                     otherDrive: store.otherDrive,
                     groups: {},
-                    analyze: []
+                    analyze: [],
+                    sharingResult: []
                 });
             }
             case GlobalStoreActionType.OPEN_AC_SEARCH: {
@@ -235,7 +245,8 @@ function GlobalStoreContextProvider(props) {
                     parents: [],
                     otherDrive: store.otherDrive,
                     groups: {},
-                    analyze: []
+                    analyze: [],
+                    sharingResult: []
                 });
             }
             case GlobalStoreActionType.CLOSE_MODAL: {
@@ -253,7 +264,8 @@ function GlobalStoreContextProvider(props) {
                     parents: store.parents,
                     otherDrive: store.otherDrive,
                     groups: store.groups,
-                    analyze: []
+                    analyze: [],
+                    sharingResult: []
                 });
             }
             
@@ -272,7 +284,8 @@ function GlobalStoreContextProvider(props) {
                     path: [],
                     parents: [],
                     otherDrive: store.otherDrive,
-                    analyze: []
+                    analyze: [],
+                    sharingResult: []
                 });
             }
             case GlobalStoreActionType.OPEN_ANALYZE: {
@@ -290,7 +303,8 @@ function GlobalStoreContextProvider(props) {
                     path: [],
                     parents: [],
                     otherDrive: store.otherDrive,
-                    analyze: []
+                    analyze: [],
+                    sharingResult: []
                 });
             }
             case GlobalStoreActionType.OPEN_ANALYZE_VIEW: {
@@ -308,7 +322,8 @@ function GlobalStoreContextProvider(props) {
                     path: [],
                     parents: [],
                     otherDrive: store.otherDrive,
-                    analyze: payload
+                    analyze: payload,
+                    sharingResult: []
                 });
             }
             default:
