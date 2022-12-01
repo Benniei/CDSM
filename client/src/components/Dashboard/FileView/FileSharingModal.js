@@ -322,7 +322,8 @@ function FileSharingModal(props) {
             let fileInfo = store.allItems[file.index].permissionsRaw;
             filePerms.push({fileId: fileID, permissions: fileInfo})
         }
-        let payload = {files: filePerms, changes: changes}
+        let tempchanges = changes.filter((item) => !(item.id === "new" && item.role === "Remove Access"))
+        let payload = {files: filePerms, changes: tempchanges}
         store.updateSharing(payload)
     }
 
@@ -335,18 +336,15 @@ function FileSharingModal(props) {
     }
 
     function changePermission(payload) {
-        console.log(payload)
         if(payload.id === "new"){
-            let temp = changes.filter(item=> item.id !== "new" || item.email !== payload.email );
+            let temp = changes.filter(item=> item.email !== payload.email && item.id !== "new");
             temp.push(payload)
-            setChanges([...changes, payload])
-            console.log(temp)
+            setChanges(temp)
         }
         else{
             let temp = changes.filter(item=> item.id !== payload.id);
             temp.push(payload)
-            setChanges([...changes, payload])
-            console.log(temp)
+            setChanges(temp)
         }
     }
     
@@ -354,7 +352,7 @@ function FileSharingModal(props) {
         if(uniqueUsers.some(e => e.email === data) || mixedUsers.some(e=>e.email === data)){
             return
         }
-        let newUser = {role: "writer", type: newRole, email: data, id: "new"}
+        let newUser = {role: "Writer", type: newRole, email: data, id: "new"}
         setUniqueUsers([...uniqueUsers, newUser])
         changePermission(newUser)
     }
