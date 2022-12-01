@@ -175,6 +175,14 @@ async function getSnapshot(req, res) {
     }
 }
 
+async function updateSharing(req, res) {
+    try{
+        
+    }catch(error){
+        res.status(400).json({ success: false, error: error });
+    }
+}
+
 // Delete all files stored in the database
 async function deleteFiles(req, res) {
     // const owner = '634cb4405445ff8fb73a6749';    // Bennie
@@ -199,5 +207,6 @@ module.exports = {
     getFiles,
     getFolder,
     getSnapshot,
+    updateSharing,
     deleteFiles
 };
