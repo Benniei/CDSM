@@ -173,7 +173,7 @@ checkACR = async (req, res) => {
             throw new Error('Could not find User in database.');
         }
         let email = user.email;
-        const {query, AW, AR, DW, DR, Grp } = acr;
+        let {query, AW, AR, DW, DR, Grp } = acr;
 
         // Perform search query
         builtQuery = parseQuery(query, email);
@@ -189,7 +189,6 @@ checkACR = async (req, res) => {
         }
 
         const groups = user.groupsnapshot ? user.groupsnapshot : [];
-        let validGroup = {}
         var snapshotTime = snapshot.createdAt
         if (Grp) {
             for (let value of groups) {
@@ -203,7 +202,19 @@ checkACR = async (req, res) => {
                     // Take the first one
                     {$limit: 1}
                 ])
-                validGroup[value] = group[0].doc.emails
+                if (AW.includes(value)) {
+                    AW = [...new Set([...AW, ...group[0].doc.emails])]
+                }
+                if (AR.includes(value)) {
+                    AR = [...new Set([...AR, ...group[0].doc.emails])]
+                }
+                if (DW.includes(value)) {
+                    DW = [...new Set([...DW, ...group[0].doc.emails])]
+                }
+                if (DR.includes(value)) {
+                    DR = [...new Set([...DR, ...group[0].doc.emails])]
+                }
+
             }
         }
 
@@ -211,65 +222,14 @@ checkACR = async (req, res) => {
         let violations = []
         for(const file of files) {
             let violation = {}
-            let violated_AW;
-            let violated_AR;
-            let violated_DW;
-            let violated_DR;
-            if(Grp) {
-                violated_AW = [...file.writable.filter(u => {
-                    if(Object.keys(validGroup).includes(u)) {
-                        return AW.filter((v) => v.includes(u)).length > 0;
-                    } else { 
-                        return !AW.includes(u);
-                    }}),
-                    ...file.readable.filter(u => {
-                        if(Object.keys(validGroup).includes(u)) {
-                            return AW.filter((v) => v.includes(u)).length > 0;
-                        } else { 
-                            return !AW.includes(u);
-                }})];
-                violated_AR = file.readable.filter(u => {
-                    if(Object.keys(validGroup).includes(u)) {
-                        return AR.filter((v) => !v.includes(u)).length > 0;
-                    } else { 
-                        return !AR.includes(u);
-                }});
-                violated_DW = [...DW.filter(u => {
-                    if(Object.keys(validGroup).includes(u)) {
-                        return file.writable.filter((v) => {
-                            if(v) v.includes(u);
-                            else false;
-                        }).length > 0;
-                    } else { 
-                        return file.writable.includes(u);
-                }}),
-                    ...DW.filter(u => {
-                        if(Object.keys(validGroup).includes(u)) {
-                            return file.readable.filter((v) => {
-                                if(v) v.includes(u);
-                                else false;
-                            }).length > 0;
-                        } else { 
-                            return file.readable.includes(u);
-                }})];
-                violated_DR = DR.filter(u => {
-                    if(Object.keys(validGroup).includes(u)) {
-                        return file.readable.filter((v) => {
-                            if(v) v.includes(u);
-                            else false;
-                        }).length > 0;
-                    } else { 
-                        return file.readable.includes(u);
-                }});
-            } else { // Everything is treated as an email.
                 
-                violated_AW = [...file.writable.filter(u => !AW.includes(u)),
-                    ...file.readable.filter(u => !AW.includes(u))];
-                violated_AR = file.readable.filter(u => !AR.includes(u));
-                violated_DW = [...DW.filter(u => file.writable.includes(u)),
-                    ...DW.filter(u => file.readable.includes(u))];
-                violated_DR = DR.filter(u => file.readable.includes(u));
-            }
+            let violated_AW = [...new Set([...file.writable.filter(u => AW.includes(u)),
+                    ...file.readable.filter(u => AW.includes(u))])];
+            let violated_AR = file.readable.filter(u => AR.includes(u));
+            let violated_DR = [...new Set([...DR.filter(u => !file.writable.includes(u)),
+                    ...DR.filter(u => !file.readable.includes(u))])];
+            let violated_DW = DW.filter(u => !file.writable.includes(u));
+
             if (violated_AW.length > 0)
                 violation["AW"] = violated_AW;
             if (violated_AR.length > 0)
