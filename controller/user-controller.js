@@ -172,15 +172,22 @@ doQuery = async function (req, res) {
 // User Functions
 checkACR = async (req, res) => {
     try {
-        let {acr, snapshot_id} = req.body;
-        const user = await User.findOneAndUpdate({ _id: req.userId }, { $set:{ access_control_req: acr }},
-            { fields: 'email access_control_req groupsnapshot', returnDocument: 'after' });
-        if (!user) {
-            throw new Error('Could not find User in database.');
+        let {acr, snapshot_id, flag} = req.body;
+        let user;
+        if(flag){
+            user = await User.findOneAndUpdate({ _id: req.userId }, { $set:{ access_control_req: acr }},
+                { fields: 'email access_control_req groupsnapshot', returnDocument: 'after' });
+            if (!user) {
+                throw new Error('Could not find User in database.');
+            }
+        }
+        else{
+            user = await User.findById(req.userId, { email: 1 });
         }
         let email = user.email;
         let {query, AW, AR, DW, DR, Grp } = acr;
 
+        query = query? query: ""
         // Perform search query
         builtQuery = parseQuery(query, email);
         if (builtQuery)

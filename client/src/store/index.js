@@ -576,7 +576,7 @@ function GlobalStoreContextProvider(props) {
     };
 
     store.updateACR = async function(access_control_req) {
-        const response = await api.checkACR({acr: access_control_req, snapshot_id: store.currentSnapshot});
+        const response = await api.checkACR({acr: access_control_req, snapshot_id: store.currentSnapshot, flag: true});
         if (response.status === 200) {
             let acr = response.data.acr;
             console.log(response.data.violations);
@@ -659,7 +659,7 @@ function GlobalStoreContextProvider(props) {
 
     store.openAccessView = async function () { 
         console.log("Open Access Control Policy View");
-        const response = await api.checkACR({snapshot_id: store.currentSnapshot});
+        const response = await api.checkACR({acr: auth.user.access_control_req, snapshot_id: store.currentSnapshot, flag: false});
         if (response.status === 200) {
             console.log(response.data.violations);
             storeReducer({
