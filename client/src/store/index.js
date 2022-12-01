@@ -229,6 +229,26 @@ function GlobalStoreContextProvider(props) {
                     sharingResult: []
                 });
             }
+            case GlobalStoreActionType.UPDATE_SHARING: {
+                return setStore({
+                    allItems: store.allItems,
+                    currentSnapshot: store.currentSnapshot,
+                    queryBuilder: false,
+                    takeSnapshotModal: false,
+                    updateSharingModal: true,
+                    accessModal: false,
+                    search: false,
+                    openDrive: store.openDrive,
+                    openAccess: store.openAccess,
+                    openAnalyze: store.openAnalyze,
+                    path: store.path,
+                    parents: store.parents,
+                    otherDrive: store.otherDrive,
+                    groups: store.groups,
+                    analyze: [],
+                    sharingResult: payload
+                });
+            }
             case GlobalStoreActionType.OPEN_AC_SEARCH: {
                 return setStore({
                     allItems: store.allItems,
@@ -528,9 +548,8 @@ function GlobalStoreContextProvider(props) {
         }
     };
 
-    store.updateGroups = async function(name, domain, emails) {
+    store.updateGroups = async function(domain, emails) {
         let payload = {
-            name: name,
             domain: domain,
             emails: emails
         }
