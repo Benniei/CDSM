@@ -48,13 +48,15 @@ function objectify(op, email) {
         query['name'] = toInvert ? { $ne: regexValue } : regexValue;
     } else if (field === 'inFolder') {
         regexValue = { $regex: '\/'+value+'\/$' };
-        query['path'] = toInvert ? { $ne: regexValue } : regexValue;
+        query['path.name'] = toInvert ? { $ne: regexValue } : regexValue;
     } else if (field === 'folder') {
         regexValue = { $regex: '\/'+value };
-        query['path'] = toInvert ? { $ne: regexValue } : regexValue;
+        query['path.name'] = toInvert ? { $ne: regexValue } : regexValue;
     } else if (field === 'drive') {
         regexValue = { $regex: '^\/'+value };
-        query['path'] = toInvert ? { $ne: regexValue } : regexValue;
+        query['path.name'] = toInvert ? { $ne: regexValue } : regexValue;
+    } else if (field === 'path') {
+        query['path.name'] = toInvert ? { $ne: value } : value;
     } else {
         if (value === 'me') {
             first = {}
